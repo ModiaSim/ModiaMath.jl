@@ -97,7 +97,7 @@ see [Plans for Version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/P
 ## Issues and Contributions
 
 Contributions are welcome, as are feature requests and suggestions.
-Please open an [issue][ https://github.com/ModiaSim/ModiaMath.jl/issues] in this case and also if you encounter problems.
+Please open an [issue](https://github.com/ModiaSim/ModiaMath.jl/issues) in this case and also if you encounter problems.
 
 
 ## Main Developer
