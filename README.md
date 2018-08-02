@@ -101,7 +101,7 @@ Please open an [issue](https://github.com/ModiaSim/ModiaMath.jl/issues) in this 
 
 
 ## Main Developer
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/en/staff/martin.otter/), 
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 
 License: MIT (expat)
