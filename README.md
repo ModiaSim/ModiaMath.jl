@@ -30,7 +30,7 @@ see [ModiaMath installation](ModiaMathInstallation-url).
 
 ## Documentation
 
-- [**STABLE**][docs-stable-url] &mdash; **most recently tagged version of the documentation.**
+- [**LATEST**][docs-latest-url] &mdash; *in-development version of the documentation.*
 
 
 ## Use
@@ -110,12 +110,11 @@ License: MIT (expat)
 
 [Modia-url]:   https://github.com/ModiaSim/Modia.jl
 [Modia3D-url]: https://github.com/ModiaSim/Modia3D.jl
-[ModiaMathInstallation-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/build/index.html#Installation-1
-[PendulumPlot-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/resources/images/pendulumPlot.png
-[ModiaMathPlans-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/build/man/Plans.html
+[ModiaMathInstallation-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1
+[PendulumPlot-url]: https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png
+[ModiaMathPlans-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html
 
-[docs-latest-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/build
-[docs-stable-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/build
+[docs-latest-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/
+[docs-stable-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/
 
 [issues-url]: https://github.com/ModiaSim/ModiaMath.jl/issues
-
