@@ -1,0 +1,7 @@
+Julia 0.6
+Sundials
+StaticArrays
+DataStructures
+DataFrames
+Unitful
+PyPlot

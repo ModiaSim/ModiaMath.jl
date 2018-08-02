@@ -1,0 +1,6 @@
+include("test_Plot1.jl")
+include("test_Plot2.jl")
+include("test_Plot3.jl")
+include("test_Plot4.jl")
+include("test_Plot5.jl")
+include("test_Plot6.jl")
