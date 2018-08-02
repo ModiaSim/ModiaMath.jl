@@ -1,7 +1,7 @@
 # ModiaMath
 
 ModiaMath provides a simulation engine and other mathematical utilities for packages 
-[Modia](Modia-url) and [Modia3D](Modia3D-url)
+[Modia](https://github.com/ModiaSim/Modia.jl) and [Modia3D](https://github.com/ModiaSim/Modia3D.jl)
 that are used to model physical systems such as electrical circuits, robots, or vehicles.
 The recommended way is to use ModiaMath via Modia or Modia3D.
 However, ModiaMath is self-contained and can be also used without Modia/Modia3D.
@@ -71,7 +71,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
   plot(result, [(:phi, :w) :a])
 ```
 
-[PendulumPlot](PendulumPlot-url)
+[PendulumPlot](https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png)
 
 
 ### To run examples:
@@ -91,13 +91,13 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 
 The package has been tested with Julia `0.6` on Windows 7.
 Version number is 0.2.0-beta.1 and functionality and robustness is planned to be improved for the 1.0 version,
-see [Plans for Version 1.0](ModiaMathPlans-url).
+see [Plans for Version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
 ## Issues and Contributions
 
 Contributions are welcome, as are feature requests and suggestions.
-Please open an [issue][issues-url] in this case and also if you encounter problems.
+Please open an [issue][ https://github.com/ModiaSim/ModiaMath.jl/issues] in this case and also if you encounter problems.
 
 
 ## Main Developer
@@ -105,15 +105,3 @@ Please open an [issue][issues-url] in this case and also if you encounter proble
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 
 License: MIT (expat)
-
-
-
-[Modia-url]:   https://github.com/ModiaSim/Modia.jl
-[Modia3D-url]: https://github.com/ModiaSim/Modia3D.jl
-[PendulumPlot-url]: https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png
-[ModiaMathPlans-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html
-
-[docs-latest-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/
-[docs-stable-url]: https://ModiaSim.github.io/ModiaMath.jl/stable/
-
-[issues-url]: https://github.com/ModiaSim/ModiaMath.jl/issues
