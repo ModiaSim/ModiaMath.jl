@@ -25,7 +25,7 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 ## Installation
 
-see [ModiaMath installation](ModiaMathInstallation-url).
+see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1).
 
 
 ## Documentation
@@ -110,7 +110,6 @@ License: MIT (expat)
 
 [Modia-url]:   https://github.com/ModiaSim/Modia.jl
 [Modia3D-url]: https://github.com/ModiaSim/Modia3D.jl
-[ModiaMathInstallation-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1
 [PendulumPlot-url]: https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png
 [ModiaMathPlans-url]: https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html
 
