@@ -71,7 +71,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
   plot(result, [(:phi, :w) :a])
 ```
 
-[PendulumPlot](https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png)
+![PendulumPlot](https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png)
 
 
 ### To run examples:
