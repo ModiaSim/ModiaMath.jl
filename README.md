@@ -30,7 +30,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 
 ## Documentation
 
-- [**LATEST**][docs-latest-url] &mdash; *in-development version of the documentation.*
+- [**LATEST**](https://ModiaSim.github.io/ModiaMath.jl/latest) &mdash; *in-development version of the documentation.*
 
 
 ## Use
