@@ -68,7 +68,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 
 ```julia
   result = ModiaMath.simulate!(simulationModel; log=true);
-  plot(result, [(:phi, :w) :a])
+  ModiaMath.plot(result, [(:phi, :w) :a])
 ```
 
 ![PendulumPlot](https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.png)
