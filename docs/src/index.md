@@ -1,6 +1,6 @@
 # ModiaMath.jl Documentation
 
-ModiaMath provides a simulation engine and other mathematical utilities for packages 
+[ModiaMath](https://github.com/ModiaSim/ModiaMath.jl) provides a simulation engine and other mathematical utilities for packages 
 [Modia](https://github.com/ModiaSim/Modia.jl) and [Modia3D](https://github.com/ModiaSim/Modia3D.jl)
 that are used to model physical systems such as electrical circuits, robots, or vehicles.
 The recommended way is to use ModiaMath via Modia or Modia3D.
