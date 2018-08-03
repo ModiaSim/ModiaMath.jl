@@ -36,7 +36,7 @@ To simulate a model and plot results:
 
 ```julia
   result = ModiaMath.simulate!(simulationModel; log=true);
-  plot(result, [(:phi, :w) :a])
+  ModiaMath.plot(result, [(:phi, :w) :a])
 ```
 
 [PendulumPlot](PendulumPlot-url)

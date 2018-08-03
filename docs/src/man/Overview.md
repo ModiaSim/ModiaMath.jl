@@ -71,10 +71,13 @@ In directory ModiaMath/examples/withoutMacros_withoutVariables several examples 
 that are based on this interface.
 
 In order to simplify the definition of direct ModiaMath models (to evaluate and test ModiaMath 
-functionality), the macro [`@composition`](@ref) has been introduced.
-In examples in directory ModiaMath/examples/xxx.jl use this model definition.
+functionality), the macro [`@component`](@ref) has been introduced.
+The examples in directory ModiaMath/examples/xxx.jl use this model definition.
 In directory ModiaMath/examples/withoutMacros/xxx.jl the same examples are present,
-however, the macro has been manually expanded.
+however, the macro has been manually expanded (to show and test the result of the macro).
+The [`@component`](@ref) does not yet support events. If events are present in a model,
+the model has to be defined as shown in the examples of directory
+ModiaMath/examples/withoutMacros_withoutVariables.
 
 
 ## Getting Started
@@ -121,7 +124,7 @@ You can just past the following code into the Julia REPL.
 This results in:
 
 ```@raw html
-<img src="../../resources/images/pendulumPlot.png">
+<img src="../../resources/images/pendulumPlot.svg">
 ```
 
 
