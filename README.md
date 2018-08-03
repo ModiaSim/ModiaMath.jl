@@ -89,7 +89,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 
 ## Status
 
-The package has been tested with Julia `0.6` on Windows 7.
+The package has been tested with Julia `0.6.3` on Windows 7 and on Linux (OpenSuse 42).
 Version number is 0.2.0-beta.1 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for Version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
