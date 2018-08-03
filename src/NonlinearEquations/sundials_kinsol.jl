@@ -53,16 +53,26 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
                   tables[1], "\n\n", 
                   tables[2], "\n\n")
        end
+
        if error_code == -11
-          str = "\nIt might be that the Jacobian is singular (= there are redundant equations).\n"
+          str1 = "\nIt might be that the Jacobian is singular (= there are redundant equations).\n"
        else
-          str = "\n"
+          str1 = "\n"
        end
+
+       if typeof(simulationModel) <: ModiaMath.AbstractSimulationModel
+          simState = simulationModel.simulationState
+          str2 = "time = " * string(simState.time) * 
+                 ", stepsize of implicit Euler step = " * string(simState.hev) *
+                 ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents)
+       else
+          str2 = ""
+       end
+
        error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction), 
-             "(...) returned with a [", unsafe_string(KINmodule), "] error:\n", 
-             unsafe_string(message),"\n(lastNorm(r) = ", eqInfo.lastNorm_r,
-             ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ").",str,
-             "(simulationState.scaleConstraintsAtEvents = ", simulationModel.simulationState.scaleConstraintsAtEvents, ")")       
+             "(...) returned with a [", unsafe_string(KINmodule), "] error:\n    ", 
+             unsafe_string(message),"\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
+             ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".",str1,str2)       
     end
     return nothing
 end

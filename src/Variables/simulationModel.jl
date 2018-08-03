@@ -27,7 +27,9 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                             startTime = 0.0,
                             stopTime  = 1.0,
                             tolerance = 1e-4,
-                            interval  = (stopTime-startTime)/500.0)
+                            interval  = (stopTime-startTime)/500.0,
+                            hev = 1e-8,
+                            scaleConstraintsAtEvents::Bool = true)
       modelName = ModiaMath.componentName(model)
       var = ModelVariables(model)
       x = zeros(var.nx)
@@ -41,7 +43,9 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                                 defaultStartTime = startTime,
                                 defaultStopTime  = stopTime,
                                 defaultTolerance = tolerance,
-                                defaultInterval  = interval)
+                                defaultInterval  = interval,
+                                hev = hev,
+                                scaleConstraintsAtEvents = scaleConstraintsAtEvents)
 
       # model._internal.simulationState = simulationState
       new(modelName, simulationState, var, model)
