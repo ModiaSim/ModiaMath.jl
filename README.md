@@ -78,7 +78,7 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 ```julia
   include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")         # ODE as index-0 DAE
   include("$(ModiaMath.path)/examples/Simulate_FreeBodyRotation.jl") # index-1 DAE
-  include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_PendulumDAE.jl") # index-3 -> index-1 DAE
+  include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_PendulumDAE.jl") # index-3 DAE
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_SimpleStateEvents.jl")
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_BouncingBall.jl")
 ```
