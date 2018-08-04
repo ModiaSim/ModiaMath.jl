@@ -1,14 +1,10 @@
-################################################
-#
-# Simulate model\PendulumODE
-#
-# Author: Martin Otter, DLR-SR 
-#         (first version: Dec. 4, 2016)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    Simulate_PendulumDAE - Simulate PendulumDAE model
+    module Simulate_PendulumDAE
+
+Simulate PendulumDAE model (= index-3 model transformed to index-1 model)
 """
 module Simulate_PendulumDAE
 
@@ -20,6 +16,6 @@ import ModiaMath
 model  = PendulumDAE.Model()
 result = ModiaMath.simulate!(model, stopTime=2.0, log=true) 
 
-ModiaMath.plot(result, [(:x, :y), (:vx, :vy), :lambda], heading="simulationWithoutMacro/Simulate_PendulumDAE.jl")
+ModiaMath.plot(result, [(:x, :y), (:vx, :vy), :lambda], heading="Simulate_PendulumDAE.jl (index3 reduced to index1)")
 
 end

@@ -1,12 +1,10 @@
-###########################################
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Aug. 16, 2017)
-#
-###########################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    StateSelection - DAE-model to test manual state selection of simple multibody system
+    module StateSelection
+
+DAE-model to test manual state selection of simple multibody system.
 
 This model is mainly used to test initialization
 """

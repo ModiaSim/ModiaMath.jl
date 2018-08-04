@@ -1,12 +1,10 @@
-###########################################
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Dec. 4, 2016)
-#
-###########################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    PendulumDAE - DAE-model of a mass point attached via a rod to a revolute joint (GGL formulation)
+    module PendulumDAE
+
+DAE-model of a mass point attached via a rod to a revolute joint (GGL formulation).
     
 Starting equations (der(xx) = dxx/dt):
 

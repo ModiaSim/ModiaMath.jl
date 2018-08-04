@@ -1,12 +1,10 @@
-################################################
-#
-# Author: Martin Otter, DLR-SR 
-#         (first version: Nov. 26, 2016)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    Simulate_BouncingBall - Simulate bouncing ball
+    modul Simulate_BouncingBall
+
+Simulate bouncing ball (model with state events and discontinuous change of DAE states).
 """
 module Simulate_BouncingBall
 

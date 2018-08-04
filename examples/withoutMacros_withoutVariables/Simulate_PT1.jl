@@ -1,14 +1,10 @@
-################################################
-#
-# Simulate model\PT1
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Nov. 19, 2016)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    Simulate_PT1 - Simulate PT1 model
+    module Simulate_PT1
+
+Simulate PT1 model.
 """
 module Simulate_PT1
 

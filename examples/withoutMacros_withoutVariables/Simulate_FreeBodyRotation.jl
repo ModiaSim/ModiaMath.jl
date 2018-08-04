@@ -1,12 +1,10 @@
-################################################
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Nov. 22, 2017)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-     Simulate_FreeBodyRotation - Simulate body with unconstrained rotational motion in 3D (using quaternions)
+     module Simulate_FreeBodyRotation
+
+Simulate body with unconstrained rotational motion in 3D (using quaternions; = index-1 model).
 """
 module Simulate_FreeBodyRotation
 

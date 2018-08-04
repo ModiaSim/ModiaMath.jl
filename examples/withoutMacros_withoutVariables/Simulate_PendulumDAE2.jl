@@ -1,14 +1,10 @@
-################################################
-#
-# Simulate model\PendulumDAE with x_fixed=true
-#
-# Author: Martin Otter, DLR-SR 
-#         (first version: Aug. 15, 2017)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    Simulate_PendulumDAE2 - Simulate PendulumDAE model with x_fixed=true
+    module Simulate_PendulumDAE2
+
+Simulate PendulumDAE model with x_fixed=true.
 """
 module Simulate_PendulumDAE2
 
@@ -20,6 +16,6 @@ import ModiaMath
 model  = PendulumDAE.Model(x_fixed=true)
 result = ModiaMath.simulate!(model, stopTime=2.0, log=true) 
 
-ModiaMath.plot(result, [(:x, :y), (:vx, :vy), :lambda], heading="simulationWithoutMacro/Simulate_PendulumDAE2.jl")
+ModiaMath.plot(result, [(:x, :y), (:vx, :vy), :lambda], heading="Simulate_PendulumDAE2.jl (index3 reduced to index1)")
 
 end

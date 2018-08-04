@@ -1,14 +1,10 @@
-################################################
-#
-# Simulate model\StateSelection.jl
-#
-# Author: Martin Otter, DLR-SR 
-#         (first version: Aug. 16, 2017)
-#
-################################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    Simulate_StateSelection - DAE-model to test manual state selection of simple multibody system
+    module Simulate_StateSelection
+
+DAE-model to test manual state selection of simple multibody system.
 """
 module Simulate_StateSelection
 

@@ -1,11 +1,10 @@
-###########################################
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: March 22, 2017)
-#
-###########################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
+
 """
-    FreeBodyRotation - DAE model of a body with unconstrained rotational motion in 3D (using quaternions)
+    module FreeBodyRotation
+
+DAE model of a body with unconstrained rotational motion in 3D (using quaternions;)
     
 DAE equations:
   u := A.*sin(2*pi*freqHz*time + phase);

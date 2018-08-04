@@ -1,12 +1,10 @@
-###########################################
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Nov. 26, 2016)
-#
-###########################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    BouncingBall - Model of a ball bouncing on ground
+    module BouncingBall
+
+Model of a ball bouncing on ground.
 """
 module BouncingBall
 

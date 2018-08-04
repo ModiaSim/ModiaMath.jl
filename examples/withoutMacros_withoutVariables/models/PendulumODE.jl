@@ -1,15 +1,10 @@
-###########################################
-#
-# File  : Pendulum.jl
-#
-# Author: Martin Otter, DLR-SR
-#         (first version: Nov. 19, 2016)
-#
-# License: MIT
-###########################################
+# License for this file: MIT (expat)
+# Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    PendulumODE - ODE-model of a mass point attached via a rod to a revolute joint with 2 states
+    module PendulumODE
+
+ODE-model of a mass point attached via a rod to a revolute joint with 2 states.
 """
 module PendulumODE
 
