@@ -114,7 +114,7 @@ Defines how a variable is used in the integrator interface. The goal is to descr
  0 &= f_d(\\dot{x}, x, t, z_i > 0) \\\\
  0 &= f_c(x, t, z_i > 0) \\\\
  J &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};  
-              \\frac{\\partial f_c}{\\partial x} \\right] \; \\text{is regular}
+              \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular}
 \\end{align}
 ```
 
