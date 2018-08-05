@@ -128,11 +128,7 @@ RealVariable{ValueType, ElementType}(
 function Base.show(io::IO, r::RealVariable{ValueType, ElementType}) where {ValueType, ElementType}
    print(r.value, " ", r.unit)
    if r.info != ""
-@static if VERSION < v"0.7.0-DEV.2005"
-      print(" \# ", r.info)
-else
-      print(" # ", r.info)
-end
+      # print(" # ", r.info)
    end
 end
 
