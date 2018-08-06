@@ -13,6 +13,8 @@ Martin Otter, [DLR - Institute of System Dynamics and Control](https://www.dlr.d
 """
 module Logging
 
+@static if VERSION >= v"0.7.0-DEV.2005" @eval using Printf end
+
 export Logger, setLog!, setAllLogCategories!, setLogCategories!
 export isLogStatistics, isLogProgress, isLogInfos, isLogWarnings, isLogEvents
 export logOn!, logOff!, setLogCategories

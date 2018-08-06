@@ -7,11 +7,20 @@
 
 # Definitions used to construct hierarchical variable name spaces
 
-mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
+@static if VERSION >= v"0.7.0-DEV.2005"
+ mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
    name::Symbol                                                  # Name of component
-   within::Union{ModiaMath.AbstractComponentWithVariables,Void}  # Component in which component is present (if within==nothing, object is not within a component)
+   within::Union{ModiaMath.AbstractComponentWithVariables, Nothing}  # Component in which component is present (if within==nothing, object is
 
    ComponentInternal(name=NoNameDefined, within=nothing) = new(name, within)
+ end
+else
+ mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
+   name::Symbol                                                  # Name of component
+   within::Union{ModiaMath.AbstractComponentWithVariables, Void}  # Component in which component is present (if within==nothing, object is not within a component)
+
+   ComponentInternal(name=NoNameDefined, within=nothing) = new(name, within)
+ end
 end
 
 isInComponent(   internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) != Void

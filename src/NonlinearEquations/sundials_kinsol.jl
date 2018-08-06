@@ -15,7 +15,23 @@ module KINSOL
 import Sundials
 import ModiaMath
 
-mutable struct NonlinearEquationsInfo
+@static if VERSION >= v"0.7.0-DEV.2005" 
+ mutable struct NonlinearEquationsInfo
+   extraInfo                # Model-specific extra information
+   name::String             # Name of equation system
+   ny::Int                  # Number of equations (length of y-vector)
+   getResidues!::Function   # Function of the nonlinear equation system
+   lastNorm_r::Float64
+   lastrScaledNorm_r::Float64   
+   kin_mem::Ptr{Nothing}       # KINSOL pointer (to access all KINgetXXX functions)
+    
+   function NonlinearEquationsInfo(name::String, ny::Int, getResidues!::Function; extraInfo=nothing)
+      @assert(ny >= 0)
+      new(extraInfo, name, ny, getResidues!, 1.0, 1.0)
+   end
+ end
+else
+ mutable struct NonlinearEquationsInfo
    extraInfo                # Model-specific extra information
    name::String             # Name of equation system
    ny::Int                  # Number of equations (length of y-vector)
@@ -28,6 +44,7 @@ mutable struct NonlinearEquationsInfo
       @assert(ny >= 0)
       new(extraInfo, name, ny, getResidues!, 1.0, 1.0)
    end
+ end
 end
 
 function kinsol_f(y::Sundials.N_Vector, r::Sundials.N_Vector, eqInfo::NonlinearEquationsInfo)
@@ -35,8 +52,12 @@ function kinsol_f(y::Sundials.N_Vector, r::Sundials.N_Vector, eqInfo::NonlinearE
     return Cint(0)   # indicates normal return
 end
 
-const kinsol_fc = cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const kinsol_fc = @cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
+else
+    const kinsol_fc = cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
+end
 
 function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::Cstring,
                              message::Cstring, eqInfo::NonlinearEquationsInfo)
@@ -77,8 +98,11 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
     return nothing
 end
 
-const kinsol_ErrHandlerFnc = cfunction(kinsol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring,
-                                                                   Ref{NonlinearEquationsInfo}))
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const kinsol_ErrHandlerFnc = @cfunction(kinsol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
+else
+    const kinsol_ErrHandlerFnc = cfunction(kinsol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
+end
 
 
 function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Float64};

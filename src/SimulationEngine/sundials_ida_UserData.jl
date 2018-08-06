@@ -87,7 +87,11 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
 end
 
 
-const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const idasol_fc = @cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
+else
+    const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
+end
 
 
 #------- root finding
@@ -103,7 +107,11 @@ function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vec
    return Cint(0)   # indicates normal return
 end
 
-const idasol_gc = cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const idasol_gc = @cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
+else
+    const idasol_gc = cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
+end
 
 #=
 #-------- Jacobian
@@ -137,8 +145,14 @@ function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N
     return Cint(0)   # indicates normal return
 end
 
-const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
-                                                    Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
+
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const idasol_sjacc = @cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
+                                                         Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
+else
+    const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
+                                                        Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
+end
 =#
 
 
@@ -168,6 +182,11 @@ function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::
     nothing
 end
 
-const idasol_ErrHandlerFnc = cfunction(idasol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring,
-                                                                   Ref{IntegratorData}))
+@static if VERSION >= v"0.7.0-DEV.2005"
+    const idasol_ErrHandlerFnc = @cfunction(idasol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring,
+                                                                       Ref{IntegratorData}))
+else
+    const idasol_ErrHandlerFnc = cfunction(idasol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring,
+                                                                       Ref{IntegratorData}))
+end
 

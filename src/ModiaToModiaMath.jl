@@ -167,6 +167,6 @@ function simulate(m::ModiaSimulationModel, t::Vector{Float64};
                          interval=interval, 
                          log=log,
                          KLUorderingChoice = KLUorderingChoice)
-end                   
+end                    
                    
 end
