@@ -16,6 +16,10 @@ import Sundials
 import ModiaMath
 
 @static if VERSION >= v"0.7.0-DEV.2005" 
+ @noinline function old_cfunction(f, r, a)
+   ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+ end
+
  mutable struct NonlinearEquationsInfo
    extraInfo                # Model-specific extra information
    name::String             # Name of equation system
@@ -54,7 +58,8 @@ end
 
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-    const kinsol_fc = @cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
+    const kinsol_fc = old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}})
+                      # @cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
 else
     const kinsol_fc = cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
 end
@@ -99,7 +104,8 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
 end
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-    const kinsol_ErrHandlerFnc = @cfunction(kinsol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
+    const kinsol_ErrHandlerFnc = old_cfunction(kinsol_ErrHandlerFn, Void, Tuple{Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}})
+#   const kinsol_ErrHandlerFnc = @cfunction(kinsol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
 else
     const kinsol_ErrHandlerFnc = cfunction(kinsol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
 end

@@ -88,7 +88,13 @@ end
 
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-    const idasol_fc = @cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
+   @noinline function old_cfunction(f, r, a)
+     ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+   end
+
+    const idasol_fc = old_cfunction(idasol_f, Cint, Tuple{Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}})
+#   const idasol_fc = @cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
+
 else
     const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
 end
