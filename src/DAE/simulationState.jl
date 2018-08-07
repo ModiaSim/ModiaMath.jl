@@ -68,10 +68,16 @@ mutable struct SimulationState
    #jac::Union{SparseMatrixCSC{Float64,Cint},Void}
                                      # Optional sparse Jacobian of DAE: der(f!,y) + cr*der(f!, yp)
                                      # (cr is a constant provided by the integrator)
-   jac::Void
-   #cg::Union{ModiaMath.SparseJacobian.ColumnGroups,Void} # if sparse, column groups of Jacobian jac
-   cg::Void # if sparse, column groups of Jacobian jac
+   @static if VERSION >= v"0.7.0-DEV.2005"
+       jac::Nothing
+       #cg::Union{ModiaMath.SparseJacobian.ColumnGroups,Void} # if sparse, column groups of Jacobian jac
+       cg::Nothing # if sparse, column groups of Jacobian jac
+   else
+       jac::Void
+       #cg::Union{ModiaMath.SparseJacobian.ColumnGroups,Void} # if sparse, column groups of Jacobian jac
+       cg::Void # if sparse, column groups of Jacobian jac
 
+   end
    # Model specific information not used by ModiaMath (can be used as default setting for ModiaMath)
    defaultTolerance::Float64    # default relative integration tolerance
    defaultStartTime::Float64    # default start time
@@ -146,9 +152,16 @@ mutable struct SimulationState
       @assert(hev > 0.0)
       @assert(length(x_errorControl) == length(x_start))
       nx = length(x_start)
-      if typeof(jac) != Void
+      @static if VERSION >= v"0.7.0-DEV.2005"
+       if typeof(jac) != Nothing
          @assert(size(jac,1) == nx)
          @assert(size(jac,2) == nx)
+       end
+      else
+       if typeof(jac) != Void
+         @assert(size(jac,1) == nx)
+         @assert(size(jac,2) == nx)
+       end
       end
       @assert(0.0 <= maxSparsity <= 1.0)
       @assert(defaultTolerance > 0.0)

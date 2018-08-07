@@ -24,7 +24,11 @@ mutable struct IntegratorData
    order::MVector{1,Cint}       # Current order for IDAGetCurrentOrder                
    r::Vector{Sundials.realtype} # Residues vector used in idasol_f function
 
-   ida_mem::Ptr{Void}              # IDA pointer (to access all IDAgetXXX functions)
+   @static if VERSION >= v"0.7.0-DEV.2005"
+      ida_mem::Ptr{Nothing}              # IDA pointer (to access all IDAgetXXX functions)
+   else
+      ida_mem::Ptr{Void}              # IDA pointer (to access all IDAgetXXX functions)
+   end
 
    y::Vector{Sundials.realtype}    # Julia vector of y wrapping y_N_Vector vector
    yp::Vector{Sundials.realtype}   # Julia vector of yp wrapping yp_N_Vector vector

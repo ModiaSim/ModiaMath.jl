@@ -6,7 +6,7 @@
 #
 
 # Provide functions to handle time and state events in user models.
-
+@static if VERSION >= v"0.7.0-DEV.2005" @eval using Printf end
 
 mutable struct EventHandler
    # Input values for the event functions

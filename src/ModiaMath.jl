@@ -2,7 +2,7 @@
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 
-doc"""
+@doc doc"""
 ModiaMath - Mathematical Utilities for Modia and Modia3D
 
 To define a model use Modia or Modia3D. You can define a model
@@ -146,4 +146,4 @@ using .Variables
 include("ModiaToModiaMath.jl")
 using .ModiaToModiaMath
 
-end # module
+end # module 
