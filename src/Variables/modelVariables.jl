@@ -18,6 +18,22 @@ isUsedInAnalysis(v::ModiaMath.AbstractVariable, analysis::AnalysisType) = Int(v.
 function get_ModelVariables_aux!(model, modelType, var, dict, analysis::AnalysisType)
    dict[model] = true   # Mark that model is going to be inspected
    #println("... inspect modelType = ", modelType)
+
+@static if VERSION >= v"0.7.0-DEV.2005"
+   for i = 1:fieldcount(modelType)
+      field = getfield(model, fieldname(modelType,i))
+      ftype = typeof(field)
+      #println("... fieldname = ", fieldname(modelType,i), ", ftype = ", ftype)
+      if ftype <: ModiaMath.AbstractVariable 
+         if isUsedInAnalysis(field,analysis)
+            # Use field since defined for the desired analysis
+            push!(var, field)
+         end
+      elseif ftype <: ModiaMath.AbstractComponentWithVariables && !haskey(dict,field)  # Only inspect further, if model/field was not yet inspected
+         get_ModelVariables_aux!(field, ftype, var, dict, analysis)
+      end
+   end
+else
    for i = 1:nfields(modelType)
       field = getfield(model, fieldname(modelType,i))
       ftype = typeof(field)
@@ -33,6 +49,8 @@ function get_ModelVariables_aux!(model, modelType, var, dict, analysis::Analysis
    end
 end
 
+end
+
 
 """
     var = get_ModelVariables(model) - Return all variables defined in model component
@@ -42,7 +60,11 @@ The function returns a vector var that contains all AbstractVariables defined in
 function get_ModelVariables(model::Any, analysis::AnalysisType)
    var = ModiaMath.AbstractVariable[]
    modelType = typeof(model)
+#@static if VERSION >= v"0.7.0-DEV.2005"
+#   dict = IdDict{Any,Any}
+#else
    dict = ObjectIdDict()
+#end
    if modelType <: ModiaMath.AbstractComponentWithVariables
       get_ModelVariables_aux!(model, modelType, var, dict, analysis)
    end
@@ -82,7 +104,7 @@ function get_variableTable(var::Vector{ModiaMath.AbstractVariable})
          unit        = v.unit
          numericType = v.numericType
          vec         = NumericTypeToVector[Int(v.numericType)]
-         der         = typeof(v.derivative) == Void ? Symbol("") : instanceName(v.derivative)
+         der         = typeof(v.derivative) == NOTHING ? Symbol("") : instanceName(v.derivative)
          vmin        = v.min
          vmax        = v.max
          vnominal    = v.nominal
@@ -105,6 +127,7 @@ end
 
 
 function indexToString(name, A, linearIndex)
+#=
    index = ind2sub(A, linearIndex)
    s = Symbol(name, "[")
    for i in 1:length(index)
@@ -115,6 +138,18 @@ function indexToString(name, A, linearIndex)
          s = Symbol(s, ",")
       end
    end
+=#
+
+   s = Symbol(name, "[")
+   for i in 1:length(A)
+      s = Symbol(s, A[i])
+      if i == length(A)
+         s = Symbol(s, "]")
+      else
+         s = Symbol(s, ",")
+      end
+   end
+
    return s
 end
 
@@ -146,7 +181,7 @@ function pushNames!(v::RealVariable, vnumType, xNames, residueNames)
        push!(residueNames, string(instanceName(v)))
    end
    if vnumType == XD_EXP
-      if typeof(v.derivative) == Void
+      if typeof(v.derivative) == NOTHING
          error(instanceName(v), " is defined as XD_EXP, but no variable is defined as its derivative.")
       end
       push!(residueNames, string(instanceName(v.derivative)) * " - derx[.]")
@@ -241,8 +276,12 @@ mutable struct ModelVariables
          dummyDifferentialEquation = false
       end
       time = RealScalar("time"; unit="s", causality = Independent, numericType = TIME)
-      unshift!(var, time) 
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+      pushfirst!(var, time) 
+else
+      unshift!(var, time) 
+end
       # println("\n... v_table = ", get_variableTable(var))
 
       # Check dimensions
@@ -261,7 +300,11 @@ mutable struct ModelVariables
       end
 
       # Allocate variable/index vectors to copy x-, derx-values to variables and variables to residues
+@static if VERSION >= v"0.7.0-DEV.2005"
+      x_var        = Array{ModiaMath.AbstractRealVariable}(undef,nx_exp_var + nx_imp_var + nx_alg_var)   # = [x_exp_var, x_imp_var, x_alg_var]
+else
       x_var        = Array{ModiaMath.AbstractRealVariable}(nx_exp_var + nx_imp_var + nx_alg_var)   # = [x_exp_var, x_imp_var, x_alg_var]
+end
                      ix_exp    = 1
                      ix_imp    = nx_exp    + 1
                      ix_alg    = ix_imp    + nx_imp
@@ -273,7 +316,11 @@ mutable struct ModelVariables
                      ix_lambda_var = ix_alg_var    + nx_alg_var
                      ix_mue_var    = ix_lambda_var + nx_lambda_var
                    
+@static if VERSION >= v"0.7.0-DEV.2005"
+      derx_var     = Array{ModiaMath.AbstractRealVariable}(undef,nx_imp_var + nx_lambda_var + nx_mue_var)  # = [der(x_imp_var), lambda_var, mue_var]
+else
       derx_var     = Array{ModiaMath.AbstractRealVariable}(nx_imp_var + nx_lambda_var + nx_mue_var)  # = [der(x_imp_var), lambda_var, mue_var]
+end
                      iderx_imp    = 1
                      iderx_lambda = nx_imp + 1
                      iderx_mue    = nx_imp + nx_lambda + 1
@@ -281,20 +328,32 @@ mutable struct ModelVariables
                      iderx_lambda_var = nx_imp_var + 1
                      iderx_mue_var    = nx_imp_var + nx_lambda_var + 1
                    
+@static if VERSION >= v"0.7.0-DEV.2005"
+      residue_var  = Array{ModiaMath.AbstractRealVariable}(undef,nfd_imp_var+nfc_var)   # = [fd_imp_var, fc_var]
+else
       residue_var  = Array{ModiaMath.AbstractRealVariable}(nfd_imp_var+nfc_var)   # = [fd_imp_var, fc_var]
-                     ifd_imp = 1
+end
+                    ifd_imp = 1
                      ifc     = nfd_imp + 1 
                      ifd_imp_var = 1
                      ifc_var     = nfd_imp_var + 1
                    
+@static if VERSION >= v"0.7.0-DEV.2005"
+      result_var   = Array{ModiaMath.AbstractVariable}(undef,1 + length(x_var) + nderx_exp_var + length(derx_var) + nwr_var + nwc_var - (dummyDifferentialEquation ? 2 : 0) )    # [time, x_var, derx_var, wr_var, wc_var]
+      result_names = Array{String}(undef,1 + nx_exp+nx_imp+nx_alg + nderx_exp+nx_imp+nx_lambda+nx_mue + nwr + nwc - (dummyDifferentialEquation ? 2 : 0) )
+else
       result_var   = Array{ModiaMath.AbstractVariable}(1 + length(x_var) + nderx_exp_var + length(derx_var) + nwr_var + nwc_var - (dummyDifferentialEquation ? 2 : 0) )    # [time, x_var, derx_var, wr_var, wc_var]
       result_names = Array{String}(1 + nx_exp+nx_imp+nx_alg + nderx_exp+nx_imp+nx_lambda+nx_mue + nwr + nwc - (dummyDifferentialEquation ? 2 : 0) )
+end
                      result_names[1] = "time"
                      iresult     = 1
                      iresult_var = 1
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+      x_names      = Array{String}(undef,nx)
+else
       x_names      = Array{String}(nx)
-
+end
       #println("... length(result_var) = ", length(result_var), ", length(result_names) = ", length(result_names), ", nx_exp = ", nx_exp)
 
       for i in eachindex(var)

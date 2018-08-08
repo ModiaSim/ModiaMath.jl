@@ -7,27 +7,18 @@
 
 # Definitions used to construct hierarchical variable name spaces
 
-@static if VERSION >= v"0.7.0-DEV.2005"
- mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
-   name::Symbol                                                  # Name of component
-   within::Union{ModiaMath.AbstractComponentWithVariables, Nothing}  # Component in which component is present (if within==nothing, object is
+mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
+   name::Symbol                                                      # Name of component
+   within::Union{ModiaMath.AbstractComponentWithVariables, NOTHING}  # Component in which component is present (if within==nothing, object is not within a component)
 
-   ComponentInternal(name=NoNameDefined, within=nothing) = new(name, within)
+   ComponentInternal(name=NoNameDefined, within=nothing) = new(Symbol(name), within)
  end
-else
- mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
-   name::Symbol                                                  # Name of component
-   within::Union{ModiaMath.AbstractComponentWithVariables, Void}  # Component in which component is present (if within==nothing, object is not within a component)
 
-   ComponentInternal(name=NoNameDefined, within=nothing) = new(name, within)
- end
-end
+isInComponent(   internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) != NOTHING
+isNotInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) == NOTHING
 
-isInComponent(   internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) != Void
-isNotInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) == Void
-
-isInComponent(   component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) != Void
-isNotInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) == Void
+isInComponent(   component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) != NOTHING
+isNotInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) == NOTHING
 
 
 """

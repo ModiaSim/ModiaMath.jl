@@ -5,6 +5,12 @@
 #   ModiaMath.DAE (ModiaMath/DAE/_module.jl)
 #
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+   FLOATMAX(v) = floatmax(v)
+else
+   FLOATMAX(v) = realmax(v)
+end
+
 """
     initInfo = InitInfo(...)
 
@@ -24,13 +30,17 @@ struct InitInfo
                      yp0::Vector{Float64};
                      y_nominal::Vector{Float64}=ones(length(y0)),
                      y_errorControl::Vector{Bool}=fill(true,length(y0)),                   
-                     maxTime::Float64=realmax(Float64),
-                     nextEventTime::Float64=realmax(Float64),
+                     maxTime::Float64=FLOATMAX(Float64),
+                     nextEventTime::Float64=FLOATMAX(Float64),
                      integrateToEvent::Bool=true,
                      terminate::Bool=false)
       @assert(length(y0) == length(yp0))
       @assert(length(y0) == length(y_nominal))
-      @assert(y_nominal[ indmin(y_nominal) ] > 0.0)      
+@static if VERSION >= v"0.7.0-DEV.2005"
+      @assert(y_nominal[ argmin(y_nominal) ] > 0.0)    
+else
+      @assert(y_nominal[ indmin(y_nominal) ] > 0.0)    
+end  
       new(y0, yp0, y_nominal, y_errorControl, maxTime, nextEventTime, integrateToEvent, terminate)
    end
 end
@@ -48,14 +58,14 @@ mutable struct EventInfo
    integrateToEvent::Bool   # = true, if exact integration to nextEventTime
    nextModel                # If restart==FullRestart, next model
 
-   EventInfo() = new(Restart, realmax(Float64), realmax(Float64), true, nothing)
+   EventInfo() = new(Restart, FLOATMAX(Float64), FLOATMAX(Float64), true, nothing)
 end
 
 
 function reset!(einfo::EventInfo)
    einfo.restart = Restart
-   einfo.maxTime = realmax(Float64)
-   einfo.nextEventTime = realmax(Float64)
+   einfo.maxTime = FLOATMAX(Float64)
+   einfo.nextEventTime = FLOATMAX(Float64)
    einfo.integrateToEvent = true
    einfo.nextModel = nothing
 end

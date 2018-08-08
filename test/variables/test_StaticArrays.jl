@@ -8,6 +8,12 @@ module test_StaticArrays
 using StaticArrays
 import DataFrames
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+   const NOTHING = Nothing
+else
+   const NOTHING = Void
+end
+
 function A_add_B!(C, A, B)
    for i=1:length(A)
       C[i] = A[i] + B[i]
@@ -83,7 +89,7 @@ println("\ntest_for_loop: elapsedTime = ", elapsedTime, ", bytesAllocated = ", b
 
 
 # Evaluate matrix multiplication and assignment
-function mult_StandardArray_assign(var::ModelVariables)::Void
+function mult_StandardArray_assign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v1a = var.v1c + i*var.R1*var.v1c
    end
@@ -91,14 +97,14 @@ function mult_StandardArray_assign(var::ModelVariables)::Void
 end
 
 
-function mult_StandardArray_dotAssign(var::ModelVariables)::Void
+function mult_StandardArray_dotAssign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v1a .= var.v1c + i*var.R1*var.v1c
    end
   return nothing
 end
 
-function mult_StandardArray_elementAssign(var::ModelVariables)::Void
+function mult_StandardArray_elementAssign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v1a[1:3] = var.v1c + i*var.R1*var.v1c
    end
@@ -106,7 +112,7 @@ function mult_StandardArray_elementAssign(var::ModelVariables)::Void
 end
 
 
-function mult_StandardArray_mult(var::ModelVariables)::Void
+function mult_StandardArray_mult(var::ModelVariables)::NOTHING
    for i = 1:nmax
       A_mul_B!(var.v1a, var.R1, var.v1c)
       A_add_B!(var.v1a, var.v1c, i*var.v1a)
@@ -115,7 +121,7 @@ function mult_StandardArray_mult(var::ModelVariables)::Void
 end
 
 
-function mult_MArray_assign(var::ModelVariables)::Void
+function mult_MArray_assign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v2a = var.v2c + i*var.R2*var.v2c
    end
@@ -123,7 +129,7 @@ function mult_MArray_assign(var::ModelVariables)::Void
 end
 
 
-function mult_MArray_dotAssign(var::ModelVariables)::Void
+function mult_MArray_dotAssign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v2a .= var.v2c + i*var.R2*var.v2c
    end
@@ -131,7 +137,7 @@ function mult_MArray_dotAssign(var::ModelVariables)::Void
 end
 
 
-function mult_MArray_elementAssign(var::ModelVariables)::Void
+function mult_MArray_elementAssign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v2a[1:3] = var.v2c + i*var.R2*var.v2c
    end
@@ -139,7 +145,7 @@ function mult_MArray_elementAssign(var::ModelVariables)::Void
 end
 
 
-function mult_MArray_mult(var::ModelVariables)::Void
+function mult_MArray_mult(var::ModelVariables)::NOTHING
    for i = 1:nmax
       A_mul_B!(var.v2a, var.R2, var.v2c)
       A_add_B!(var.v2a, var.v2c, i*var.v2a)
@@ -148,7 +154,7 @@ function mult_MArray_mult(var::ModelVariables)::Void
 end
 
 
-function mult_SArray_assign(var::ModelVariables)::Void
+function mult_SArray_assign(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v3a = var.v3c + i*var.R3*var.v3c
    end
@@ -156,7 +162,7 @@ function mult_SArray_assign(var::ModelVariables)::Void
 end
 
 
-function mult_SArray_assignWithMMatrix(var::ModelVariables)::Void
+function mult_SArray_assignWithMMatrix(var::ModelVariables)::NOTHING
    for i = 1:nmax
       var.v3a = var.v3c + i*var.R2*var.v3c
    end

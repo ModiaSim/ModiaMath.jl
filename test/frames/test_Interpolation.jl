@@ -4,6 +4,7 @@ module test_Interpolation
     using Base.Test
 else
     using Test
+    using LinearAlgebra
 end
 
 

@@ -51,13 +51,8 @@ Types WC are additional variables that are computed only at communication points
 Type TIME is just used to mark which variable is the independent time variable.
 =#
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    isNothing(T) = typeof(T) == Nothing
-    hasValue(T)  = typeof(T) != Nothing
-else
-    isNothing(T) = typeof(T) == Void
-    hasValue(T)  = typeof(T) != Void
-end
+isNothing(T) = typeof(T) == NOTHING
+hasValue(T)  = typeof(T) != NOTHING
 
 
 #------------------------------ Generic Real Variable ----------------------------------------
@@ -81,17 +76,12 @@ mutable struct RealVariable{ValueType, ElementType} <: ModiaMath.AbstractRealVar
    # Attributes specific to Real variables
    min::ElementType
    max::ElementType
-   nominal::ElementType                                          # nominal value; is used to compute absolute tolerances and might be used for scaling
+   nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
    flow::Bool
-   numericType::NumericType                                      # how the variable is used in the equations
-   @static if VERSION >= v"0.7.0-DEV.2005"
-     integral::Union{Nothing, RealVariable{ValueType, ElementType}}    # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt)
-     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-   else
-     integral::Union{Void, RealVariable{ValueType, ElementType}}    # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt)
-     derivative::Union{Void, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-   end
-   unit::String                                                  # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
+   numericType::NumericType                                          # how the variable is used in the equations
+   integral::Union{NOTHING  , RealVariable{ValueType, ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+   derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+   unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
 
    # How the variable is stored in vectors
    ivar::Int        # if value is stored in x/derx/residue vector: x/derx/residue[ ivar ] = first value of variable.value
@@ -104,20 +94,8 @@ mutable struct RealVariable{ValueType, ElementType} <: ModiaMath.AbstractRealVar
       variable = new(ComponentInternal(name,within), deepcopy(start), info, causality, variability, 
                      start, fixed, analysis, min, max, nominal, flow, numericType, integral, nothing, unit, 0, 0) 
 
-      @static if VERSION >= v"0.7.0-DEV.2005"
-       if typeof(within) != Nothing
+      if typeof(within) != NOTHING
          setfield!(within,Symbol(name),variable)
-       end
-      else
-        @static if VERSION >= v"0.7.0-DEV.2005"
-          if typeof(within) != Nothing
-            setfield!(within,Symbol(name),variable)
-          end
-        else
-          if typeof(within) != Void
-            setfield!(within,Symbol(name),variable)
-          end
-        end
       end
 
       if hasValue(integral)

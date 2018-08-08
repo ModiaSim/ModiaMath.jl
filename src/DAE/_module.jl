@@ -66,7 +66,9 @@ export SimulationState
 # export computeAndStoreResult!, terminate!, processEvent!, getEventIndicators
 
 import ModiaMath
-
+@static if VERSION >= v"0.7.0-DEV.2005"
+    using LinearAlgebra
+end
 
 """
     @enum EventRestart NoRestart Restart FullRestart Terminate

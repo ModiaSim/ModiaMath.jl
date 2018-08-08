@@ -213,9 +213,16 @@ mutable struct SimulationStatistics
    sparseSolver::Bool
    nGroups::Int
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+   SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
+        new(0.0,0.0,0.0,0.0,0.0,0.0,nEquations,0,0,0,0,0,0,0,0,0,floatmax(Float64),
+            floatmax(Float64),0.0,0,sparseSolver,nGroups)
+else
    SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
         new(0.0,0.0,0.0,0.0,0.0,0.0,nEquations,0,0,0,0,0,0,0,0,0,realmax(Float64),
             realmax(Float64),0.0,0,sparseSolver,nGroups)
+end
+
 end
 
 function reInitializeStatistics!(stat::SimulationStatistics,
@@ -235,8 +242,13 @@ function reInitializeStatistics!(stat::SimulationStatistics,
    stat.nStateEvents   = 0
    stat.nRestartEvents = 0
    stat.nErrTestFails  = 0
+@static if VERSION >= v"0.7.0-DEV.2005"
+   stat.h0             = floatmax(Float64)
+   stat.hMin           = floatmax(Float64)
+else
    stat.h0             = realmax(Float64)
    stat.hMin           = realmax(Float64)
+end
    stat.hMax           = 0.0
    stat.orderMax       = 0                                
 end

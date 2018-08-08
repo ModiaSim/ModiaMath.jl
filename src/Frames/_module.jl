@@ -142,6 +142,10 @@ export skew
 using StaticArrays
 import ModiaMath
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+    using LinearAlgebra
+end
+
 include("vector3D.jl")
 include("rotationMatrix.jl")
 include("quaternion.jl")
