@@ -127,11 +127,14 @@ function getSignal(seriesDict, name)
       keyName = name
    else
       if nameAsString[end] == ']'
+@static if VERSION >= v"0.7.0-DEV.2005"
+         indexRange = something( findlast("[", nameAsString), 0:-1 )
+else
          indexRange = rsearch(nameAsString, "[")
+end
          i = indexRange[1]
          @assert(i >= 2)
          keyName = Symbol(nameAsString[1:i-1])
- 
          if haskey(seriesDict, keyName)
             sig2 = seriesDict[keyName]
 
@@ -166,7 +169,12 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
       ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
    else
       # sig has more as one dimension
+@static if VERSION >= v"0.7.0-DEV.2005"
+      ysigLegend = Array{String}(undef,length(yvar.value))
+else
       ysigLegend = Array{String}(length(yvar.value))
+end
+
       for i in eachindex(yvar.value)
          ysigLegend[i] = appendUnit(ModiaMath.indexToString(ykeyName, yvar.value, i), yvar.unit)
       end

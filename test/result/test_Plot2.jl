@@ -2,14 +2,15 @@ module test_Plot2
 
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
+    t = linspace(0.0, 10.0, 100)
 else
     using Test
+    t = range(0.0, stop=10.0, length=100)
 end
 
 import ModiaMath
 
 series = Dict{Symbol,Any}()
-t = linspace(0.0, 10.0, 100)
 series[:time] = t
 series[:phi]  = sin.(t)
 series[:w]    = cos.(t)

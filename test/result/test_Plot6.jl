@@ -2,15 +2,16 @@ module test_Plot6
 
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
+    t = linspace(0.0, 10.0, 100)
 else
     using Test
+    t = range(0.0, stop=10.0, length=100)
 end
 
 
 import ModiaMath
 
 # Define signals
-t = linspace(0.0, 10.0, 100)
 result = Dict{Symbol,AbstractVector}(:time=>t, :phi1=>sin.(t), :phi2=>0.5*sin.(t),
                                                :w1  =>cos.(t), :w2  => 0.6*cos.(t))
 
