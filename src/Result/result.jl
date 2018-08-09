@@ -32,11 +32,19 @@ the key of the y-vector (`name`) and the key of the x-vector (`xAxis`).
 If `xLabel=false` the legend of the x-vector should be an empty string (`""`).
 """
 function resultTimeSeries(result::SymbolDictResult, name, xLabel::Bool, xAxis)
-    xsig       = result[Symbol(xAxis)]
+    xsig = get(result, Symbol(xAxis), nothing)
+    if xsig == nothing
+       warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end
     xsigLegend = xLabel ? appendUnit( string(xAxis), string(unit(xsig[1])) ) : ""
     xsig       = ustrip.( xsig )
 
-    ysig       = result[Symbol(name)] 
+    ysig = get(result, Symbol(name), nothing)
+    if ysig == nothing
+       warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end 
     ysigLegend = [appendUnit( string(name), string(unit(ysig[1])) )]
     ysig       = ustrip.( ysig )
 
@@ -47,11 +55,19 @@ end
 const StringDictResult = Dict{String,AbstractVector}
 resultHeading(result::StringDictResult) = ""
 function resultTimeSeries(result::StringDictResult, name, xLabel::Bool, xAxis)
-    xsig       = result[ string(xAxis) ]
+    xsig = get(result, string(xAxis), nothing)
+    if xsig == nothing
+       warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end
     xsigLegend = xLabel ? appendUnit( string(xAxis), string(unit(xsig[1])) ) : ""
     xsig       = ustrip.( xsig )
 
-    ysig       = result[string(name)]
+    ysig = get(result, string(name), nothing)
+    if ysig == nothing
+       warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end 
     ysigLegend = [appendUnit( string(name), string(unit(ysig[1])) )]
     ysig       = ustrip.( ysig )
 
@@ -62,11 +78,19 @@ end
 const StringDictAnyResult = Dict{AbstractString,Any}
 resultHeading(result::StringDictAnyResult) = ""
 function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis)
-    xsig       = result[ string(xAxis) ]
+    xsig = get(result, string(xAxis), nothing)
+    if xsig == nothing
+       warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end
     xsigLegend = xLabel ? appendUnit( string(xAxis), string(unit(xsig[1])) ) : ""
     xsig       = ustrip.( xsig )
 
-    ysig       = result[string(name)]
+    ysig = get(result, string(name), nothing)
+    if ysig == nothing
+       warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+       return (nothing, nothing, nothing, nothing)
+    end 
     ysigLegend = [appendUnit( string(name), string(unit(ysig[1])) )]
     ysig       = ustrip.( ysig )
 
@@ -117,10 +141,13 @@ function getSignal(seriesDict, name)
             append!(ex2.args, ex1.args)
             sig = @eval $ex2
          else
-            error("ModiaMath.plot: argument name (= ", name, ") is not correct.")
+            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct.")
+            sig = nothing
          end  
       else
-         error("ModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")     
+         warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")     
+         sig = nothing
+         keyName = name
       end
    end
    return (sig, keyName, nameAsString)
@@ -130,6 +157,9 @@ end
 function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis)
    seriesDict = result.series
    (ysig,ykeyName,yNameAsString) = getSignal(seriesDict, Symbol(name))
+   if ysig == nothing
+      return (nothing, nothing, nothing, nothing) 
+   end
    yvar = result.var[ykeyName]
    if ndims(ysig) == 1
       # ysig is a vector

@@ -9,6 +9,7 @@
 #--------------------------- Utility plot functions
 function addPlot(result, name::Symbol, grid::Bool, xLabel::Bool, xAxis)
    (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name, xLabel, xAxis)
+   if xsig == nothing; return; end
    PyPlot.plot(xsig, ysig)
    PyPlot.grid(grid)
    PyPlot.legend(ysigLegend)
@@ -24,13 +25,15 @@ function addPlot(result, collectionOfNames::Tuple, grid::Bool, xLabel::Bool, xAx
    for name in collectionOfNames
       name2 = Symbol(name)
       (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name2, xLabel, xAxis)
-      PyPlot.plot(xsig, ysig)
-      append!(legend, ysigLegend)
+      if xsig != nothing
+         PyPlot.plot(xsig, ysig)
+         append!(legend, ysigLegend)
+      end
    end
 
    PyPlot.grid(grid)
    PyPlot.legend(legend)
-   if xLabel
+   if xLabel && xsigLegend != nothing
       PyPlot.xlabel(xsigLegend)
    end
 end
