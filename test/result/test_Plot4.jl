@@ -2,15 +2,16 @@ module test_Plot4
 
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
+    t = linspace(0.0, 10.0, 100)
 else
     using Test
+    t = range(0.0, stop=10.0, length=100)
 end
 
 import ModiaMath
 using Unitful
 
 result = Dict{Symbol,AbstractVector}()
-t = linspace(0.0, 10.0, 100)
 result[:time] = t*u"s"
 result[:phi]  = sin.(t)u"rad"
 result[:phi2] = 0.5*sin.(t)u"rad"

@@ -60,11 +60,11 @@ The function returns a vector var that contains all AbstractVariables defined in
 function get_ModelVariables(model::Any, analysis::AnalysisType)
    var = ModiaMath.AbstractVariable[]
    modelType = typeof(model)
-#@static if VERSION >= v"0.7.0-DEV.2005"
-#   dict = IdDict{Any,Any}
-#else
+@static if VERSION >= v"0.7.0-DEV.2005"
+   dict = IdDict{Any,Bool}()
+else
    dict = ObjectIdDict()
-#end
+end
    if modelType <: ModiaMath.AbstractComponentWithVariables
       get_ModelVariables_aux!(model, modelType, var, dict, analysis)
    end
