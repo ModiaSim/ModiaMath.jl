@@ -17,7 +17,6 @@ end
 
 
 import ModiaMath
-using PyPlot
 
 include(joinpath(ModiaMath.path,"examples","withoutMacros_withoutVariables","models","PT1.jl"))
 import .PT1

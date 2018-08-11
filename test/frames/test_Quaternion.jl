@@ -42,7 +42,6 @@ v1a = ModiaMath.resolve1(q1a,v2a)
 q6a = ModiaMath.absoluteRotation( q1a, q2a)
 q6b = ModiaMath.qrot123(angle1, angle1, 0.0)
 q7  = ModiaMath.relativeRotation( q1a, q6b)
-q4d = ModiaMath.inverseRotation(q4a)
 
 
 @testset "ModiaMath.Frames: test Quaternions" begin 

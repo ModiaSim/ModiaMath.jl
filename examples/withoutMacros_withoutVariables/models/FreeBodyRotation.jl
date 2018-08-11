@@ -32,21 +32,29 @@ module FreeBodyRotation
 
 import ModiaMath
 
-     
+@static if VERSION >= v"0.7.0-DEV.2005"
+   using LinearAlgebra
+   DIAGONAL(m) = Diagonal(m)
+else
+   DIAGONAL(m) = diagm(m)
+end
+
+using StaticArrays
+
 mutable struct Model <: ModiaMath.AbstractSimulationModel
    simulationState::ModiaMath.SimulationState
    
    # Parameters
    m::Float64
-   I::Matrix{Float64}
-   A::Vector{Float64}
-   freqHz::Vector{Float64}
-   phase::Vector{Float64}
+   I::SMatrix{3,3,Float64,9}
+   A::SVector{3,Float64}
+   freqHz::SVector{3,Float64}
+   phase::SVector{3,Float64}
 
-   function Model(;m=1.0, I=diagm([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
+   function Model(;m=1.0, I=DIAGONAL([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
                   phase=[0,0.5235987755983,1.0471975511966],
-                  Q0::Vector{Float64}=[0.1, 0.5, 0.0, 1.0],
-                  w0::Vector{Float64}=zeros(3))
+                  Q0=[0.1, 0.5, 0.0, 1.0],
+                  w0=zeros(3))
       @assert(m > 0.0)
       @assert(size(I)==(3,3))
       @assert(isposdef(I))
@@ -54,9 +62,13 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
       @assert(length(freqHz)==3)
       @assert(length(phase)==3)
       @assert(minimum(A) > 0.0)
+      @assert(length(Q0) == 4)
+      @assert(length(w0) == 3)
 
-      simulationState = ModiaMath.SimulationState("FreeBodyRotation", getModelResidues!, [Q0;w0], getVariableName;  nc = 1) 
-      new(simulationState,m,I,A,freqHz,phase)
+      simulationState = ModiaMath.SimulationState("FreeBodyRotation", getModelResidues!, Vector{Float64}([Q0;w0]), getVariableName;  nc = 1) 
+      new(simulationState,m,SMatrix{3,3,Float64,9}(I), SVector{3,Float64}(A),
+                                                       SVector{3,Float64}(freqHz),
+                                                       SVector{3,Float64}(phase))
    end
 end 
 
@@ -66,10 +78,10 @@ getVariableName(model,vcat,vindex) = ModiaMath.getVariableName(model,vcat,vindex
 function getModelResidues!(m::Model, _t::Float64, _x::Vector{Float64}, _derx::Vector{Float64}, _r::Vector{Float64}, _w::Vector{Float64})
    u = m.A .* sin.(2.0*pi*m.freqHz*_t + m.phase)   
  
-   Q    = _x[1:4]
-   w    = _x[5:7]
-   derQ = _derx[1:4]
-   derw = _derx[5:7]
+   Q    = SVector{4,Float64}(_x[1:4])
+   w    = SVector{3,Float64}(_x[5:7])
+   derQ = SVector{4,Float64}(_derx[1:4])
+   derw = SVector{3,Float64}(_derx[5:7])
 
    _r[1:3] = w - 2.0*([ Q[4]  Q[3] -Q[2] -Q[1]; 
                        -Q[3]  Q[4]  Q[1] -Q[2];

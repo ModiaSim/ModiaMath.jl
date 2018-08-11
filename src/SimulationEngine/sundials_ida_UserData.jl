@@ -81,11 +81,11 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
 
     # Copy simModel.r to _r
-@static if VERSION >= v"0.7.0-DEV.2005"
-    unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
-else
-    unsafe_copy!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
-end
+    @static if VERSION >= v"0.7.0-DEV.2005"
+       unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
+    else
+       unsafe_copy!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
+    end
     return Cint(0)   # indicates normal return
 end
 
@@ -94,10 +94,6 @@ end
    @noinline function old_cfunction(f, r, a)
      ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
    end
-
-    const idasol_fc = old_cfunction(idasol_f, Cint, Tuple{Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}})
-#   const idasol_fc = @cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
-
 else
     const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
 end
@@ -116,10 +112,7 @@ function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vec
    return Cint(0)   # indicates normal return
 end
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const idasol_gc = old_cfunction(idasol_g, Cint, Tuple{Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}})
-#   const idasol_gc = @cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
-else
+@static if VERSION < v"0.7.0-DEV.2005"
     const idasol_gc = cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
 end
 
@@ -156,7 +149,7 @@ function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N
 end
 
 
-@static if VERSION >= v"0.7.0-DEV.2005"
+@static if VERSION < v"0.7.0-DEV.2005"
     const idasol_sjacc = @cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
                                                          Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
 else
@@ -192,10 +185,7 @@ function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::
     nothing
 end
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const idasol_ErrHandlerFnc = old_cfunction(idasol_ErrHandlerFn, Nothing, Tuple{Cint, Cstring, Cstring, Cstring, Ref{IntegratorData}})
-#   const idasol_ErrHandlerFnc = @cfunction(idasol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring, Ref{IntegratorData}))
-else
+@static if VERSION < v"0.7.0-DEV.2005"
     const idasol_ErrHandlerFnc = cfunction(idasol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring, Ref{IntegratorData}))
 end
 

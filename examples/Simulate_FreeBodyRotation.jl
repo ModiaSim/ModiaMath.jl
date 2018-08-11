@@ -33,6 +33,10 @@ Reference Modelica model:
 """
 module Simulate_FreeBodyRotation
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+   using LinearAlgebra
+end
+
 using ModiaMath
 using StaticArrays
 

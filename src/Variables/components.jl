@@ -72,6 +72,22 @@ end
 
 
 function Base.show(io::IO, component::ModiaMath.AbstractComponentWithVariables)
+
+ @static if VERSION >= v"0.7.0-DEV.2005"
+   for c in fieldnames(typeof(component))
+      field = getfield(component,c)
+      if typeof(field) <: ModiaMath.AbstractComponentWithVariables
+         println(io,"\n   ", c, " = ", field)
+      elseif typeof(field) <: AbstractVector
+         for i in 1:length(field)
+            println(io,"   ", c, "[", i, "] = ", field[i])
+         end
+      elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
+         # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
+         println(io,"   ", c, " = ", field)
+      end
+   end
+  else
    for c in fieldnames(component)
       field = getfield(component,c)
       if typeof(field) <: ModiaMath.AbstractComponentWithVariables
@@ -85,6 +101,8 @@ function Base.show(io::IO, component::ModiaMath.AbstractComponentWithVariables)
          println(io,"   ", c, " = ", field)
       end
    end
+
+  end
    print(io, "   )")
 end
 

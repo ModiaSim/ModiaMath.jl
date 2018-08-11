@@ -185,7 +185,7 @@ mutable struct SimulationState
       jac = nothing
       cg = nothing
 
-      new(name, nothing, getModelResidues!, getVariableName, getResultNames, 
+      new(Symbol(name), nothing, getModelResidues!, getVariableName, getResultNames, 
           storeResult!, getResult, eventHandler, nx, nd, nc, nw, nz, zDir,
           sparse, jac, cg, defaultTolerance, defaultStartTime, defaultStopTime,
           defaultInterval, NaN, ModiaMath.Logger(),

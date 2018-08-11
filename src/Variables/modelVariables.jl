@@ -265,8 +265,13 @@ mutable struct ModelVariables
          dummyDifferentialEquation = true
          dummy_x    = RealScalar("_dummy_x"   ; fixed=true, numericType=XD_EXP)
          dummy_derx = RealScalar("_dummy_derx";             numericType=DER_XD_EXP, integral=dummy_x)
-         unshift!(var, dummy_derx)
-         unshift!(var, dummy_x) 
+         @static if VERSION >= v"0.7.0-DEV.2005" 
+            pushfirst!(var, dummy_derx)
+            pushfirst!(var, dummy_x) 
+         else 
+            unshift!(var, dummy_derx)
+            unshift!(var, dummy_x) 
+         end
          nx        = 1
          nx_exp    = 1
          nderx_exp = 1

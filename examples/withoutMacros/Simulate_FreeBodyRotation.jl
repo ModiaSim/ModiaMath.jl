@@ -33,6 +33,13 @@ Reference Modelica model:
 """
 module Simulate_FreeBodyRotation
 
+@static if VERSION >= v"0.7.0-DEV.2005"
+   using LinearAlgebra
+   DIAGONAL(m) = Diagonal(m)
+else
+   DIAGONAL(m) = diagm(m)
+end
+
 using ModiaMath
 using StaticArrays
 
@@ -63,7 +70,7 @@ mutable struct FreeBodyRotationWithoutMacro <: ModiaMath.AbstractComponentWithVa
   residue_t::RealSVector3
   residue_q::RealScalar
 
-  function FreeBodyRotationWithoutMacro(;I      = diagm([1.0,2.0,3.0]),
+  function FreeBodyRotationWithoutMacro(;I      = DIAGONAL([1.0,2.0,3.0]),
                                          A      = [3.0,4.0,5.0],
                                          freqHz = [0.3,0.2,0.1],
                                          phase  = [0,0.5235987755983,1.0471975511966],

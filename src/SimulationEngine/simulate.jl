@@ -233,10 +233,18 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
    # Run IDA
    try
       # Set error handler function
-      Sundials.IDASetErrHandlerFn(mem, idasol_ErrHandlerFnc, pointer_from_objref(simModel))
+      @static if VERSION >= v"0.7.0-DEV.2005"
+         Sundials.IDASetErrHandlerFn(mem, old_cfunction(idasol_ErrHandlerFn, Nothing, Tuple{Cint, Cstring, Cstring, Cstring, Ref{typeof(IntegratorData)}}), pointer_from_objref(simModel))
+      else
+         Sundials.IDASetErrHandlerFn(mem, idasol_ErrHandlerFnc, pointer_from_objref(simModel))
+      end
 
       # Initialize IDA
-      Sundials.__IDAInit(mem, idasol_fc, t0, y_N_Vector, yp_N_Vector)
+      @static if VERSION >= v"0.7.0-DEV.2005"
+         Sundials.IDAInit(mem, old_cfunction(idasol_f, Cint, Tuple{Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{typeof(IntegratorData)}}), t0, y_N_Vector, yp_N_Vector)
+      else
+         Sundials.__IDAInit(mem, idasol_fc, t0, y_N_Vector, yp_N_Vector)
+      end
 
       #IDASStolerances(mem, tolerance, 0.1*tolerance)
       tolAbs = 0.1*tolerance*init.y_nominal
@@ -264,7 +272,11 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
       # Initialize zero crossing function, if required
       hasZeroCross = nz > 0
       if hasZeroCross     
-         Sundials.IDARootInit(mem, nz, idasol_gc)
+         @static if VERSION >= v"0.7.0-DEV.2005"
+            Sundials.IDARootInit(mem, nz, old_cfunction(idasol_g, Cint, Tuple{Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{typeof(IntegratorData)}}))
+         else
+            Sundials.IDARootInit(mem, nz, idasol_gc)
+         end
          Sundials.IDASetRootDirection(mem, sim.zDir)
       end
 
