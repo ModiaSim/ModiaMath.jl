@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "ModiaMath is not yet registered in METADATA.jland need to be installed with Pkg.clone:julia> Pkg.clone(\"https://github.com/ModiaSim/ModiaMath.jl\")A higher level ModiaMath.plot function is provided in ModiaMath to visualize the time series of simulation results in a convenient way. Other Julia plotting packages can also be used, but all the tests and examples in ModiaMath, Modia and Modia3D use ModiaMath.plot).  It is based on the Julia interface package PyPlot which uses the Matplotlib plotting library from Python. PyPlot need to be installed, if the examples and tests of ModiaMath shall be executed. Installing PyPlot by just  using the Julia package manager often fails. The following installation order is recommended:Install a Python 3.x distribution that contains Matplotlib.\nRecommended: Anaconda distribution.\nAdvantage: very robust; disadvantage: > 3 GByte memory needed;\nModiaMath is based on the Python 3.x version of Matplotlib where some keywords are different to the Python 2.x version.\nInclude the path to the python executable in your HOME/.juliarc.jl file:\n ENV[\"PYTHON\"] = joinpath(\"....\", \"Anaconda3\", \"python.exe\")\nStart Julia, give the command ENV[\"PYTHON\"] in the REPL, and check whether the path is correct (if you made a typo in the .juliarc.jl file, Julia might use another Python executable and PyPlot might crash Julia).\nInstall PyPlot via Pkg.add(\"PyPlot\")"
+    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add.julia> Pkg.add(\"ModiaMath\")A higher level ModiaMath.plot function is provided in ModiaMath to visualize the time series of simulation results in a convenient way. Other Julia plotting packages can also be used, but all the tests and examples in ModiaMath, Modia and Modia3D use ModiaMath.plot).  It is based on the Julia interface package PyPlot which uses the Matplotlib plotting library from Python. PyPlot need to be installed, if the examples and tests of ModiaMath shall be executed. Installing PyPlot by just  using the Julia package manager often fails. The following installation order is recommended:Install a Python 3.x distribution that contains Matplotlib.\nRecommended: Anaconda distribution.\nAdvantage: very robust; disadvantage: > 3 GByte memory needed;\nModiaMath is based on the Python 3.x version of Matplotlib where some keywords are different to the Python 2.x version.\nInclude the path to the python executable in your HOME/.juliarc.jl file:\n ENV[\"PYTHON\"] = joinpath(\"....\", \"Anaconda3\", \"python.exe\")\nStart Julia, give the command ENV[\"PYTHON\"] in the REPL, and check whether the path is correct (if you made a typo in the .juliarc.jl file, Julia might use another Python executable and PyPlot might crash Julia).\nIf you have used a different Python installation before, execute the command Pkg.build[\"PyCall\"], exit Julia and start Julia again.\nInstall PyPlot via Pkg.add(\"PyPlot\")"
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "SimulationEngine",
     "title": "ModiaMath.SimulationEngine",
     "category": "module",
-    "text": "module ModiaMath.SimulationEngine\n\nSimulation engine for implicit index 1 DAE models with events.\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.SimulationEngine\n\nSimulation engine for implicit index 1 DAE models with events.\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -125,7 +125,7 @@ var documenterSearchIndex = {"docs": [
     "page": "SimulationEngine",
     "title": "ModiaMath.SimulationEngine.simulate!",
     "category": "method",
-    "text": "ModiaMath.simulate!(simulationModel; log=false, startTime=NaN, stopTime=NaN, \n                                                tolerance=NaN, interval=NaN)\n\nSimulates a DAE simulationModel that is defined with package Modia, package Modia3D or with the ModiaMath.@component macro. The DAE is mathematically described as  implicit, index 1 DAE with events (containing an ODE or a semi-explicit  index 1 DAE as special cases):\n\nbeginalign\n 0       = f_d(dotx x t z_pos) \n 0       = f_c(x t z_pos) \n z       = f_z(xt) \n z_pos = textevent()    z  0    textlast(z_pos) \n J       = left fracpartial f_dpartial dotx  \n                    fracpartial f_cpartial x right  textis regular\nendalign\n\nwith initial conditions x_0^-:\n\nlim_epsilon rightarrow 0 x(t_0 - epsilon) = x_0^-\n\nDuring continuous integration, equation system (1)-(4) is solved with the Sundials IDA solver (accessed via the Julia Sundials interface package). ModiaMath assumes that J (5) is regular for all time instants. If this condition is violated, initialization and simulation will usually fail and an error message of the form \"Solver does not converge\" might appear. Note, ModiaMath does not check this condition and can therefore not provide better diagnostics in such cases.\n\nIf one of the elements of z crosses zero, an event is triggered and simulation is halted. At an event, equation z_pos = z  0 (element wise) is added. The equation system (1)-(4) is then solved with a fixed-point iteration scheme (= event iteration). Afterwards, integration is  restarted and z_pos keeps its value until the next event occurs.\n\nInitial conditions x_0^- must be provided before simulation can start.  Best is if they fulfil the constraint equation 0 = f_c(x_0^- t_0 z  0). If this is not the case, initialization will simulate for an infinitesimal small time instant  so that x_0^- changes discontinuously to x_0^+ with f_c (x_0^+ t_0 z  0 )=0.  Note, dotx is a Dirac impulse in this case.\n\nInput arguments\n\nsimulationModel::ModiaMath.AbstractSimulationModel: Model struct (generated with Modia, Modia3D or ModiaMath.@component).\nlog::Bool: = true, if logging is enabled, otherwise it is disabled.\nstartTime::Float64: Start time of the simulation in [s].                       If startTime=NaN, the default startTime is used that is defined by the simulationModel.\nstopTime::Float64: Stop time of the simulation in [s].                       If stopTime=NaN, the default stopTime is used that is defined by the simulationModel.\ntolerance::Float64: The relative tolerance for the integration. The absolute tolerance is computed as 0.1*tolerance*nominal(variable) where nominal(variable) is the nominal value of the variable.  If tolerance=NaN, the default tolerance is used that is defined by the simulationModel.\ninterval::Float64: Output interval for results in [s]. If events occur, the event time instants are additionally added to the result. If interval=NaN, the default interval is used that is defined by the simulationModel.\n\n\n\n"
+    "text": "ModiaMath.simulate!(simulationModel; log=false, startTime=NaN, stopTime=NaN, \n                                                tolerance=NaN, interval=NaN)\n\nSimulates a DAE simulationModel that is defined with package Modia, package Modia3D or with the ModiaMath.@component macro. The DAE is mathematically described as  implicit, index 1 DAE with events (containing an ODE or a semi-explicit  index 1 DAE as special cases):\n\nbeginalign\n 0       = f_d(dotx x t z_pos) \n 0       = f_c(x t z_pos) \n z       = f_z(xt) \n z_pos = textevent()    z  0    textlast(z_pos) \n J       = left fracpartial f_dpartial dotx  \n                    fracpartial f_cpartial x right  textis regular\nendalign\n\nwith initial conditions x_0^-:\n\nlim_epsilon rightarrow 0 x(t_0 - epsilon) = x_0^-\n\nDuring continuous integration, equation system (1)-(4) is solved with the Sundials IDA solver (accessed via the Julia Sundials interface package). ModiaMath assumes that J (5) is regular for all time instants. If this condition is violated, initialization and simulation will usually fail and an error message of the form \"Solver does not converge\" might appear. Note, ModiaMath does not check this condition and can therefore not provide better diagnostics in such cases.\n\nIf one of the elements of z crosses zero, an event is triggered and simulation is halted. At an event, equation z_pos = z  0 (element wise) is added. The equation system (1)-(4) is then solved with a fixed-point iteration scheme (= event iteration). Afterwards, integration is  restarted and z_pos keeps its value until the next event occurs.\n\nInitial conditions x_0^- must be provided before simulation can start.  Best is if they fulfil the constraint equation 0 = f_c(x_0^- t_0 z  0). If this is not the case, initialization will simulate for an infinitesimal small time instant  so that x_0^- changes discontinuously to x_0^+ with f_c (x_0^+ t_0 z  0 )=0.  Note, dotx is a Dirac impulse in this case.\n\nInput arguments\n\nsimulationModel::ModiaMath.AbstractSimulationModel: Model struct (generated with Modia, Modia3D or ModiaMath.@component).\nlog::Bool: = true, if logging is enabled, otherwise it is disabled.\nstartTime::Float64: Start time of the simulation in [s].                       If startTime=NaN, the default startTime is used that is defined by the simulationModel.\nstopTime::Float64: Stop time of the simulation in [s].                       If stopTime=NaN, the default stopTime is used that is defined by the simulationModel.\ntolerance::Float64: The relative tolerance for the integration. The absolute tolerance is computed as 0.1*tolerance*nominal(variable) where nominal(variable) is the nominal value of the variable.  If tolerance=NaN, the default tolerance is used that is defined by the simulationModel.\ninterval::Float64: Output interval for results in [s]. If events occur, the event time instants are additionally added to the result. If interval=NaN, the default interval is used that is defined by the simulationModel.\n\n\n\n\n\n"
 },
 
 {
@@ -134,14 +134,6 @@ var documenterSearchIndex = {"docs": [
     "title": "SimulationEngine",
     "category": "section",
     "text": "Modules = [ModiaMath.SimulationEngine]\r\nPrivate = false\r\nOrder   = [:module, :type, :macro, :function]"
-},
-
-{
-    "location": "lib/SimulationEngine.html#-1",
-    "page": "SimulationEngine",
-    "title": "",
-    "category": "section",
-    "text": ""
 },
 
 {
@@ -157,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result",
     "category": "module",
-    "text": "module ModiaMath.Result\n\nOrganize and plot simulation result data (time series). The result data of ModiaMath.simulate! is returned in one of the formats supported by this module. The ModiaMath.plot function of this module allows to plot the result data by giving the signal names. The legends/labels of the plots are automatically constructed by the signal names and their unit. Example\n\nModiaMath.plot(result, [ (:phi,:r)      (:phi,:phi2,:w);\n                         (:w,:w2,:phi2) (:phi,:w)      ], \n               heading=\"Matrix of plots\")\n\ngenerates the following plot:\n\n(Image: Matrix-of-Plots)\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.Result\n\nOrganize and plot simulation result data (time series). The result data of ModiaMath.simulate! is returned in one of the formats supported by this module. The ModiaMath.plot function of this module allows to plot the result data by giving the signal names. The legends/labels of the plots are automatically constructed by the signal names and their unit. Example\n\nModiaMath.plot(result, [ (:phi,:r)      (:phi,:phi2,:w);\n                         (:w,:w2,:phi2) (:phi,:w)      ], \n               heading=\"Matrix of plots\")\n\ngenerates the following plot:\n\n(Image: Matrix-of-Plots)\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -165,7 +157,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.RawResult",
     "category": "type",
-    "text": "mutable struct RawResult\n\nHold result data in a Float64 matrix (first column time, i-th column variable i). Typical usage:\n\n    raw = RawResult(100,3) # Initial storage: 100 time points, 3 variables\n    storeRawResult!(raw, [1.0, 2.0, 1.0])\n    storeRawResult!(raw, [2.0, 3.0, 5.0])\n      ...\n    res = getDictResult(res, [\"time\", \"r[1]\", \"r[2]\"]\n    \n    plot(res[\"time\"], res[\"r[1]\"])\n\nIf initial storage is not sufficient, it is automatically doubled.\n\n\n\n"
+    "text": "mutable struct RawResult\n\nHold result data in a Float64 matrix (first column time, i-th column variable i). Typical usage:\n\n    raw = RawResult(100,3) # Initial storage: 100 time points, 3 variables\n    storeRawResult!(raw, [1.0, 2.0, 1.0])\n    storeRawResult!(raw, [2.0, 3.0, 5.0])\n      ...\n    res = getDictResult(res, [\"time\", \"r[1]\", \"r[2]\"]\n    \n    plot(res[\"time\"], res[\"r[1]\"])\n\nIf initial storage is not sufficient, it is automatically doubled.\n\n\n\n\n\n"
 },
 
 {
@@ -173,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.ResultWithVariables",
     "category": "type",
-    "text": "mutable struct ResultWithVariables\n\nStruct that is generated as a result of ModiaMath.simulate!(...), if the model is a Modia3D.AbstractComponentWithVariables struct.\n\n\n\n"
+    "text": "mutable struct ResultWithVariables\n\nStruct that is generated as a result of ModiaMath.simulate!(...), if the model is a Modia3D.AbstractComponentWithVariables struct.\n\n\n\n\n\n"
 },
 
 {
@@ -181,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.plot",
     "category": "method",
-    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, figure=1)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{Symbol,AbstractVector}\nA dictionary Dict{String,AbstractVector}\nA dictionary Dict{AbstractString,Any}\nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or String).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{Symbol,Vector{Float64}}(\n            :time=>t*u\"s\", :phi1=>sin.(t)u\"rad\", :phi2=>0.5*sin.(t),\n                           :w1  =>cos.(t)u\"rad/s\", :w2  => 0.6*cos.(t))\n\n# 1 signal in one diagram\nModiaMath.plot(result, :phi1)\n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (:phi1, :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)                   \n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n"
+    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, figure=1)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{Symbol,AbstractVector}\nA dictionary Dict{String,AbstractVector}\nA dictionary Dict{AbstractString,Any}\nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or String).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{Symbol,Vector{Float64}}(\n            :time=>t*u\"s\", :phi1=>sin.(t)u\"rad\", :phi2=>0.5*sin.(t),\n                           :w1  =>cos.(t)u\"rad/s\", :w2  => 0.6*cos.(t))\n\n# 1 signal in one diagram\nModiaMath.plot(result, :phi1)\n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (:phi1, :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)                   \n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
 },
 
 {
@@ -189,7 +181,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.resultTimeSeries",
     "category": "method",
-    "text": "(xsig, xsigLegend, ysig, ysigLegend) = \n       ModiaMath.resultTimeSeries(result, name, xLabel::Bool, xAxis)\n\nFor a desired result data structure, this function has to be provided to return the x-vector (xsig), the y-vector (ysig) and the legend of the x-vector (xsigLegend), and of the y-vector (ysigLegend) as Strings, given  the key of the y-vector (name) and the key of the x-vector (xAxis). If xLabel=false the legend of the x-vector should be an empty string (\"\").\n\n\n\n"
+    "text": "(xsig, xsigLegend, ysig, ysigLegend) = \n       ModiaMath.resultTimeSeries(result, name, xLabel::Bool, xAxis)\n\nFor a desired result data structure, this function has to be provided to return the x-vector (xsig), the y-vector (ysig) and the legend of the x-vector (xsigLegend), and of the y-vector (ysigLegend) as Strings, given  the key of the y-vector (name) and the key of the x-vector (xAxis). If xLabel=false the legend of the x-vector should be an empty string (\"\").\n\n\n\n\n\n"
 },
 
 {
@@ -213,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE",
     "category": "module",
-    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model.\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model.\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -221,7 +213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.EventRestart",
     "category": "type",
-    "text": "@enum EventRestart NoRestart Restart FullRestart Terminate\n\nDefine how to continue or restart integration after an event. Usually, Restart should be used. Only in special cases, the other flags are useful.\n\nNoRestart, continue integration without restarting the integrator\nRestart, restart integrator\nFullRestart, restart integrator and optionally exchange simulationState (so dimensions may change)\nTerminate, terminate integration\n\n\n\n"
+    "text": "@enum EventRestart NoRestart Restart FullRestart Terminate\n\nDefine how to continue or restart integration after an event. Usually, Restart should be used. Only in special cases, the other flags are useful.\n\nNoRestart, continue integration without restarting the integrator\nRestart, restart integrator\nFullRestart, restart integrator and optionally exchange simulationState (so dimensions may change)\nTerminate, terminate integration\n\n\n\n\n\n"
 },
 
 {
@@ -229,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.change!",
     "category": "method",
-    "text": "ModiaMath.change!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nTrigger an event, whenever crossing > 0 changes from false to true or from true to false. The function returns always false.\n\n\n\n"
+    "text": "ModiaMath.change!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nTrigger an event, whenever crossing > 0 changes from false to true or from true to false. The function returns always false.\n\n\n\n\n\n"
 },
 
 {
@@ -237,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.edge!",
     "category": "method",
-    "text": "ModiaMath.edge!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nTrigger an event, whenever crossing > 0 switches from false to true. The function returns always false.\n\n\n\n"
+    "text": "ModiaMath.edge!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nTrigger an event, whenever crossing > 0 switches from false to true. The function returns always false.\n\n\n\n\n\n"
 },
 
 {
@@ -245,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.getStartTime",
     "category": "method",
-    "text": "ModiaMath.getStartTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn startTime of the actual simulation run.\n\n\n\n"
+    "text": "ModiaMath.getStartTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn startTime of the actual simulation run.\n\n\n\n\n\n"
 },
 
 {
@@ -253,7 +245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.getStopTime",
     "category": "method",
-    "text": "ModiaMath.getStopTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn stopTime of the actual simulation run (when the simulation will be terminated).\n\n\n\n"
+    "text": "ModiaMath.getStopTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn stopTime of the actual simulation run (when the simulation will be terminated).\n\n\n\n\n\n"
 },
 
 {
@@ -261,7 +253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.getTime",
     "category": "method",
-    "text": "ModiaMath.getTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn actual simulation time.\n\n\n\n"
+    "text": "ModiaMath.getTime(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn actual simulation time.\n\n\n\n\n\n"
 },
 
 {
@@ -269,7 +261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.getTolerance",
     "category": "method",
-    "text": "ModiaMath.getTolerance(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn (relative) tolerance of the actual simulation run.\n\n\n\n"
+    "text": "ModiaMath.getTolerance(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn (relative) tolerance of the actual simulation run.\n\n\n\n\n\n"
 },
 
 {
@@ -277,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isAfterSimulationStart",
     "category": "method",
-    "text": "ModiaMath.isAfterSimulationStart(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if after start of simulation and false if during initialization.\n\n\n\n"
+    "text": "ModiaMath.isAfterSimulationStart(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if after start of simulation and false if during initialization.\n\n\n\n\n\n"
 },
 
 {
@@ -285,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isEvent",
     "category": "method",
-    "text": "ModiaMath.isEvent(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if event phase of simulation (including initialization)\n\n\n\n"
+    "text": "ModiaMath.isEvent(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if event phase of simulation (including initialization)\n\n\n\n\n\n"
 },
 
 {
@@ -293,7 +285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isInitial",
     "category": "method",
-    "text": "ModiaMath.isInitial(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if initialization phase of simulation.\n\n\n\n"
+    "text": "ModiaMath.isInitial(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if initialization phase of simulation.\n\n\n\n\n\n"
 },
 
 {
@@ -301,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isStoreResult",
     "category": "method",
-    "text": "ModiaMath.isStoreResult(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if communication point and variables shall be stored in the result data structure.\n\n\n\n"
+    "text": "ModiaMath.isStoreResult(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if communication point and variables shall be stored in the result data structure.\n\n\n\n\n\n"
 },
 
 {
@@ -309,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isTerminal",
     "category": "method",
-    "text": "ModiaMath.isTerminal(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if terminal phase of simulation.\n\n\n\n"
+    "text": "ModiaMath.isTerminal(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if terminal phase of simulation.\n\n\n\n\n\n"
 },
 
 {
@@ -317,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.isZeroCrossing",
     "category": "method",
-    "text": "ModiaMath.isZeroCrossing(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if simulation model shall compute zero-crossing functions (as required by the integrator).\n\n\n\n"
+    "text": "ModiaMath.isZeroCrossing(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn true, if simulation model shall compute zero-crossing functions (as required by the integrator).\n\n\n\n\n\n"
 },
 
 {
@@ -325,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.negative!",
     "category": "method",
-    "text": "ModiaMath.negative!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nReturn crossing < 0 such that a state event is triggered whenever crossing < 0 changes its value.\n\n\n\n"
+    "text": "ModiaMath.negative!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nReturn crossing < 0 such that a state event is triggered whenever crossing < 0 changes its value.\n\n\n\n\n\n"
 },
 
 {
@@ -333,7 +325,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.positive!",
     "category": "method",
-    "text": "ModiaMath.positive!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nReturn crossing > 0 such that a state event is triggered whenever crossing > 0 changes its value.\n\nNote, a small hysteresis is added to the crossing function during continuous integration,  in order to reduce issues during event iterations due to small numerical errors. However, at an event instant, crossing > 0 is returned without any hysteresis.\n\nArguments\n\nsim::ModiaMath.SimulationState: (Internal) simulation state provided by simulation engine.\nnr::Int: (> 0 required) Every call of positive!(..) must be identified by a unique value of nr       This value is used as index in a vector that holds the internal memory for crossing > 0.\ncrossing::Float64: Zero crossing function.\ncrossingAsString::String: crossing as string representation. This string is used for log messages.\nrestart::ModiaMath.EventRestart: Restart action after the crossing > 0 event occurred.\n\nExample\n\nfunction computeVariables!(m::Model, sim::SimulationState)\n   ...\n   # f = s > 0 ? fMax : 0.0\n   m.sPos.value = ModiaMath.positive!(sim, 1, m.s.value, \"s\")\n   m.f.value    = m.sPos.value ? m.fMax.value : 0.0\n   ...\nend\n\n\n\n"
+    "text": "ModiaMath.positive!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nReturn crossing > 0 such that a state event is triggered whenever crossing > 0 changes its value.\n\nNote, a small hysteresis is added to the crossing function during continuous integration,  in order to reduce issues during event iterations due to small numerical errors. However, at an event instant, crossing > 0 is returned without any hysteresis.\n\nArguments\n\nsim::ModiaMath.SimulationState: (Internal) simulation state provided by simulation engine.\nnr::Int: (> 0 required) Every call of positive!(..) must be identified by a unique value of nr       This value is used as index in a vector that holds the internal memory for crossing > 0.\ncrossing::Float64: Zero crossing function.\ncrossingAsString::String: crossing as string representation. This string is used for log messages.\nrestart::ModiaMath.EventRestart: Restart action after the crossing > 0 event occurred.\n\nExample\n\nfunction computeVariables!(m::Model, sim::SimulationState)\n   ...\n   # f = s > 0 ? fMax : 0.0\n   m.sPos.value = ModiaMath.positive!(sim, 1, m.s.value, \"s\")\n   m.f.value    = m.sPos.value ? m.fMax.value : 0.0\n   ...\nend\n\n\n\n\n\n"
 },
 
 {
@@ -341,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.setNextEvent!",
     "category": "method",
-    "text": "ModiaMath.setNextEvent!(sim, nextEventTime; integratoToEvent=true, restart = ModiaMath.Restart)\n\nAt an event instant (isEvent(sim) == true) trigger the next time event. \n\nArguments\n\nsim::ModiaMath.SimulationState: (Internal) simulation state provided by simulation engine.\nnextEventTime::Float64: Time instant of the next time event.\nintegrateToEvent::Bool: If true, the integrator integrates exactly to this event. If false, the integrator might integrate beyond nextEventTime (so the step size of the integrator is not influenced by this event). This option is only useful, if information is inquired at the event and restart=ModiaMath.NoRestart is used. The benefit is that the integrator is  practically not influenced by this event.\nrestart::ModiaMath.EventRestart: Restart action after the event at which setNextEvent! was called.\n\n\n\n"
+    "text": "ModiaMath.setNextEvent!(sim, nextEventTime; integratoToEvent=true, restart = ModiaMath.Restart)\n\nAt an event instant (isEvent(sim) == true) trigger the next time event. \n\nArguments\n\nsim::ModiaMath.SimulationState: (Internal) simulation state provided by simulation engine.\nnextEventTime::Float64: Time instant of the next time event.\nintegrateToEvent::Bool: If true, the integrator integrates exactly to this event. If false, the integrator might integrate beyond nextEventTime (so the step size of the integrator is not influenced by this event). This option is only useful, if information is inquired at the event and restart=ModiaMath.NoRestart is used. The benefit is that the integrator is  practically not influenced by this event.\nrestart::ModiaMath.EventRestart: Restart action after the event at which setNextEvent! was called.\n\n\n\n\n\n"
 },
 
 {
@@ -349,7 +341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.setNominal!",
     "category": "method",
-    "text": "ModiaMath.setNominal!(sim::ModiaMath.SimulationState, x_nominal::Vector{Float64})\n\nAt initialization provide x_nominal, the nominal values of the x-vector, and  store them insim`, the simulation state. These values are used to compute the absolute tolerances of the x-vector for the integrator.\n\nExample\n\nfunction getModelResidues!(m::Model, t, x, derx, r, w)\n   sim = m.simulationState\n   if ModiaMath.isInitial(sim)\n      ModiaMath.setNominal!(sim, [1.0, 1e-5, 1e8])   # if length(x)=3\n   end\n   ...\nend\n\n\n\n"
+    "text": "ModiaMath.setNominal!(sim::ModiaMath.SimulationState, x_nominal::Vector{Float64})\n\nAt initialization provide x_nominal, the nominal values of the x-vector, and  store them insim`, the simulation state. These values are used to compute the absolute tolerances of the x-vector for the integrator.\n\nExample\n\nfunction getModelResidues!(m::Model, t, x, derx, r, w)\n   sim = m.simulationState\n   if ModiaMath.isInitial(sim)\n      ModiaMath.setNominal!(sim, [1.0, 1e-5, 1e8])   # if length(x)=3\n   end\n   ...\nend\n\n\n\n\n\n"
 },
 
 {
@@ -358,14 +350,6 @@ var documenterSearchIndex = {"docs": [
     "title": "DAE",
     "category": "section",
     "text": "Modules = [ModiaMath.DAE]\r\nPrivate = false"
-},
-
-{
-    "location": "lib/DAE.html#-1",
-    "page": "DAE",
-    "title": "",
-    "category": "section",
-    "text": ""
 },
 
 {
@@ -381,7 +365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables",
     "category": "module",
-    "text": "module ModiaMath.Variables\n\nProvide variable types for simulation models.\n\nThis module provides functions to declare simulation Variables as special structs that have a value and associated attributes. Furthermore, there are functions to copy the integrator interface variables (x, derx, residue) to the appropriate Variables and  vice versa. Therefore, the modeler does not have to care about, how the values of the variables are mapped to the integrator interface. Typically, a model is constructed with macro @component using RealXXX variable declarations. Example:\n\n  using ModiaMath\n  using StaticArrays\n\n  @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81) begin\n     phi = RealScalar(start=pi/2, unit=\"rad\"    , fixed=true,               numericType=ModiaMath.XD_EXP)\n     w   = RealScalar(start=0.0 , unit=\"rad/s\"  , fixed=true, integral=phi, numericType=ModiaMath.XD_EXP)\n     a   = RealScalar(            unit=\"rad/s^2\",             integral=w  , numericType=ModiaMath.DER_XD_EXP) \n     r   = RealSVector{2}(        unit=\"m\"      ,                           numericType=ModiaMath.WC)\n  end;\n\nThe following variable types are currently supported:\n\nVariable types Description\nRealScalar Scalar variable with Float64 value\nRealSVector{Size} Variable with SVector{Size,Float64} value\nRealSVector3 Variable with SVector{3,Float64} value\nRealVariable{VType, EType} Variable with value/element type VType/EType\n\nAll of them have the following attributes:\n\nVariable attributes Description\nvalue::VType Value of the variable (scale, vector, matrix, ...)\ninfo::AbstractString Description text\ncausality::ModiaMath.Causality Causality of variable\nvariability::ModiaMath.Variability Variability of variable\nstart::EType Start value of variable\nfixed::Bool fixed = true: value=start after initialization\nanalysis::VariableAnalysisType Analysis for which the variable is used\nmin::EType Minimum value of value and of start\nmax::EType Maximum value of value and of start\nnominal::EType Nominal value of value (used to improve numerics)\nflow::Bool = true if variable is a flow variable\nnumericyType::ModiaMath.NumericType Defines how variable is used by the integrator\nintegral = the integral variable or nothing\nunit::String Unit of value and of start\n\nThe following functions are provided to perform the actual copy-operations and/or to inquire information about the variables in the model\n\nModiaMath.copy_start_to_x!\nModiaMath.copy_x_and_derx_to_variables!\nModiaMath.copy_variables_to_residue!\nModiaMath.print_ModelVariables\nModiaMath.get_xTable\nModiaMath.get_copyToVariableTable\nModiaMath.get_copyToResidueTable\nModiaMath.get_copyToResultTable\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.Variables\n\nProvide variable types for simulation models.\n\nThis module provides functions to declare simulation Variables as special structs that have a value and associated attributes. Furthermore, there are functions to copy the integrator interface variables (x, derx, residue) to the appropriate Variables and  vice versa. Therefore, the modeler does not have to care about, how the values of the variables are mapped to the integrator interface. Typically, a model is constructed with macro @component using RealXXX variable declarations. Example:\n\n  using ModiaMath\n  using StaticArrays\n\n  @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81) begin\n     phi = RealScalar(start=pi/2, unit=\"rad\"    , fixed=true,               numericType=ModiaMath.XD_EXP)\n     w   = RealScalar(start=0.0 , unit=\"rad/s\"  , fixed=true, integral=phi, numericType=ModiaMath.XD_EXP)\n     a   = RealScalar(            unit=\"rad/s^2\",             integral=w  , numericType=ModiaMath.DER_XD_EXP) \n     r   = RealSVector{2}(        unit=\"m\"      ,                           numericType=ModiaMath.WC)\n  end;\n\nThe following variable types are currently supported:\n\nVariable types Description\nRealScalar Scalar variable with Float64 value\nRealSVector{Size} Variable with SVector{Size,Float64} value\nRealSVector3 Variable with SVector{3,Float64} value\nRealVariable{VType, EType} Variable with value/element type VType/EType\n\nAll of them have the following attributes:\n\nVariable attributes Description\nvalue::VType Value of the variable (scale, vector, matrix, ...)\ninfo::AbstractString Description text\ncausality::ModiaMath.Causality Causality of variable\nvariability::ModiaMath.Variability Variability of variable\nstart::EType Start value of variable\nfixed::Bool fixed = true: value=start after initialization\nanalysis::VariableAnalysisType Analysis for which the variable is used\nmin::EType Minimum value of value and of start\nmax::EType Maximum value of value and of start\nnominal::EType Nominal value of value (used to improve numerics)\nflow::Bool = true if variable is a flow variable\nnumericyType::ModiaMath.NumericType Defines how variable is used by the integrator\nintegral = the integral variable or nothing\nunit::String Unit of value and of start\n\nThe following functions are provided to perform the actual copy-operations and/or to inquire information about the variables in the model\n\nModiaMath.copy_start_to_x!\nModiaMath.copy_x_and_derx_to_variables!\nModiaMath.copy_variables_to_residue!\nModiaMath.print_ModelVariables\nModiaMath.get_xTable\nModiaMath.get_copyToVariableTable\nModiaMath.get_copyToResidueTable\nModiaMath.get_copyToResultTable\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -389,7 +373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.AnalysisType",
     "category": "type",
-    "text": "@enum AnalysisType KinematicAnalysis QuasiStaticAnalysis DynamicAnalysis\n\nType of analyis that is actually carried out. The AnalysisType is set by the user of the simulation model. Variables are declared in the model with VariableAnalysisType. Variables with [VariableAnalysisType](@ref) <= AnalysisTypeare removed from the analysis and do not show up in the result. For example, an *acceleration* would be declared asOnlyDynamicAnalysisand then this variable would not show up in the result, ifAnalysisType = KinematicAnalysisorQuasiStaticAnalysis`.\n\n\n\n"
+    "text": "@enum AnalysisType KinematicAnalysis QuasiStaticAnalysis DynamicAnalysis\n\nType of analyis that is actually carried out. The AnalysisType is set by the user of the simulation model. Variables are declared in the model with VariableAnalysisType. Variables with [VariableAnalysisType](@ref) <= AnalysisTypeare removed from the analysis and do not show up in the result. For example, an *acceleration* would be declared asOnlyDynamicAnalysisand then this variable would not show up in the result, ifAnalysisType = KinematicAnalysisorQuasiStaticAnalysis`.\n\n\n\n\n\n"
 },
 
 {
@@ -397,7 +381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.Causality",
     "category": "type",
-    "text": "@enum Causality Parameter CalculatedParameter Input Output Local Independent\n\nCausality of variable (only used when connecting models)\n\n\n\n"
+    "text": "@enum Causality Parameter CalculatedParameter Input Output Local Independent\n\nCausality of variable (only used when connecting models)\n\n\n\n\n\n"
 },
 
 {
@@ -405,7 +389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.ModelVariables",
     "category": "type",
-    "text": "vars = ModiaMath.ModelVariables(model::ModiaMath.AbstractComponentWithVariables; \n                                analysis::AnalysisType = ModiaMath.DynamicAnalysis)\n\nReturn a struct that contains all the variables in model in a form so that fast copying from the integrator interface to the variables can be performed, and vice versa.\n\n\n\n"
+    "text": "vars = ModiaMath.ModelVariables(model::ModiaMath.AbstractComponentWithVariables; \n                                analysis::AnalysisType = ModiaMath.DynamicAnalysis)\n\nReturn a struct that contains all the variables in model in a form so that fast copying from the integrator interface to the variables can be performed, and vice versa.\n\n\n\n\n\n"
 },
 
 {
@@ -413,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.NumericType",
     "category": "type",
-    "text": "@enum NumericType XD_EXP XD_IMP ..\n\nDefines how a variable is used in the integrator interface. The goal is to describe an implicit index-1 DAE:\n\nbeginalign\n z = f_z(x t) \n 0 = f_d(dotx x t z_i  0) \n 0 = f_c(x t z_i  0) \n J = left fracpartial f_dpartial dotx  \n              fracpartial f_cpartial x right  textis regular\nendalign\n\nThe integrator interface to the model is\n\ngetModelResidues(m::AbstractSimulationModel, t::Float64, x::Vector{Float64},  \n                 derx::Vector{Float64}, r::Vector{Float64}\n\nIn the following table it is shown how NumericType values of variables are mapped to this integrator interface:\n\n@enum value Mapping/Description\nXD_EXP Copied from x into variable; der(v) is computed by model\nXD_IMP Copied from x into variable; der(v) copied from derx\nXA Copied from x into variable; derx is ignored (algebraic variable)\nDER_XD_EXP Computed by model; automatic: residue = der(v) - derx\nDER_XD_IMP Copied from derx into variable (= der(v); v has type XD_IMP\nLAMBDA Copied from derx into variable; index-1 algebraic variable\nMUE Copied from derx; stabilizing variable to reduced index to index 1\nFD_IMP Is copied from variable to residue; part of f_d equations\nFC Is copied from variable to residue; part of f_c equations\nWR Computed by model; stored in result; used to compute residues\nWC Computed by model; stored in result; only available at communication points\nTIME Copied from t into variable; independent variable time\n\n\n\n"
+    "text": "@enum NumericType XD_EXP XD_IMP ..\n\nDefines how a variable is used in the integrator interface. The goal is to describe an implicit index-1 DAE:\n\nbeginalign\n z = f_z(x t) \n 0 = f_d(dotx x t z_i  0) \n 0 = f_c(x t z_i  0) \n J = left fracpartial f_dpartial dotx  \n              fracpartial f_cpartial x right  textis regular\nendalign\n\nThe integrator interface to the model is\n\ngetModelResidues(m::AbstractSimulationModel, t::Float64, x::Vector{Float64},  \n                 derx::Vector{Float64}, r::Vector{Float64}\n\nIn the following table it is shown how NumericType values of variables are mapped to this integrator interface:\n\n@enum value Mapping/Description\nXD_EXP Copied from x into variable; der(v) is computed by model\nXD_IMP Copied from x into variable; der(v) copied from derx\nXA Copied from x into variable; derx is ignored (algebraic variable)\nDER_XD_EXP Computed by model; automatic: residue = der(v) - derx\nDER_XD_IMP Copied from derx into variable (= der(v); v has type XD_IMP\nLAMBDA Copied from derx into variable; index-1 algebraic variable\nMUE Copied from derx; stabilizing variable to reduced index to index 1\nFD_IMP Is copied from variable to residue; part of f_d equations\nFC Is copied from variable to residue; part of f_c equations\nWR Computed by model; stored in result; used to compute residues\nWC Computed by model; stored in result; only available at communication points\nTIME Copied from t into variable; independent variable time\n\n\n\n\n\n"
 },
 
 {
@@ -421,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.RealSVector",
     "category": "type",
-    "text": "v = RealSVector{Size}(..)\n\nGenerate a variable of type RealVariable{SVector{Size,Float64},Float64} where the values have type StaticArrays.SVector{Size,Float64}. The argument list is described in module Variables.\n\n\n\n"
+    "text": "v = RealSVector{Size}(..)\n\nGenerate a variable of type RealVariable{SVector{Size,Float64},Float64} where the values have type StaticArrays.SVector{Size,Float64}. The argument list is described in module Variables.\n\n\n\n\n\n"
 },
 
 {
@@ -429,7 +413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.RealSVector3",
     "category": "type",
-    "text": "v = RealSVector3(..)\n\nGenerate a variable of type RealVariable{SVector{3,Float64},Float64} where the values have type StaticArrays.SVector{3,Float64}. The argument list is described in module Variables.\n\n\n\n"
+    "text": "v = RealSVector3(..)\n\nGenerate a variable of type RealVariable{SVector{3,Float64},Float64} where the values have type StaticArrays.SVector{3,Float64}. The argument list is described in module Variables.\n\n\n\n\n\n"
 },
 
 {
@@ -437,7 +421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.RealScalar",
     "category": "type",
-    "text": "v = RealScalar(..)\n\nGenerate a variable of type RealVariable{Float64,Float64} to define scalar, Float64, real variables. The argument list is described in module Variables.\n\n\n\n"
+    "text": "v = RealScalar(..)\n\nGenerate a variable of type RealVariable{Float64,Float64} to define scalar, Float64, real variables. The argument list is described in module Variables.\n\n\n\n\n\n"
 },
 
 {
@@ -445,7 +429,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.RealVariable",
     "category": "type",
-    "text": "v = RealVariable{ValueType,ElementType}(...)\n\nGenerate a new variable with v.value::ValueType, v.nominal::ElementType. The argument list is described in module Variables.\n\n\n\n"
+    "text": "v = RealVariable{ValueType,ElementType}(...)\n\nGenerate a new variable with v.value::ValueType, v.nominal::ElementType. The argument list is described in module Variables.\n\n\n\n\n\n"
 },
 
 {
@@ -453,7 +437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.SimulationModel",
     "category": "type",
-    "text": "sm = ModiaMath.SimulationModel(model::ModiaMath.AbstractComponentWithVariables;\n                               startTime = 0.0, stopTime = 1.0, tolerance = 1e-4,\n                               interval = (stopTime-startTime)/500.0)\n\nReturn a simulationModel sm struct that can be simulated with ModiaMath.simulate!. The given model is typically constructed with the @component macro. As keyword arguments, default values for startTime, stopTime, tolerance, interval can be given.\n\n\n\n"
+    "text": "sm = ModiaMath.SimulationModel(model::ModiaMath.AbstractComponentWithVariables;\n                               startTime = 0.0, stopTime = 1.0, tolerance = 1e-4,\n                               interval = (stopTime-startTime)/500.0)\n\nReturn a simulationModel sm struct that can be simulated with ModiaMath.simulate!. The given model is typically constructed with the @component macro. As keyword arguments, default values for startTime, stopTime, tolerance, interval can be given.\n\n\n\n\n\n"
 },
 
 {
@@ -461,7 +445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.Variability",
     "category": "type",
-    "text": "@enum Variability Constant Fixed Tunable Discrete Continuous\n\nCurrently not used. Will be used in the future to store only the minimum information in the result (store value only, when it can potentially change).\n\n\n\n"
+    "text": "@enum Variability Constant Fixed Tunable Discrete Continuous\n\nCurrently not used. Will be used in the future to store only the minimum information in the result (store value only, when it can potentially change).\n\n\n\n\n\n"
 },
 
 {
@@ -469,7 +453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.VariableAnalysisType",
     "category": "type",
-    "text": "@enum VariableAnalysisType AllAnalysis QuasiStaticAndDynamicAnalysis \n                           OnlyDynamicAnalysis NotUsedInAnalysis\n\nType of analysis that can be carried out with the variable (e.g. a force would be defined as QuasiStaticAndDynamicAnalysis, an acceleration would be defined as OnlyDynamicAnalysis and a position variable would be defined as AllAnalysis.\n\nVariables with VariableAnalysisType <=AnalysisType are removed from the analysis and do not show up in the result. For example, an acceleration would be declared as OnlyDynamicAnalysis and then this variable would not show up in the result, if AnalysisType = KinematicAnalysis or QuasiStaticAnalysis.\n\n\n\n"
+    "text": "@enum VariableAnalysisType AllAnalysis QuasiStaticAndDynamicAnalysis \n                           OnlyDynamicAnalysis NotUsedInAnalysis\n\nType of analysis that can be carried out with the variable (e.g. a force would be defined as QuasiStaticAndDynamicAnalysis, an acceleration would be defined as OnlyDynamicAnalysis and a position variable would be defined as AllAnalysis.\n\nVariables with VariableAnalysisType <=AnalysisType are removed from the analysis and do not show up in the result. For example, an acceleration would be declared as OnlyDynamicAnalysis and then this variable would not show up in the result, if AnalysisType = KinematicAnalysis or QuasiStaticAnalysis.\n\n\n\n\n\n"
 },
 
 {
@@ -477,7 +461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.componentName",
     "category": "method",
-    "text": "name = ModiaMath.componentName(\n           component::ModiaMath.AbstractComponentWithVariables)\n\nReturn name of component (without the leading path) as Symbol. \n\n\n\n"
+    "text": "name = ModiaMath.componentName(\n           component::ModiaMath.AbstractComponentWithVariables)\n\nReturn name of component (without the leading path) as Symbol. \n\n\n\n\n\n"
 },
 
 {
@@ -485,7 +469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_start_to_x!",
     "category": "method",
-    "text": "copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool})\n\nCopy start and fixed values of variables varsto x and x_fixed vectors.\n\n\n\n"
+    "text": "copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool})\n\nCopy start and fixed values of variables varsto x and x_fixed vectors.\n\n\n\n\n\n"
 },
 
 {
@@ -493,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_variables_to_residue!",
     "category": "method",
-    "text": "copy_variables_to_residue!(vars::ModelVariables, x::Vector{Float64},\n                           derx::Vector{Float64}, residue::Vector{Float64})\n\nCopy variables vars to residue vector and include the inherent residue equations of XD_EXP variables (residue = der(v) - derx).\n\n\n\n"
+    "text": "copy_variables_to_residue!(vars::ModelVariables, x::Vector{Float64},\n                           derx::Vector{Float64}, residue::Vector{Float64})\n\nCopy variables vars to residue vector and include the inherent residue equations of XD_EXP variables (residue = der(v) - derx).\n\n\n\n\n\n"
 },
 
 {
@@ -501,7 +485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_x_and_derx_to_variables!",
     "category": "method",
-    "text": "copy_x_and_derx_to_variables!(time::Float64, x::Vector{Float64}, \n                              derx::Vector{Float64}, vars::ModelVariables)\n\nCopy xand derxof the integrator interface to the model variables vars.\n\n\n\n"
+    "text": "copy_x_and_derx_to_variables!(time::Float64, x::Vector{Float64}, \n                              derx::Vector{Float64}, vars::ModelVariables)\n\nCopy xand derxof the integrator interface to the model variables vars.\n\n\n\n\n\n"
 },
 
 {
@@ -509,7 +493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.fullName",
     "category": "method",
-    "text": "name = ModiaMath.fullName(component::ModiaMath.AbstractComponentWithVariables)\n\nReturn full path name of component (including root name) as Symbol.\n\n\n\n"
+    "text": "name = ModiaMath.fullName(component::ModiaMath.AbstractComponentWithVariables)\n\nReturn full path name of component (including root name) as Symbol.\n\n\n\n\n\n"
 },
 
 {
@@ -517,7 +501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToResidueTable",
     "category": "method",
-    "text": "table = ModiaMath.get_copyToResidueTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from variables to the residue vector.\n\n\n\n"
+    "text": "table = ModiaMath.get_copyToResidueTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from variables to the residue vector.\n\n\n\n\n\n"
 },
 
 {
@@ -525,7 +509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToResultTable",
     "category": "method",
-    "text": "table = ModiaMath.get_copyToResultTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from variables to the result.\n\n\n\n"
+    "text": "table = ModiaMath.get_copyToResultTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from variables to the result.\n\n\n\n\n\n"
 },
 
 {
@@ -533,7 +517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToVariableTable",
     "category": "method",
-    "text": "table = ModiaMath.get_copyToVariableTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from x/derx to the variables.\n\n\n\n"
+    "text": "table = ModiaMath.get_copyToVariableTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables in vars that are copied from x/derx to the variables.\n\n\n\n\n\n"
 },
 
 {
@@ -541,7 +525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.get_xTable",
     "category": "method",
-    "text": "table = ModiaMath.get_xTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables stored in x-vector in vars.\n\n\n\n"
+    "text": "table = ModiaMath.get_xTable(vars::ModelVariables)\n\nFunction returns a DataFrames tables of all the variables stored in x-vector in vars.\n\n\n\n\n\n"
 },
 
 {
@@ -549,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.initComponent!",
     "category": "method",
-    "text": "initComponent!(within::ModiaMath.AbstractComponentWithVariables, component, name)\n\nInitialize component with name (of String or Symbol type) for component within. If component::ModiaMath.AbstractComponentWithVariables the within object and name are stored in component._internal.\n\nAdditionally, and for all other types of component the following statement is executed:\n\n   setfield!(within, Symbol(name), component)\n\n\n\n"
+    "text": "initComponent!(within::ModiaMath.AbstractComponentWithVariables, component, name)\n\nInitialize component with name (of String or Symbol type) for component within. If component::ModiaMath.AbstractComponentWithVariables the within object and name are stored in component._internal.\n\nAdditionally, and for all other types of component the following statement is executed:\n\n   setfield!(within, Symbol(name), component)\n\n\n\n\n\n"
 },
 
 {
@@ -557,7 +541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.instanceName",
     "category": "method",
-    "text": "ModiaMath.instanceName(component::ModiaMath.AbstractComponentWithVariables)\n\nReturn instance name of component (= full name but without root name) as Symbol.\n\n\n\n"
+    "text": "ModiaMath.instanceName(component::ModiaMath.AbstractComponentWithVariables)\n\nReturn instance name of component (= full name but without root name) as Symbol.\n\n\n\n\n\n"
 },
 
 {
@@ -565,7 +549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.print_ModelVariables",
     "category": "method",
-    "text": "table = print_ModelVariables(vars::ModelVariables)\n\nPrint all the variables in vars in form of DataFrames tables.\n\n\n\n"
+    "text": "table = print_ModelVariables(vars::ModelVariables)\n\nPrint all the variables in vars in form of DataFrames tables.\n\n\n\n\n\n"
 },
 
 {
@@ -573,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.@component",
     "category": "macro",
-    "text": "@component ComponentName(arguments) begin ... end\n\nMacro to generate a mutable struct ComponentName. An instance of this struct can be used as simulationModel in constructor ModiaMath.SimulationModel and can then be simulated with ModiaMath.simulate!.\n\nThe arguments must be keyword arguments and are used as keyword arguments for the generated constructor function ComponentName. The code inbegin ... endis  basically the body of the generated constructor function. All left-hand-side (scalar or vector) symbols present betweenbegin ... end, as well as all keyword-argumentsargumentsare declared as fields in structComponentName`.\n\nExamples\n\nusing ModiaMath\n\n@component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90.0) begin\n   @assert(L > 0.0)\n   @assert(m > 0.0)\n   @assert(d >= 0.0)\n  \n   phi = RealScalar(..)\n   w   = RealScalar(..)\n   a   = RealScalar(..) \n   r   = RealSVector{2}(..)\nend\n\npendulum = Pendulum(L=1.8)\n\nThe symbols  L, m, d, g, phi0_deg, phi, w, a, r are used as fields in pendulum (so pendulum.L = 1.8).\n\n\n\n"
+    "text": "@component ComponentName(arguments) begin ... end\n\nMacro to generate a mutable struct ComponentName. An instance of this struct can be used as simulationModel in constructor ModiaMath.SimulationModel and can then be simulated with ModiaMath.simulate!.\n\nThe arguments must be keyword arguments and are used as keyword arguments for the generated constructor function ComponentName. The code inbegin ... endis  basically the body of the generated constructor function. All left-hand-side (scalar or vector) symbols present betweenbegin ... end, as well as all keyword-argumentsargumentsare declared as fields in structComponentName`.\n\nExamples\n\nusing ModiaMath\n\n@component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90.0) begin\n   @assert(L > 0.0)\n   @assert(m > 0.0)\n   @assert(d >= 0.0)\n  \n   phi = RealScalar(..)\n   w   = RealScalar(..)\n   a   = RealScalar(..) \n   r   = RealSVector{2}(..)\nend\n\npendulum = Pendulum(L=1.8)\n\nThe symbols  L, m, d, g, phi0_deg, phi, w, a, r are used as fields in pendulum (so pendulum.L = 1.8).\n\n\n\n\n\n"
 },
 
 {
@@ -597,7 +581,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging",
     "category": "module",
-    "text": "module ModiaMath.Logger\n\nLog model evaluations.\n\nMain developer\n\nMartin Otter, DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.Logger\n\nLog model evaluations.\n\nMain developer\n\nMartin Otter, DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -605,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.Logger",
     "category": "type",
-    "text": "mutable struct Logger - Log model evaluations\n\n\n\n"
+    "text": "mutable struct Logger - Log model evaluations\n\n\n\n\n\n"
 },
 
 {
@@ -613,7 +597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.SimulationStatistics",
     "category": "type",
-    "text": "mutable struct SimulationStatistics - Collect statistics of the last simulation run.\n\nThe following data is stored in this structure:\n\ncpuTimeInitialization: CPU-time for initialization\ncpuTimeIntegration: CPU-time for integration\nstartTime: start time of the integration\nstopTime: stop time of the integration\ninterval: communication interval of the integration\ntolerance: relative tolerance used for the integration\nnEquations: number of equations (length of y and of yp)\nnResults: number of time points stored in result data structure\nnSteps: number of (successful) steps\nnResidues: number of calls to compute residues (includes residue calls for Jacobian)\nnZeroCrossing: number of calls to compute zero crossings\nnJac: number of calls to compute Jacobian\nnTimeEvents: number of time events\nnRestartEvents: number of events with integrator restart\nnErrTestFails: number of fails of error tests\nh0: stepsize used at the first step\nhMin: minimum integration stepsize\nhMax: maximum integration stepsize\norderMax: maximum integration order\nsparseSolver = true: if sparse solver used, otherwise dense solver\nnGroups: if sparseSolver, number of column groups to compute Jacobian (e.g. if nEquations=100, nGroups=5, then 5+1=6 model evaluations are needed to compute the Jacobian numerically, instead of 101 model evaluations without taking the sparseness structure into account).\n\n\n\n"
+    "text": "mutable struct SimulationStatistics - Collect statistics of the last simulation run.\n\nThe following data is stored in this structure:\n\ncpuTimeInitialization: CPU-time for initialization\ncpuTimeIntegration: CPU-time for integration\nstartTime: start time of the integration\nstopTime: stop time of the integration\ninterval: communication interval of the integration\ntolerance: relative tolerance used for the integration\nnEquations: number of equations (length of y and of yp)\nnResults: number of time points stored in result data structure\nnSteps: number of (successful) steps\nnResidues: number of calls to compute residues (includes residue calls for Jacobian)\nnZeroCrossing: number of calls to compute zero crossings\nnJac: number of calls to compute Jacobian\nnTimeEvents: number of time events\nnRestartEvents: number of events with integrator restart\nnErrTestFails: number of fails of error tests\nh0: stepsize used at the first step\nhMin: minimum integration stepsize\nhMax: maximum integration stepsize\norderMax: maximum integration order\nsparseSolver = true: if sparse solver used, otherwise dense solver\nnGroups: if sparseSolver, number of column groups to compute Jacobian (e.g. if nEquations=100, nGroups=5, then 5+1=6 model evaluations are needed to compute the Jacobian numerically, instead of 101 model evaluations without taking the sparseness structure into account).\n\n\n\n\n\n"
 },
 
 {
@@ -621,7 +605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogEvents",
     "category": "method",
-    "text": "ModiaMath.isLogEvents(obj)\n\nReturn true, if logger settings require to print event messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n"
+    "text": "ModiaMath.isLogEvents(obj)\n\nReturn true, if logger settings require to print event messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n\n\n"
 },
 
 {
@@ -629,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogInfos",
     "category": "method",
-    "text": "ModiaMath.isLogInfos(obj)\n\nReturn true, if logger settings require to print info messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n"
+    "text": "ModiaMath.isLogInfos(obj)\n\nReturn true, if logger settings require to print info messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n\n\n"
 },
 
 {
@@ -637,7 +621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogProgress",
     "category": "method",
-    "text": "ModiaMath.isLogProgress(logger::ModiaMath.Logger)\n\nReturn true, if logger settings require to print progress messages of the model\n\n\n\n"
+    "text": "ModiaMath.isLogProgress(logger::ModiaMath.Logger)\n\nReturn true, if logger settings require to print progress messages of the model\n\n\n\n\n\n"
 },
 
 {
@@ -645,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogStatistics",
     "category": "method",
-    "text": "ModiaMath.isLogStatistics(logger::ModiaMath.Logger)\n\nReturn true, if logger settings require to print statistics messages of the model.\n\n\n\n"
+    "text": "ModiaMath.isLogStatistics(logger::ModiaMath.Logger)\n\nReturn true, if logger settings require to print statistics messages of the model.\n\n\n\n\n\n"
 },
 
 {
@@ -653,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogWarnings",
     "category": "method",
-    "text": "ModiaMath.isLogWarnings(obj)\n\nReturn true, if logger settings require to print warning messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n"
+    "text": "ModiaMath.isLogWarnings(obj)\n\nReturn true, if logger settings require to print warning messages of the model (obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger).\n\n\n\n\n\n"
 },
 
 {
@@ -661,7 +645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.logOff!",
     "category": "method",
-    "text": "ModiaMath.logOff!(obj)\n\nDisable logging on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger)\n\n\n\n"
+    "text": "ModiaMath.logOff!(obj)\n\nDisable logging on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger)\n\n\n\n\n\n"
 },
 
 {
@@ -669,7 +653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.logOn!",
     "category": "method",
-    "text": "ModiaMath.logOn!(obj)\n\nEnable logging on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger)\n\n\n\n"
+    "text": "ModiaMath.logOn!(obj)\n\nEnable logging on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger)\n\n\n\n\n\n"
 },
 
 {
@@ -677,7 +661,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.setLogCategories!",
     "category": "method",
-    "text": "ModiaMath.setLogCategories!(obj, categories; reinit=true)\n\nSet log categories on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger) as vector of symbols, e.g. setLogCategories!(simulationModel, [:LogProgess]). Supported categories:\n\n:LogStatistics, print statistics information at end of simulation\n:LogProgress, print progress information during simulation\n:LogInfos, print information messages of the model\n:LogWarnings, print warning messages of the model\n:LogEvents, log events of the model\n\nIf option reinit=true, all previous set categories are reinitialized to be no longer present. If reinit=false, previously set categories are not changed.\n\n\n\n"
+    "text": "ModiaMath.setLogCategories!(obj, categories; reinit=true)\n\nSet log categories on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,  or ModiaMath.Logger) as vector of symbols, e.g. setLogCategories!(simulationModel, [:LogProgess]). Supported categories:\n\n:LogStatistics, print statistics information at end of simulation\n:LogProgress, print progress information during simulation\n:LogInfos, print information messages of the model\n:LogWarnings, print warning messages of the model\n:LogEvents, log events of the model\n\nIf option reinit=true, all previous set categories are reinitialized to be no longer present. If reinit=false, previously set categories are not changed.\n\n\n\n\n\n"
 },
 
 {
@@ -701,7 +685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames",
     "category": "module",
-    "text": "module ModiaMath.Frames\n\nThis module contains functions for frames that is coordinate systems in 3D. The orientation of a frame is described either with a 3x3 rotation matrix  or with a quaternion vector and its origin is described with a Vector3D:\n\nconstModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}`:  Type of a Rotation matrix to rotate from a frame 1 into a frame 2.\nconstModiaMath.Quaternion = SVector{4,Float64}`: Type of a Quaternion vector to rotate from a frame 1 into a frame 2.\nconstModiaMath.Vector3D = SVector{3,Float64}`: Type of a vector in 3D space (e.g. position vector of the origin of a frame).\n\nThe following constants are defined\n\nconstModiaMath.NullRotation:  RotationMatrix with no rotation from a frame 1 into a frame 2.\nconstModiaMath.NullQuaternion: Quaternion vector with no rotation from a frame 1 into a frame 2.\nconstModiaMath.ZeroVector3D: Vector3D with only zero elements.\n\nIf an angle is given as an argument to one of the functions below, it might be a number (interpreted as having unit rad) or a number with a unit (for example: using Unitful; angle = 90u\"°\").\n\nConstructors for a RotationMatrix R\n\nThe following functions return a ModiaMath.RotationMatrixR to rotate a frame 1 into a frame 2.\n\nFunction Description\nModiaMath.rot1(angle) Rotate around angle along x-axis\nModiaMath.rot2(angle) Rotate around angle along y-axis\nModiaMath.rot3(angle) Rotate around angle along z-axis\nModiaMath.rot123(angle1, angle2, angle3) Rotate around angles along x,y,z-axes\nModiaMath.rot_e(e, angle) Rotate around angle along unit vector e\nModiaMath.rot_nxy(nx, ny) nx/ny are in x/y-direction of frame 2\nModiaMath.from_q(q) Return R from Quaternion q\n\nConstructors for a Quaternion q\n\nThe following functions return a ModiaMath.Quaternionq to rotate a frame 1 into a frame 2. Since q and -q define the same rotation the constructor functions have a keyword argument q_guess::Quaternion = NullQuaternion. From the two possible solutions q the one is returned that is closer to q_guess.\n\nFunction Description\nModiaMath.qrot1(angle) Rotate around angle along x-axis\nModiaMath.qrot2(angle) Rotate around angle along y-axis\nModiaMath.qrot3(angle) Rotate around angle along z-axis\nModiaMath.qrot123(angle1, angle2, angle3) Rotate around angles along x,y,z-axes\nModiaMath.qrot_e(e, angle) Rotate around angle along unit vector e\nModiaMath.qrot_nxy(nx, ny) nx/ny are in x/y-direction of frame 2\nModiaMath.from_R(R) Return q from RotationMatrix R\n\nOperations on Frames\n\nThe following functions provide operations on frames. The orientation of a frame is  defined with argument Rq meaning it can be either a  ModiaMath.RotationMatrix R or a  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\nFunction Description\nModiaMath.resolve1(Rq, v2) Transform vector v from frame 2 to frame 1\nModiaMath.resolve2(Rq, v1) Transform vector v from frame 1 to frame 2\nModiaMath.absoluteRotation(Rq01, Rq12) Return rotation 0->2 from rot. 0->1 and 1->2\nModiaMath.relativeRotation(Rq01, Rq02) Return rotation 1->2 from rot. 0->1 and 0->2\nModiaMath.inverseRotation(Rq01) Return rotation 1->0 from rot, 0->1\nModiaMath.planarRotationAngle(e,v1,v2) Return angle of planar rotation along e\nModiaMath.eAxis(axis) Return unit vector e in direction of axis\nModiaMath.skew(v) Return skew-symmetric matrix of vector v\n\nInterpolation of Frames\n\nGiven a set of frames by a vector r of position vectors to their origins and  and an optional vector q of Quaternions of their absolute orientations, then the following functions interpolate linearly in these frames:\n\nFunction Description\nModiaMath.Path(r,q) Return path defined by a vector of frames\nModiaMath.t_pathEnd(path) Return path parameter t_end of last frame\nModiaMath.interpolate(path,t) Return (rt,qt) of Path at path parameter t\nModiaMath.interpolate_r(path,t) Return rt of Path at path parameter t\n\nExamples\n\nusing ModiaMath\nusing Unitful\n\n# R1,R2,R3 are the same RotationMatrices\nR1 = ModiaMath.rot1(pi/2)\nR2 = ModiaMath.rot1(90u\"°\")\nR3 = ModiaMath.rot_e([1,0,0], pi/2)\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\nThe functions of this module are mostly a mapping of some of the functions of the Modelica Standard Library from Modelica  (Modelica.Mechanics.MultiBody.Frames) to Julia (taking advantage of Julia features  such as multiple dispatch and unit package Unitful).\n\n\n\n"
+    "text": "module ModiaMath.Frames\n\nThis module contains functions for frames that is coordinate systems in 3D. The orientation of a frame is described either with a 3x3 rotation matrix  or with a quaternion vector and its origin is described with a Vector3D:\n\nconstModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}`:  Type of a Rotation matrix to rotate from a frame 1 into a frame 2.\nconstModiaMath.Quaternion = SVector{4,Float64}`: Type of a Quaternion vector to rotate from a frame 1 into a frame 2.\nconstModiaMath.Vector3D = SVector{3,Float64}`: Type of a vector in 3D space (e.g. position vector of the origin of a frame).\n\nThe following constants are defined\n\nconstModiaMath.NullRotation:  RotationMatrix with no rotation from a frame 1 into a frame 2.\nconstModiaMath.NullQuaternion: Quaternion vector with no rotation from a frame 1 into a frame 2.\nconstModiaMath.ZeroVector3D: Vector3D with only zero elements.\n\nIf an angle is given as an argument to one of the functions below, it might be a number (interpreted as having unit rad) or a number with a unit (for example: using Unitful; angle = 90u\"°\").\n\nConstructors for a RotationMatrix R\n\nThe following functions return a ModiaMath.RotationMatrixR to rotate a frame 1 into a frame 2.\n\nFunction Description\nModiaMath.rot1(angle) Rotate around angle along x-axis\nModiaMath.rot2(angle) Rotate around angle along y-axis\nModiaMath.rot3(angle) Rotate around angle along z-axis\nModiaMath.rot123(angle1, angle2, angle3) Rotate around angles along x,y,z-axes\nModiaMath.rot_e(e, angle) Rotate around angle along unit vector e\nModiaMath.rot_nxy(nx, ny) nx/ny are in x/y-direction of frame 2\nModiaMath.from_q(q) Return R from Quaternion q\n\nConstructors for a Quaternion q\n\nThe following functions return a ModiaMath.Quaternionq to rotate a frame 1 into a frame 2. Since q and -q define the same rotation the constructor functions have a keyword argument q_guess::Quaternion = NullQuaternion. From the two possible solutions q the one is returned that is closer to q_guess.\n\nFunction Description\nModiaMath.qrot1(angle) Rotate around angle along x-axis\nModiaMath.qrot2(angle) Rotate around angle along y-axis\nModiaMath.qrot3(angle) Rotate around angle along z-axis\nModiaMath.qrot123(angle1, angle2, angle3) Rotate around angles along x,y,z-axes\nModiaMath.qrot_e(e, angle) Rotate around angle along unit vector e\nModiaMath.qrot_nxy(nx, ny) nx/ny are in x/y-direction of frame 2\nModiaMath.from_R(R) Return q from RotationMatrix R\n\nOperations on Frames\n\nThe following functions provide operations on frames. The orientation of a frame is  defined with argument Rq meaning it can be either a  ModiaMath.RotationMatrix R or a  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\nFunction Description\nModiaMath.resolve1(Rq, v2) Transform vector v from frame 2 to frame 1\nModiaMath.resolve2(Rq, v1) Transform vector v from frame 1 to frame 2\nModiaMath.absoluteRotation(Rq01, Rq12) Return rotation 0->2 from rot. 0->1 and 1->2\nModiaMath.relativeRotation(Rq01, Rq02) Return rotation 1->2 from rot. 0->1 and 0->2\nModiaMath.inverseRotation(Rq01) Return rotation 1->0 from rot, 0->1\nModiaMath.planarRotationAngle(e,v1,v2) Return angle of planar rotation along e\nModiaMath.eAxis(axis) Return unit vector e in direction of axis\nModiaMath.skew(v) Return skew-symmetric matrix of vector v\n\nInterpolation of Frames\n\nGiven a set of frames by a vector r of position vectors to their origins and  and an optional vector q of Quaternions of their absolute orientations, then the following functions interpolate linearly in these frames:\n\nFunction Description\nModiaMath.Path(r,q) Return path defined by a vector of frames\nModiaMath.t_pathEnd(path) Return path parameter t_end of last frame\nModiaMath.interpolate(path,t) Return (rt,qt) of Path at path parameter t\nModiaMath.interpolate_r(path,t) Return rt of Path at path parameter t\n\nExamples\n\nusing ModiaMath\nusing Unitful\n\n# R1,R2,R3 are the same RotationMatrices\nR1 = ModiaMath.rot1(pi/2)\nR2 = ModiaMath.rot1(90u\"°\")\nR3 = ModiaMath.rot_e([1,0,0], pi/2)\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\nThe functions of this module are mostly a mapping of some of the functions of the Modelica Standard Library from Modelica  (Modelica.Mechanics.MultiBody.Frames) to Julia (taking advantage of Julia features  such as multiple dispatch and unit package Unitful).\n\n\n\n\n\n"
 },
 
 {
@@ -709,7 +693,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.NullQuaternion",
     "category": "constant",
-    "text": "const ModiaMath.NullQuaternion = Quaternion(0,0,0,1)\n\nConstant Quaternion vector of a null rotation (= no rotation from frame 1 to frame 2)\n\n\n\n"
+    "text": "const ModiaMath.NullQuaternion = Quaternion(0,0,0,1)\n\nConstant Quaternion vector of a null rotation (= no rotation from frame 1 to frame 2)\n\n\n\n\n\n"
 },
 
 {
@@ -717,7 +701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.NullRotation",
     "category": "constant",
-    "text": "const ModiaMath.NullRotation = ModiaMath.RotationMatrix(eye(3))\n\nConstant RotationMatrix that defines no rotation from frame 1 to frame 2.\n\n\n\n"
+    "text": "@static if VERSION >= v\"0.7.0-DEV.2005\"     const ModiaMath.NullRotation = ModiaMath.RotationMatrix(Matrix(1.0I, 3, 3)) else     const ModiaMath.NullRotation = ModiaMath.RotationMatrix(eye(3)) end\n\nConstant RotationMatrix that defines no rotation from frame 1 to frame 2.\n\n\n\n\n\n"
 },
 
 {
@@ -725,7 +709,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.ZeroVector3D",
     "category": "constant",
-    "text": "const ModiaMath.ZeroVector3D = Vector3D(0.0, 0.0, 0.0)\n\nConstant of a Vector3D where all elements are zero\n\n\n\n"
+    "text": "const ModiaMath.ZeroVector3D = Vector3D(0.0, 0.0, 0.0)\n\nConstant of a Vector3D where all elements are zero\n\n\n\n\n\n"
 },
 
 {
@@ -733,7 +717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.Path",
     "category": "type",
-    "text": "path = ModiaMath.Path(r::Vector{Vector3D},\n                      q::Vector{Quaternion} = Quaternion[];\n                      v = ones(length(r)))\n\nReturn an instance of a new Path object. The Path object consists of n frames defined by the position vectors of their origins (r[i] for frame i)  and optionally of their absolute rotation quaternions (q[i] for frame i) describing the rotation from the world frame to the respective frame.\n\nA path parameter t is defined in the following way on these frames:\n\nt[1] = 0.0.\nt[i] = t[i-1] + pathLength_i/(v[i]+v[i-1])/2 if the origins of frames i-1 and i do not coincide.\nt[i] = t[i-1] + pathAngle_i/(v[i]+v[i-1])/2 if the origins of frames i-1 and i do coincide.\n\nHereby pathLength_i is the distance between the origins of frames i-1 and i in [m] and pathAngle_i is the planar rotation angle between frames i-1 and i in [rad].\n\nIf v[i] is the desired velocity or angular velocity at frame i, then path parameter t is approximately the time to move along the path. The time instant t_end of the last frame can be inquired with ModiaMath.t_pathEnd(path). For example, if a simulation shall be performed in such  a way that the simulation should start with the first frame and end at stopTime at the last frame, then the path parameter should be selected as t = time*t_end/stopTime.\n\nGiven the actual path parameter, typically 0 <= t <= t_end (if t is outside of this interval, the frame at t is determined by extrapolation through the first two or the last two frames),  the corresponding frame is determined by linear interpolation in the following way:\n\n(rt, qt) = interpolate(  path,t)\n rt      = interpolate_r(path,t)\n\nwhere rt is the position vector to the origin of the frame at path parameter t and qt is the absolute quaternion of the frame at path parameter t.\n\nExample\n\nimport ModiaMath\nusing Unitful\n\nr = [ ModiaMath.Vector3D(1,0,0),\n      ModiaMath.Vector3D(0,1,0),\n      ModiaMath.Vector3D(0,0,1) ]\nq = [ ModiaMath.NullQuaternion,\n      ModiaMath.qrot1(45u\"°\"),\n      ModiaMath.qrot2(60u\"°\")]\n\npath     = ModiaMath.Path(r,q)\nt_end    = ModiaMath.t_pathEnd(path)\ndt       = 0.1\nstopTime = 2.0 \ntime     = 0.0\n\nwhile time <= stopTime\n   (rt, qt) = ModiaMath.interpolate(path, time*t_end/stopTime)\n   time += dt\nend\n\n\n\n"
+    "text": "path = ModiaMath.Path(r::Vector{Vector3D},\n                      q::Vector{Quaternion} = Quaternion[];\n                      v = ones(length(r)))\n\nReturn an instance of a new Path object. The Path object consists of n frames defined by the position vectors of their origins (r[i] for frame i)  and optionally of their absolute rotation quaternions (q[i] for frame i) describing the rotation from the world frame to the respective frame.\n\nA path parameter t is defined in the following way on these frames:\n\nt[1] = 0.0.\nt[i] = t[i-1] + pathLength_i/(v[i]+v[i-1])/2 if the origins of frames i-1 and i do not coincide.\nt[i] = t[i-1] + pathAngle_i/(v[i]+v[i-1])/2 if the origins of frames i-1 and i do coincide.\n\nHereby pathLength_i is the distance between the origins of frames i-1 and i in [m] and pathAngle_i is the planar rotation angle between frames i-1 and i in [rad].\n\nIf v[i] is the desired velocity or angular velocity at frame i, then path parameter t is approximately the time to move along the path. The time instant t_end of the last frame can be inquired with ModiaMath.t_pathEnd(path). For example, if a simulation shall be performed in such  a way that the simulation should start with the first frame and end at stopTime at the last frame, then the path parameter should be selected as t = time*t_end/stopTime.\n\nGiven the actual path parameter, typically 0 <= t <= t_end (if t is outside of this interval, the frame at t is determined by extrapolation through the first two or the last two frames),  the corresponding frame is determined by linear interpolation in the following way:\n\n(rt, qt) = interpolate(  path,t)\n rt      = interpolate_r(path,t)\n\nwhere rt is the position vector to the origin of the frame at path parameter t and qt is the absolute quaternion of the frame at path parameter t.\n\nExample\n\nimport ModiaMath\nusing Unitful\n\nr = [ ModiaMath.Vector3D(1,0,0),\n      ModiaMath.Vector3D(0,1,0),\n      ModiaMath.Vector3D(0,0,1) ]\nq = [ ModiaMath.NullQuaternion,\n      ModiaMath.qrot1(45u\"°\"),\n      ModiaMath.qrot2(60u\"°\")]\n\npath     = ModiaMath.Path(r,q)\nt_end    = ModiaMath.t_pathEnd(path)\ndt       = 0.1\nstopTime = 2.0 \ntime     = 0.0\n\nwhile time <= stopTime\n   (rt, qt) = ModiaMath.interpolate(path, time*t_end/stopTime)\n   time += dt\nend\n\n\n\n\n\n"
 },
 
 {
@@ -741,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.Quaternion",
     "category": "type",
-    "text": "const ModiaMath.Quaternion = SVector{4,Float64}\n\nDescribes the rotation from a frame 1 into a frame 2 with a quaternion vector. If e is the (normalized) axis of rotation to rotate frame 1 into frame 2 (either resolved in frame 1 or frame 2) and angle is the rotation angle for this rotation then the quaternion vector q::ModiaMath.Quaternions is defined as:\n\nq = [e*sin(angle/2),\n       cos(angle/2]\n\n\n\n"
+    "text": "const ModiaMath.Quaternion = SVector{4,Float64}\n\nDescribes the rotation from a frame 1 into a frame 2 with a quaternion vector. If e is the (normalized) axis of rotation to rotate frame 1 into frame 2 (either resolved in frame 1 or frame 2) and angle is the rotation angle for this rotation then the quaternion vector q::ModiaMath.Quaternions is defined as:\n\nq = [e*sin(angle/2),\n       cos(angle/2]\n\n\n\n\n\n"
 },
 
 {
@@ -749,7 +733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.RotationMatrix",
     "category": "type",
-    "text": "const ModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}\n\nDescribes the rotation from a frame 1 into a frame 2. An instance R of RotationMatrix has the following interpretation:\n\nR::RotationMatrix = [ex ey ez]   \n\nwhere ex, ey, ez are unit vectors in the direction of the x-axis, y-axis, and z-axis of frame 1, resolved in frame 2, respectively (for example ex=[1.0, 0.0, 0.0]) Therefore, if v1 is vector v resolved in frame 1 and v2 is vector v resolved in frame 2, the following relationship holds: \n\nv2 = R*v1   \nv1 = R\'*v2\n\n\n\n"
+    "text": "const ModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}\n\nDescribes the rotation from a frame 1 into a frame 2. An instance R of RotationMatrix has the following interpretation:\n\nR::RotationMatrix = [ex ey ez]   \n\nwhere ex, ey, ez are unit vectors in the direction of the x-axis, y-axis, and z-axis of frame 1, resolved in frame 2, respectively (for example ex=[1.0, 0.0, 0.0]) Therefore, if v1 is vector v resolved in frame 1 and v2 is vector v resolved in frame 2, the following relationship holds: \n\nv2 = R*v1   \nv1 = R\'*v2\n\n\n\n\n\n"
 },
 
 {
@@ -757,7 +741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.Vector3D",
     "category": "type",
-    "text": "const ModiaMath.Vector3D = SVector{3,Float64}\n\nType of a vector in 3D space (e.g. position vector of the origin of a frame)\n\n\n\n"
+    "text": "const ModiaMath.Vector3D = SVector{3,Float64}\n\nType of a vector in 3D space (e.g. position vector of the origin of a frame)\n\n\n\n\n\n"
 },
 
 {
@@ -765,7 +749,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.absoluteRotation",
     "category": "method",
-    "text": " R2 = ModiaMath.absoluteRotation(R1, R_rel) \n q2 = ModiaMath.absoluteRotation(q1, q_rel)\n\nReturn ModiaMath.RotationMatrixR2 or ModiaMath.Quaternionq2 defining the rotation from frame 0 to frame 2 from RotationMatrix R1 or Quaternion q1that define the rotation from frame 0 to frame 1 and the relative RotationMatrix R_rel or the relative Quaternion q_rel that define the rotation from frame 1 to frame 2.\n\n\n\n"
+    "text": " R2 = ModiaMath.absoluteRotation(R1, R_rel) \n q2 = ModiaMath.absoluteRotation(q1, q_rel)\n\nReturn ModiaMath.RotationMatrixR2 or ModiaMath.Quaternionq2 defining the rotation from frame 0 to frame 2 from RotationMatrix R1 or Quaternion q1that define the rotation from frame 0 to frame 1 and the relative RotationMatrix R_rel or the relative Quaternion q_rel that define the rotation from frame 1 to frame 2.\n\n\n\n\n\n"
 },
 
 {
@@ -773,7 +757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.assertQuaternion",
     "category": "method",
-    "text": "ModiaMath.assertQuaternion(q::AbstractVector)\n\nAssert that vector q has the properties of a Quaternion vector (has 4 elements, norm(q) = 1)\n\n\n\n"
+    "text": "ModiaMath.assertQuaternion(q::AbstractVector)\n\nAssert that vector q has the properties of a Quaternion vector (has 4 elements, norm(q) = 1)\n\n\n\n\n\n"
 },
 
 {
@@ -781,7 +765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.assertRotationMatrix",
     "category": "method",
-    "text": "ModiaMath.assertRotationMatrix(R::AbstractMatrix)\n\nAssert that matrix R has the properties of a rotation matrix (is 3x3 and R\'*R - eye(3) = zeros(3,3))\n\n\n\n"
+    "text": "ModiaMath.assertRotationMatrix(R::AbstractMatrix)\n\nAssert that matrix R has the properties of a rotation matrix (is 3x3 and R\'*R - eye(3) = zeros(3,3))\n\n\n\n\n\n"
 },
 
 {
@@ -789,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.eAxis",
     "category": "method",
-    "text": "e = eAxis(axis::Int)\n\nReturn unit vector e in direction of axis axis (axis = 1,2,3 or -1,-2-,3).\n\nExample\n\nimport ModiaMath\n\ne1 = ModiMath.eAxis(1)    # e1 = Vector3D(1.0,  0.0, 0.0)\ne2 = ModiMath.eAxis(-2)   # d2 = Vector3D(0.0, -1.0, 0.0)\n\n\n\n"
+    "text": "e = eAxis(axis::Int)\n\nReturn unit vector e in direction of axis axis (axis = 1,2,3 or -1,-2-,3).\n\nExample\n\nimport ModiaMath\n\ne1 = ModiMath.eAxis(1)    # e1 = Vector3D(1.0,  0.0, 0.0)\ne2 = ModiMath.eAxis(-2)   # d2 = Vector3D(0.0, -1.0, 0.0)\n\n\n\n\n\n"
 },
 
 {
@@ -797,7 +781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.from_R",
     "category": "method",
-    "text": "q = ModiaMath.from_R(R::ModiaMath.RotationMatrix;\n                     q_guess = NullQuaternion)\n\nReturn Quaternion q from RotationMatrix R.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.from_R(R::ModiaMath.RotationMatrix;\n                     q_guess = NullQuaternion)\n\nReturn Quaternion q from RotationMatrix R.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -805,7 +789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.from_q",
     "category": "method",
-    "text": "R = ModiaMath.from_q(q::ModiaMath.Quaternion)\n\nReturn RotationMatrix R from Quaternion q.\n\n\n\n"
+    "text": "R = ModiaMath.from_q(q::ModiaMath.Quaternion)\n\nReturn RotationMatrix R from Quaternion q.\n\n\n\n\n\n"
 },
 
 {
@@ -813,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.interpolate",
     "category": "method",
-    "text": "(rt, qt) = ModiaMath.interpolate(path, t)\n\nReturn position rtand Quaternion qt of path::ModiaMath.Path at path parameter t::Number.\n\n\n\n"
+    "text": "(rt, qt) = ModiaMath.interpolate(path, t)\n\nReturn position rtand Quaternion qt of path::ModiaMath.Path at path parameter t::Number.\n\n\n\n\n\n"
 },
 
 {
@@ -821,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.interpolate_r",
     "category": "method",
-    "text": "rt = ModiaMath.interpolate_r(path, t)\n\nReturn position r of path::ModiaMath.Path at path parameter t::Number.\n\n\n\n"
+    "text": "rt = ModiaMath.interpolate_r(path, t)\n\nReturn position r of path::ModiaMath.Path at path parameter t::Number.\n\n\n\n\n\n"
 },
 
 {
@@ -829,7 +813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.inverseRotation",
     "category": "method",
-    "text": " R_inv = ModiaMath.inverseRotation(R) \n q_inv = ModiaMath.inverseRotation(q)\n\nReturn inverse ModiaMath.RotationMatrixR_inv or inverse ModiaMath.Quaternionq_inv defining the rotation from frame 1 to frame 0  from RotationMatrix R or Quaternion qthat define the rotation from frame 0 to frame 1.\n\n\n\n"
+    "text": " R_inv = ModiaMath.inverseRotation(R) \n q_inv = ModiaMath.inverseRotation(q)\n\nReturn inverse ModiaMath.RotationMatrixR_inv or inverse ModiaMath.Quaternionq_inv defining the rotation from frame 1 to frame 0  from RotationMatrix R or Quaternion qthat define the rotation from frame 0 to frame 1.\n\n\n\n\n\n"
 },
 
 {
@@ -837,7 +821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.planarRotationAngle",
     "category": "method",
-    "text": "angle = planarRotationAngle(e, v1, v2; angle_guess = 0.0)\n\nReturn angle of a planar rotation, given the normalized axis of rotation to rotate frame 1 around e into frame 2 (norm(e) == 1 required), and the representations of a vector in frame 1 (v1) and frame 2 (v2). Hereby, it is required that v1 is not parallel to e. The returned angle is in the range -pi <= angle - angle_guess <= pi (from the infinite many solutions, the one is returned that is closest to angle_guess).\n\nExample\n\nimport ModiaMath\nusing Unitful\n\nangle1 = 45u\"°\"\ne      = normalize([1.0, 1.0, 1.0])\nR      = ModiaMath.rot_e(e, angle1)\n\nv1 = [1.0, 2.0, 3.0]\nv2 = ModiaMath.resolve2(R, v1)\n\nangle2 = planarRotationAngle(e, v1, v2)\nisapprox(angle1, angle2)\n\n\n\n"
+    "text": "angle = planarRotationAngle(e, v1, v2; angle_guess = 0.0)\n\nReturn angle of a planar rotation, given the normalized axis of rotation to rotate frame 1 around e into frame 2 (norm(e) == 1 required), and the representations of a vector in frame 1 (v1) and frame 2 (v2). Hereby, it is required that v1 is not parallel to e. The returned angle is in the range -pi <= angle - angle_guess <= pi (from the infinite many solutions, the one is returned that is closest to angle_guess).\n\nExample\n\nimport ModiaMath\nusing Unitful\n\nangle1 = 45u\"°\"\ne      = normalize([1.0, 1.0, 1.0])\nR      = ModiaMath.rot_e(e, angle1)\n\nv1 = [1.0, 2.0, 3.0]\nv2 = ModiaMath.resolve2(R, v1)\n\nangle2 = planarRotationAngle(e, v1, v2)\nisapprox(angle1, angle2)\n\n\n\n\n\n"
 },
 
 {
@@ -845,7 +829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot1",
     "category": "method",
-    "text": "q = ModiaMath.qrot1(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the x-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.qrot1(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the x-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -853,7 +837,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot123",
     "category": "method",
-    "text": "q = ModiaMath.qrot123(angle1, angle2, angle3)\n\nReturn Quaternion q by rotating with angle1 along the x-axis of frame 1, then with angle2 along the y-axis of this frame and then with angle3 along the z-axis of this frame.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.qrot123(angle1, angle2, angle3)\n\nReturn Quaternion q by rotating with angle1 along the x-axis of frame 1, then with angle2 along the y-axis of this frame and then with angle3 along the z-axis of this frame.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -861,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot2",
     "category": "method",
-    "text": "q = ModiaMath.qrot2(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the y-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.qrot2(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the y-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -869,7 +853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot3",
     "category": "method",
-    "text": "q = ModiaMath.qrot3(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the z-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.qrot3(angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along the z-axis of frame 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -877,7 +861,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot_e",
     "category": "method",
-    "text": "q = ModiaMath.qrot_e(e, angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along unit axis e. This function assumes that norm(e) == 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n"
+    "text": "q = ModiaMath.qrot_e(e, angle; q_guess = NullQuaternion)\n\nReturn Quaternion q that rotates with angle angle along unit axis e. This function assumes that norm(e) == 1.\n\nFrom the two possible solutions q the one is returned that is closer  to q_guess (note, q and -q define the same rotation).\n\n\n\n\n\n"
 },
 
 {
@@ -885,7 +869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot_nxy",
     "category": "method",
-    "text": "q = ModiaMath.qrot_nxy(nx, ny)\n\nIt is assumed that the two input vectors nx and ny are resolved in frame 1 and are directed along the x and y axis of frame 2. The function returns the Quaternion q to rotate from frame 1 to frame 2. \n\nThe function is robust in the sense that it returns always a Quaternion q, even if ny is not orthogonal to nx or if one or both vectors have zero length. This is performed in the following way:  If nx and ny are not orthogonal to each other, first a unit vector ey is  determined that is orthogonal to nx and is lying in the plane spanned by  nx and ny. If nx and ny are parallel or nearly parallel to each other  or ny is a vector with zero or nearly zero length, a vector ey is selected arbitrarily such that ex and ey are orthogonal to each other.  If both nx and ny are vectors with zero or nearly zero length, an arbitrary Quaternion q is returned.\n\nExample\n\nusing Unitful\nimport ModiaMath\n\nq1 = ModiaMath.qrot1(90u\"°\")\nq2 = ModiaMath.qrot_nxy([1  , 0, 0], [0  , 0, 1  ])\nq3 = ModiaMath.qrot_nxy([0.9, 0, 0], [1.1, 0, 1.1])\nisapprox(q1,q2)   # returns true\nisapprox(q1,q3)   # returns true\n\n\n\n"
+    "text": "q = ModiaMath.qrot_nxy(nx, ny)\n\nIt is assumed that the two input vectors nx and ny are resolved in frame 1 and are directed along the x and y axis of frame 2. The function returns the Quaternion q to rotate from frame 1 to frame 2. \n\nThe function is robust in the sense that it returns always a Quaternion q, even if ny is not orthogonal to nx or if one or both vectors have zero length. This is performed in the following way:  If nx and ny are not orthogonal to each other, first a unit vector ey is  determined that is orthogonal to nx and is lying in the plane spanned by  nx and ny. If nx and ny are parallel or nearly parallel to each other  or ny is a vector with zero or nearly zero length, a vector ey is selected arbitrarily such that ex and ey are orthogonal to each other.  If both nx and ny are vectors with zero or nearly zero length, an arbitrary Quaternion q is returned.\n\nExample\n\nusing Unitful\nimport ModiaMath\n\nq1 = ModiaMath.qrot1(90u\"°\")\nq2 = ModiaMath.qrot_nxy([1  , 0, 0], [0  , 0, 1  ])\nq3 = ModiaMath.qrot_nxy([0.9, 0, 0], [1.1, 0, 1.1])\nisapprox(q1,q2)   # returns true\nisapprox(q1,q3)   # returns true\n\n\n\n\n\n"
 },
 
 {
@@ -893,7 +877,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.relativeRotation",
     "category": "method",
-    "text": " R_rel = ModiaMath.relativeRotation(R1, R2) \n q_rel = ModiaMath.relativeRotation(q1, q2)\n\nReturn relative ModiaMath.RotationMatrixR_rel or relative ModiaMath.Quaternionq_rel defining the rotation from frame 1 to frame 2  from absolute RotationMatrix R1 or absolute Quaternion q1that define the rotation from frame 0 to frame 1 and the absolute RotationMatrix R2 or the absolute Quaternion q2 that define the rotation from frame 0 to frame 2.\n\n\n\n"
+    "text": " R_rel = ModiaMath.relativeRotation(R1, R2) \n q_rel = ModiaMath.relativeRotation(q1, q2)\n\nReturn relative ModiaMath.RotationMatrixR_rel or relative ModiaMath.Quaternionq_rel defining the rotation from frame 1 to frame 2  from absolute RotationMatrix R1 or absolute Quaternion q1that define the rotation from frame 0 to frame 1 and the absolute RotationMatrix R2 or the absolute Quaternion q2 that define the rotation from frame 0 to frame 2.\n\n\n\n\n\n"
 },
 
 {
@@ -901,7 +885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.resolve1",
     "category": "method",
-    "text": "v1 = ModiaMath.resolve1([R|q], v2)\n\nTransform vector v2 (v resolved in frame 2) to vector v1 (v resolved in frame 1) given either ModiaMath.RotationMatrix R or  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\n\n\n"
+    "text": "v1 = ModiaMath.resolve1([R|q], v2)\n\nTransform vector v2 (v resolved in frame 2) to vector v1 (v resolved in frame 1) given either ModiaMath.RotationMatrix R or  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\n\n\n\n\n"
 },
 
 {
@@ -909,7 +893,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.resolve2",
     "category": "method",
-    "text": "v2 = ModiaMath.resolve2([R|q], v1)\n\nTransform vector v1 (v resolved in frame 1) to vector v2 (v resolved in frame 2) given either ModiaMath.RotationMatrix R or  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\n\n\n"
+    "text": "v2 = ModiaMath.resolve2([R|q], v1)\n\nTransform vector v1 (v resolved in frame 1) to vector v2 (v resolved in frame 2) given either ModiaMath.RotationMatrix R or  ModiaMath.Quaternion q (to rotate a frame 1 into a frame 2).\n\n\n\n\n\n"
 },
 
 {
@@ -917,7 +901,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot1",
     "category": "method",
-    "text": "R = ModiaMath.rot1(angle)\n\nReturn RotationMatrix R that rotates with angle angle along the x-axis of frame 1. \n\n\n\n"
+    "text": "R = ModiaMath.rot1(angle)\n\nReturn RotationMatrix R that rotates with angle angle along the x-axis of frame 1. \n\n\n\n\n\n"
 },
 
 {
@@ -925,7 +909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot123",
     "category": "method",
-    "text": "R = ModiaMath.rot123(angle1, angle2, angle3)\n\nReturn RotationMatrix R by rotating with angle1 along the x-axis of frame 1, then with angle2 along the y-axis of this frame and then with angle3 along the z-axis of this frame.\n\n\n\n"
+    "text": "R = ModiaMath.rot123(angle1, angle2, angle3)\n\nReturn RotationMatrix R by rotating with angle1 along the x-axis of frame 1, then with angle2 along the y-axis of this frame and then with angle3 along the z-axis of this frame.\n\n\n\n\n\n"
 },
 
 {
@@ -933,7 +917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot2",
     "category": "method",
-    "text": "R = ModiaMath.rot2(angle)\n\nReturn RotationMatrix R that rotates with angle angle in [radian] along the y-axis of frame 1. \n\n\n\n"
+    "text": "R = ModiaMath.rot2(angle)\n\nReturn RotationMatrix R that rotates with angle angle in [radian] along the y-axis of frame 1. \n\n\n\n\n\n"
 },
 
 {
@@ -941,7 +925,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot3",
     "category": "method",
-    "text": "R = ModiaMath.rot3(angle)\n\nReturn RotationMatrix R that rotates with angle angle in [radian] along the z-axis of frame 1. \n\n\n\n"
+    "text": "R = ModiaMath.rot3(angle)\n\nReturn RotationMatrix R that rotates with angle angle in [radian] along the z-axis of frame 1. \n\n\n\n\n\n"
 },
 
 {
@@ -949,7 +933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot_e",
     "category": "method",
-    "text": "R = ModiaMath.rot_e(e, angle)\n\nReturn RotationMatrix that rotates around angle angle along unit axis e. This function assumes that norm(e) == 1.\n\n\n\n"
+    "text": "R = ModiaMath.rot_e(e, angle)\n\nReturn RotationMatrix that rotates around angle angle along unit axis e. This function assumes that norm(e) == 1.\n\n\n\n\n\n"
 },
 
 {
@@ -957,7 +941,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.rot_nxy",
     "category": "method",
-    "text": "R = ModiaMath.rot_nxy(nx, ny)\n\nIt is assumed that the two input vectors nx and ny are resolved in frame 1 and are directed along the x and y axis of frame 2. The function returns the RotationMatrix R to rotate from frame 1 to frame 2. \n\nThe function is robust in the sense that it returns always a RotationMatrix R, even if ny is not orthogonal to nx or if one or both vectors have zero length. This is performed in the following way:  If nx and ny are not orthogonal to each other, first a unit vector ey is  determined that is orthogonal to nx and is lying in the plane spanned by  nx and ny. If nx and ny are parallel or nearly parallel to each other  or ny is a vector with zero or nearly zero length, a vector ey is selected arbitrarily such that ex and ey are orthogonal to each other.  If both nx and ny are vectors with zero or nearly zero length, an arbitrary rotation matrix is returned.\n\nExample\n\nusing Unitful\nimport ModiaMath\n\nR1 = ModiaMath.rot1(90u\"°\")\nR2 = ModiaMath.rot_nxy([1  , 0, 0], [0  , 0, 1  ])\nR3 = ModiaMath.rot_nxy([0.9, 0, 0], [1.1, 0, 1.1])\nisapprox(R1,R2)   # returns true\nisapprox(R1,R3)   # returns true\n\n\n\n"
+    "text": "R = ModiaMath.rot_nxy(nx, ny)\n\nIt is assumed that the two input vectors nx and ny are resolved in frame 1 and are directed along the x and y axis of frame 2. The function returns the RotationMatrix R to rotate from frame 1 to frame 2. \n\nThe function is robust in the sense that it returns always a RotationMatrix R, even if ny is not orthogonal to nx or if one or both vectors have zero length. This is performed in the following way:  If nx and ny are not orthogonal to each other, first a unit vector ey is  determined that is orthogonal to nx and is lying in the plane spanned by  nx and ny. If nx and ny are parallel or nearly parallel to each other  or ny is a vector with zero or nearly zero length, a vector ey is selected arbitrarily such that ex and ey are orthogonal to each other.  If both nx and ny are vectors with zero or nearly zero length, an arbitrary rotation matrix is returned.\n\nExample\n\nusing Unitful\nimport ModiaMath\n\nR1 = ModiaMath.rot1(90u\"°\")\nR2 = ModiaMath.rot_nxy([1  , 0, 0], [0  , 0, 1  ])\nR3 = ModiaMath.rot_nxy([0.9, 0, 0], [1.1, 0, 1.1])\nisapprox(R1,R2)   # returns true\nisapprox(R1,R3)   # returns true\n\n\n\n\n\n"
 },
 
 {
@@ -965,7 +949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.skew",
     "category": "method",
-    "text": "M = ModiaMath.skew(e::AbstractVector)\n\nReturn the skew symmetric matrix M::SMatrix{3,3,Float64,9} of vector e (length(e) = 3)\n\n\n\n"
+    "text": "M = ModiaMath.skew(e::AbstractVector)\n\nReturn the skew symmetric matrix M::SMatrix{3,3,Float64,9} of vector e (length(e) = 3)\n\n\n\n\n\n"
 },
 
 {
@@ -973,7 +957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.t_pathEnd",
     "category": "method",
-    "text": "t_end = ModiaMath.t_pathEnd(path::[`ModiaMath.Path`](@ref))\n\nReturn the final path parameter tof the last frame in path (path parameter of first frame = 0.0).\n\n\n\n"
+    "text": "t_end = ModiaMath.t_pathEnd(path::[`ModiaMath.Path`](@ref))\n\nReturn the final path parameter tof the last frame in path (path parameter of first frame = 0.0).\n\n\n\n\n\n"
 },
 
 {
@@ -997,7 +981,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Utilities",
     "title": "ModiaMath.Utilities",
     "category": "module",
-    "text": "module ModiaMath.Utilities\n\nUtility functions used in ModiaMath.\n\nMain developer\n\nMartin Otter, DLR - Institute of System Dynamics and Control\n\n\n\n"
+    "text": "module ModiaMath.Utilities\n\nUtility functions used in ModiaMath.\n\nMain developer\n\nMartin Otter, DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -1005,7 +989,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Utilities",
     "title": "ModiaMath.Utilities.printobj",
     "category": "method",
-    "text": "ModiaMath.printobj(name,obj)\n\nPretty print obj as \"<name> = <display(obj)>\". \n\n\n\n"
+    "text": "ModiaMath.printobj(name,obj)\n\nPretty print obj as \"<name> = <display(obj)>\". \n\n\n\n\n\n"
 },
 
 {
