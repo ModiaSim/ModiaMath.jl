@@ -140,7 +140,6 @@ export Path, t_pathEnd, interpolate, interpolate_r
 export skew
 
 using StaticArrays
-import ModiaMath
 
 @static if VERSION >= v"0.7.0-DEV.2005"
     using LinearAlgebra
