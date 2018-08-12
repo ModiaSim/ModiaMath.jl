@@ -127,29 +127,21 @@ end
 
 
 function indexToString(name, A, linearIndex)
-#=
-   index = ind2sub(A, linearIndex)
-   s = Symbol(name, "[")
+   @static if VERSION >= v"0.7.0-DEV.2005"
+      index = CartesianIndices(A)[linearIndex]
+   else
+      index = ind2sub(A, linearIndex)
+   end
+
+   s = string(name, "[")
    for i in 1:length(index)
-      s = Symbol(s, index[i])
+      s = string(s, index[i])
       if i == length(index)
-         s = Symbol(s, "]")
+         s = string(s, "]")
       else
-         s = Symbol(s, ",")
+         s = string(s, ",")
       end
    end
-=#
-
-   s = Symbol(name, "[")
-   for i in 1:length(A)
-      s = Symbol(s, A[i])
-      if i == length(A)
-         s = Symbol(s, "]")
-      else
-         s = Symbol(s, ",")
-      end
-   end
-
    return s
 end
 
@@ -377,7 +369,7 @@ end
          else
             if !(dummyDifferentialEquation && (vnumType == XD_EXP || vnumType == DER_XD_EXP))
                # Determine information about result vectors
-               var_name = instanceName(v)
+               var_name = string(instanceName(v))
                if typeof(v.value) == Float64
                   result_names[iresult] = var_name
                   v.iresult = iresult

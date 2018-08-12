@@ -139,7 +139,7 @@ end
             sig2 = seriesDict[keyName]
 
             # Build AST and evaluate: sig = sig2[:,...]
-            ex1 = parse(nameAsString[i:end])
+            ex1 = Meta.parse(nameAsString[i:end])
             ex2 = :( $sig2[:] )
             append!(ex2.args, ex1.args)
             sig = @eval $ex2

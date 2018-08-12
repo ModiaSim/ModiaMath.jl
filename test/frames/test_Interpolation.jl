@@ -24,9 +24,6 @@ path     = ModiaMath.Path(r,q)
 t_end    = ModiaMath.t_pathEnd(path)
 println("t_end = ", t_end)
 println("path.t = ", path.t)
-dt       = 0.1
-stopTime = 2.0 
-time     = 0.0
 
 @testset "ModiaMath.Frame: test interpolation" begin 
    dist1 = norm(r[2] - r[1])
@@ -42,11 +39,18 @@ time     = 0.0
    @test isapprox(rt3, r[1] + (r[2] - r[1])/2 )
 end
 
+function checkInterpolation(path, t_end)
+   dt       = 0.1
+   stopTime = 2.0 
+   time     = 0.0
 
-while time <= stopTime + 1e-7
-   (rt, qt) = ModiaMath.interpolate(path, time*t_end/stopTime)
-   println("... time = ", time, ", rt = ", rt)
-   time += dt
+   while time <= stopTime + 1e-7
+      (rt, qt) = ModiaMath.interpolate(path, time*t_end/stopTime)
+      println("... time = ", time, ", rt = ", rt)
+      time += dt
+   end
 end
+
+checkInterpolation(path, t_end)
 
 end

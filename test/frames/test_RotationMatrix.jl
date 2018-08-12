@@ -4,6 +4,7 @@ module test_RotationMatrix
     using Base.Test
 else
     using Test
+    using LinearAlgebra
 end
 
 using StaticArrays
@@ -45,7 +46,6 @@ v1a = ModiaMath.resolve1(R1a,v2a)
 R6a = ModiaMath.absoluteRotation( R1a, R2a)
 R6b = ModiaMath.rot123(angle1, angle1, 0.0)
 R7  = ModiaMath.relativeRotation( R1a, R6b)
-R4d = ModiaMath.inverseRotation(R4a)
 
 @testset "ModiaMath.Frames: test RotationMatrix" begin 
    @test isapprox(R1b,R1a)
