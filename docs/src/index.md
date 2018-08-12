@@ -25,10 +25,10 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 ## Installation
 
-ModiaMath is not yet registered in `METADATA.jl`and need to be installed with `Pkg.clone`:
+ModiMath is registered in METADATA.jl and can be installed with Pkg.add.
 
-```
-julia> Pkg.clone("https://github.com/ModiaSim/ModiaMath.jl")
+```julia
+julia> Pkg.add("ModiaMath")
 ```
 
 A higher level [`ModiaMath.plot`](@ref) function is provided in ModiaMath to visualize the time series
@@ -49,5 +49,7 @@ using the Julia package manager often fails. The following installation order is
 3. Start Julia, give the command `ENV["PYTHON"]` in the REPL, and check whether the path
    is correct (if you made a typo in the `.juliarc.jl` file, Julia might use another
    Python executable and PyPlot might crash Julia).
-4. Install PyPlot via `Pkg.add("PyPlot")`
+4. If you have used a different Python installation before, execute the command
+   `Pkg.build["PyCall"]`, exit Julia and start Julia again.
+5. Install PyPlot via `Pkg.add("PyPlot")`
 

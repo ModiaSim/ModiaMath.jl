@@ -25,7 +25,16 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 ## Installation
 
-see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1).
+The package is registered in METADATA.jl and can be installed with Pkg.add.
+
+```julia
+julia> Pkg.add("ModiaMath")
+```
+
+ModiaMath uses [PyPlot](https://github.com/JuliaPy/PyPlot.jl) for plotting.
+Installing `PyPlot` by just using the Julia package manager might fail.
+In such a case, you might try these
+[installation instructions](https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1).
 
 
 ## Documentation
@@ -90,8 +99,9 @@ see [ModiaMath installation](https://ModiaSim.github.io/ModiaMath.jl/latest/inde
 
 ## Status
 
-The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28.
-Version number is 0.2.0-beta.1 and functionality and robustness is planned to be improved for the 1.0 version,
+The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
+and with Julia `0.7.0` on Windows 7.
+Version number is 0.2.1 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for Version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
