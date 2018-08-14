@@ -157,9 +157,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
    logger              = sim.logger
    ModiaMath.setLog!(logger, log)
    
-   if ModiaMath.isLogInfos(logger)
-      println("... ModiaMath(v0.2.1).simulate! from 14.08.2018 (", sim.name, "):")
-   end
+   #if ModiaMath.isLogInfos(logger)
+      println("... ModiaMath(v0.2.1).simulate! from 14.08.2018 11:55 (", sim.name, "):")
+   #end
 
    # Start timing measure
    cpuStart::UInt64 = time_ns()
