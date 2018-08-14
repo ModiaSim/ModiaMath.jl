@@ -110,6 +110,10 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
+const Version = "0.2.1"
+
+println(" \nImporting ModiaMath version ", Version)
+
 
 getVariableAndResidueValues(extraInfo::Any) = nothing    # Return a variable value and a residue value table of nonlinear solver (for error message)
 
