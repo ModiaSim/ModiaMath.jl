@@ -77,9 +77,12 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
 
        if typeof(simulationModel) <: ModiaMath.AbstractSimulationModel
           simState = simulationModel.simulationState
-          str2 = "time = " * string(simState.time) *
+          str2 = string(simState.name) * ": time = " * string(simState.time) *
                  ", stepsize of implicit Euler step = " * string(simState.hev) *
-                 ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents)
+                 ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
+                 "\nxev = " * string(simState.xev) *
+                 "\nderxev = " * string(simState.derxev) *
+                 "\nresidues = " * string(simState.residues)
        else
           str2 = ""
        end
@@ -120,7 +123,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
 
       # Initialize KINSOL
       @static if VERSION >= v"0.7.0-DEV.2005"
-          Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector, Sundials.N_Vector, Ref{typeof(NonlinearEquationsInfo)}}), y)
+          Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector, Sundials.N_Vector, Ref{typeof(NonlinearEquationsInfo)}}), Sundials.NVector(y))
       else
           Sundials.KINInit(kmem, kinsol_fc , y)
       end
@@ -141,7 +144,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
       #   IDASlsSetSparseJacFn(mem);
       #else
       A = Sundials.SUNDenseMatrix(length(y),length(y))
-      LS = Sundials.SUNDenseLinearSolver(y,A)
+      LS = Sundials.SUNDenseLinearSolver(Sundials.NVector(y),A)
       Sundials.KINDlsSetLinearSolver(kmem, LS, A)
       #end
       strategy = Sundials.KIN_LINESEARCH
