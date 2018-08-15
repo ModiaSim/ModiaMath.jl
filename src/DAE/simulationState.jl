@@ -102,6 +102,7 @@ mutable struct SimulationState
         
    # Auxiliary storage needed during initialization and at events
    eqInfo::ModiaMath.NonlinearEquationsInfo
+   nonlinearEquationsMode::Int
    xev_old::Vector{Float64}
    xev_beforeEvent::Vector{Float64}
    xev::Vector{Float64}
@@ -192,7 +193,7 @@ mutable struct SimulationState
           ModiaMath.SimulationStatistics(nx, sparse, sparse ? cg.ngroups : 0),
           NaN, NaN, NaN, NaN,
           x_start, x_fixed, ones(nx), x_errorControl, zeros(nw),  
-          eqInfo, zeros(nx), zeros(nx), zeros(nx),
+          eqInfo, 0, zeros(nx), zeros(nx), zeros(nx),
           zeros(nx), zeros(nx), zeros(nx), ones(nx), 0.0, hev, 0.0, 
           scaleConstraintsAtEvents, false, false, false)
    end
@@ -285,6 +286,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsisten
          sim.use_x_fixed = true
       end
 
+      sim.nonlinearEquationsMode = 1
       ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; rScale = sim.rScale, FTOL = sim.FTOL)
       sim.use_x_fixed = false
       
@@ -330,7 +332,9 @@ function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsisten
       println("        determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
    end
       
+   sim.nonlinearEquationsMode = 2
    ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; rScale = sim.rScale, FTOL = sim.FTOL) 
+   sim.nonlinearEquationsMode = 0
 end
 
 

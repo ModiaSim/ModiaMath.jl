@@ -33,13 +33,14 @@ mutable struct NonlinearEquationsInfo
    name::String             # Name of equation system
    ny::Int                  # Number of equations (length of y-vector)
    getResidues!::Function   # Function of the nonlinear equation system
+   y0::Vector{Float64}      # The initial y vector (to print in error messages)
    lastNorm_r::Float64
    lastrScaledNorm_r::Float64
    kin_mem::Ptr{CVOID}      # KINSOL pointer (to access all KINgetXXX functions)
 
    function NonlinearEquationsInfo(name::String, ny::Int, getResidues!::Function; extraInfo=nothing)
       @assert(ny >= 0)
-      new(extraInfo, name, ny, getResidues!, 1.0, 1.0)
+      new(extraInfo, name, ny, getResidues!, zeros(ny), 1.0, 1.0)
    end
 end
 
@@ -80,8 +81,11 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
           str2 = string(simState.name) * ": time = " * string(simState.time) *
                  ", stepsize of implicit Euler step = " * string(simState.hev) *
                  ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
-                 "\nxev = " * string(simState.xev) *
-                 "\nderxev = " * string(simState.derxev) *
+                 (simState.nonlinearEquationsMode == 1 ? "\nGoal: compute consistent x." :
+                  simState.nonlinearEquationsMode == 2 ? "\nGoal: compute consistent der(x)." : "") *
+                 "\nx_start  = " * string(eqInfo.y0) *
+                 "\nx        = " * string(simState.xev) *
+                 "\nderx     = " * string(simState.derxev) *
                  "\nresidues = " * string(simState.residues)
        else
           str2 = ""
@@ -111,6 +115,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
       error("ModiaMath.NonlinearEquations.KINSOL.solveNonlinearEquations!: Failed to allocate KINSOL solver object")
    end
    eqInfo.kin_mem = kmem
+   eqInfo.y0 .= y
 
    # Run KINSOL
    try
