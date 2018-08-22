@@ -103,9 +103,9 @@ isStoreResult(sim::SimulationState)                 = sim.storeResult
 isStoreResult(m::ModiaMath.AbstractSimulationModel) = m.simulationState.storeResult
 
 
-ModiaMath.Logging.isLogInfos(   sim::SimulationState) = ModiaMath.Logging.isLogInfos(   sim.logger)
+ModiaMath.Logging.isLogInfos(sim::SimulationState) = ModiaMath.Logging.isLogInfos(sim.logger)
 ModiaMath.Logging.isLogWarnings(sim::SimulationState) = ModiaMath.Logging.isLogWarnings(sim.logger)
-ModiaMath.Logging.isLogEvents(  sim::SimulationState) = ModiaMath.Logging.isLogEvents(  sim.logger)
+ModiaMath.Logging.isLogEvents(sim::SimulationState) = ModiaMath.Logging.isLogEvents(sim.logger)
 
 
 
@@ -129,11 +129,11 @@ end
 ```
 """
 function setNominal!(sim::SimulationState, x_nominal::Vector{Float64})
-   @assert(length(x_nominal) == sim.nx)
-   @assert(x_nominal[ indmin(x_nominal) ] > 0.0)
-   for i in eachindex(x_nominal)
-      sim.x_nominal[i] = x_nominal[i]
-   end
+    @assert(length(x_nominal) == sim.nx)
+    @assert(x_nominal[ indmin(x_nominal) ] > 0.0)
+    for i in eachindex(x_nominal)
+        sim.x_nominal[i] = x_nominal[i]
+    end
 end
 
 

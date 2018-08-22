@@ -85,7 +85,7 @@ The 5th example above (2 diagrams in form of a vector) give the following plot:
 ![Figure 5](../../resources/images/plot_figure5.svg)
 """
 plot(result, names::String; heading="", grid=true, xAxis=:time, figure=1) =
-   plot(result, Symbol(names), heading=heading, grid=grid, xAxis=xAxis, figure=figure)
+    plot(result, Symbol(names), heading=heading, grid=grid, xAxis=xAxis, figure=figure)
 
-plot(result, names::AbstractVector; heading::AbstractString = "", grid::Bool = true, xAxis = :time, figure::Int = 1) =
-   plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=xAxis, figure=figure)
+plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1) =
+    plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=xAxis, figure=figure)

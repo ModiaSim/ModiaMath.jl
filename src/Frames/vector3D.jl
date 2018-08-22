@@ -29,5 +29,5 @@ const ZeroVector3D = Vector3D(0.0, 0.0, 0.0)
 Return the skew symmetric matrix `M::SMatrix{3,3,Float64,9}` of vector `e` (`length(e) = 3`)
 """
 skew(e::AbstractVector) = @SMatrix([  0.0   -e[3]    e[2];
-                                     e[3]     0.0   -e[1];
-                                    -e[2]    e[1]    0.0 ])
+                                      e[3]   0.0    -e[1];
+                                     -e[2]   e[1]    0.0 ])

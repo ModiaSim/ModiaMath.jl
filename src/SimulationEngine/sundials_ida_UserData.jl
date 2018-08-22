@@ -54,7 +54,7 @@ end
 
 
 function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_Vector, _r::Sundials.N_Vector, simModel::IntegratorData)
-    Sundials.IDAGetCurrentStep( simModel.ida_mem, simModel.hcur)
+    Sundials.IDAGetCurrentStep(simModel.ida_mem, simModel.hcur)
     Sundials.IDAGetCurrentOrder(simModel.ida_mem, simModel.order)
     stat           = simModel.statistics
     stat.hMin      = min(stat.hMin, simModel.hcur[1])
@@ -65,35 +65,35 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
     sim                  = simModel.simulationState
     sim.time             = t
     simModel.last_t      = t
-    simModel.last_norm_y = norm(simModel.y,Inf)
+    simModel.last_norm_y = norm(simModel.y, Inf)
 
     # Check that simModel.y is still identical to _y
     if pointer(simModel.y) === Sundials.__N_VGetArrayPointer_Serial(_y)
        # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
-       y  = simModel.y
-       yp = simModel.yp
+        y  = simModel.y
+        yp = simModel.yp
     else
-       y  = Sundials.asarray(_y)
-       yp = Sundials.asarray(_yp) 
-       println("\n!!! Info message from ModiaMath.simulate:\n",      
+        y  = Sundials.asarray(_y)
+        yp = Sundials.asarray(_yp) 
+        println("\n!!! Info message from ModiaMath.simulate:\n",      
                  "    idasol_f assumption SimModel.y === _y is not valid; using asarray(_y).")
     end
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
 
     # Copy simModel.r to _r
     @static if VERSION >= v"0.7.0-DEV.2005"
-       unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
+        unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
     else
-       unsafe_copy!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
+        unsafe_copy!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
     end
     return Cint(0)   # indicates normal return
 end
 
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-   @noinline function old_cfunction(f, r, a)
-     ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
-   end
+    @noinline function old_cfunction(f, r, a)
+        ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+    end
 else
     const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
 end
@@ -101,15 +101,15 @@ end
 
 #------- root finding
 function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, gout::Ptr{Sundials.realtype}, simModel::IntegratorData)
-   simModel.statistics.nZeroCrossings += 1   
-   sim      = simModel.simulationState
-   sim.time = t
-   ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, Sundials.asarray(y), Sundials.asarray(yp), simModel.z)
+    simModel.statistics.nZeroCrossings += 1   
+    sim      = simModel.simulationState
+    sim.time = t
+    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, Sundials.asarray(y), Sundials.asarray(yp), simModel.z)
     
-   for i = 1:simModel.simulationState.nz
-      unsafe_store!(gout, simModel.z[i], i)
-   end   
-   return Cint(0)   # indicates normal return
+    for i = 1:simModel.simulationState.nz
+        unsafe_store!(gout, simModel.z[i], i)
+    end   
+    return Cint(0)   # indicates normal return
 end
 
 @static if VERSION < v"0.7.0-DEV.2005"
@@ -163,24 +163,25 @@ function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::
                              message::Cstring, simModel::IntegratorData)
     modelName = simModel.model.modelName
     if error_code > 0
-       # Print information text
-       println("\n\n!!! Warning from ModiaMath.simulate(", modelName,", ...): ", unsafe_string(IDAfunction), 
+        # Print information text
+        println("\n\n!!! Warning from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
                "(...) returned with [", unsafe_string(IDAmodule), "] error_code  = ", 
-               error_code, ":\n", unsafe_string(message),"\n")
+               error_code, ":\n", unsafe_string(message), "\n")
     elseif error_code < 0
-       # Raise error
-       time   = simModel.last_t
-       norm_y = simModel.last_norm_y
-       if time > typemin(Float64)
-          error("\n\n!!! Error from ModiaMath.simulate(", modelName,", ...): ", unsafe_string(IDAfunction), 
+        # Raise error
+        time   = simModel.last_t
+        norm_y = simModel.last_norm_y
+  
+        if time > typemin(Float64)
+            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
                 "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n", 
-                unsafe_string(message),"\n( norm( x(t=", @sprintf("%0.3g",time), " s) ) = ", @sprintf("%0.3g",norm_y), 
+                unsafe_string(message), "\n( norm( x(t=", @sprintf("%0.3g",time), " s) ) = ", @sprintf("%0.3g",norm_y), 
                 "; if this value is large, the model is unstable )\n")
-       else
-          error("\n\n!!! Error from ModiaMath.simulate(", modelName,", ...): ", unsafe_string(IDAfunction), 
+        else
+            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
                 "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n", 
-                unsafe_string(message),"\n")       
-       end
+                unsafe_string(message), "\n")       
+        end
     end
     nothing
 end

@@ -70,51 +70,52 @@ end
 ```
 """
 struct Path
-   t::Vector{Float64}        # path parameter; t=0 is (r[1],q[1])
-   r::Vector{Vector3D}       # Position vectors from world frame to origin of Frames
-   q::Vector{Quaternion}     # Quaternions describing rotation from world frame to Frames
+    t::Vector{Float64}        # path parameter; t=0 is (r[1],q[1])
+    r::Vector{Vector3D}       # Position vectors from world frame to origin of Frames
+    q::Vector{Quaternion}     # Quaternions describing rotation from world frame to Frames
 
-   function Path(r::AbstractVector, q::AbstractVector = Quaternion[]; 
-                 v::AbstractVector = ones(length(r)), 
-                 seps = sqrt(eps()) )
-      nframes = size(r,1)
-      @assert(seps > 0.0)
-      @assert(nframes > 1)
-      @assert(length(v) == nframes)
-      @assert(size(q,1) == 0 || size(q,1) == nframes)
-      @assert(v[1]   >= 0.0)
-      @assert(v[end] >= 0.0)
-      for i in 2:length(v) - 1
-         @assert(v[i] > 0.0)
-      end
-      vv = convert(Vector{Float64}, v)
+    function Path(r::AbstractVector, q::AbstractVector=Quaternion[]; 
+                  v::AbstractVector=ones(length(r)), 
+                  seps=sqrt(eps()) )
+        nframes = size(r, 1)
+        @assert(seps > 0.0)
+        @assert(nframes > 1)
+        @assert(length(v) == nframes)
+        @assert(size(q, 1) == 0 || size(q, 1) == nframes)
+        @assert(v[1]   >= 0.0)
+        @assert(v[end] >= 0.0)
+        for i in 2:length(v) - 1
+            @assert(v[i] > 0.0)
+        end
+        vv = convert(Vector{Float64}, v)
 
-      # Determine path length for every segment
-      t = zeros(nframes)
-      for i in 2:nframes
-         slen = norm(r[i] - r[i-1])
-         if slen > seps
-            # Use distance between r[i] and r[i-1] as path parameter (in [m]), scale with vv
-            t[i] = t[i-1] + slen/((vv[i]+vv[i-1])/2)
+        # Determine path length for every segment
+        t = zeros(nframes)
+        for i in 2:nframes
+            slen = norm(r[i] - r[i - 1])
+            if slen > seps
+                # Use distance between r[i] and r[i-1] as path parameter (in [m]), scale with vv
+                t[i] = t[i - 1] + slen / ((vv[i] + vv[i - 1]) / 2)
  
-         elseif length(q) > 0
-            # Use planar rotation angle between q[i] and q[i-1] as path parameter (in [rad])
-            q_rel = relativeRotation(q[i-1], q[i])
-            q4    =  q_rel[4]
-            q4    = q4 >  1+seps ?  1.0 :  
-                    q4 < -1-seps ? -1.0 : q4
-            absAngle = 2*acos(q4)
-            if absAngle < seps
-               error("ModiaMath.Path(..): r[i] == r[i-1] and q[i] == q[i-1] (i = ", i, ").")
-            end
-            t[i] = t[i-1] + absAngle/((vv[i]+vv[i-1])/2)
+            elseif length(q) > 0
+                # Use planar rotation angle between q[i] and q[i-1] as path parameter (in [rad])
+                q_rel = relativeRotation(q[i - 1], q[i])
+                q4    =  q_rel[4]
+                q4    = q4 >  1 + seps ?  1.0 :  
+                    q4 < -1 - seps ? -1.0 : q4
+                absAngle = 2 * acos(q4)
+  
+                if absAngle < seps
+                    error("ModiaMath.Path(..): r[i] == r[i-1] and q[i] == q[i-1] (i = ", i, ").")
+                end
+                t[i] = t[i - 1] + absAngle / ((vv[i] + vv[i - 1]) / 2)
             
-         else
-            error("ModiaMath.Path(..): r[i] == r[i-1] (i = ", i, ").")
-         end
-      end
-      new(t, r, q)
-   end
+            else
+                error("ModiaMath.Path(..): r[i] == r[i-1] (i = ", i, ").")
+            end
+        end
+        new(t, r, q)
+    end
 end
 
 
@@ -129,29 +130,29 @@ t_pathEnd(path::Path)::Float64 = path.t[end]
 
 
 function get_interval(path::Path, t::Number)
-   # returns index i, such that path.t[i] <= t < path.t[i+1]
+    # returns index i, such that path.t[i] <= t < path.t[i+1]
 
-   tvec = path.t
-   if t <= 0.0 
-      return 1
-   elseif t >= tvec[end]
-      return length(tvec)-1
-   end
+    tvec = path.t
+    if t <= 0.0 
+        return 1
+    elseif t >= tvec[end]
+        return length(tvec) - 1
+    end
 
-   low  = 1
-   high = length(tvec)
-   mid  = round(Int, (low+high)/2)
+    low  = 1
+    high = length(tvec)
+    mid  = round(Int, (low + high) / 2)
 
-   while t < tvec[mid] || t >= tvec[mid+1] 
-       if t < tvec[mid]
-          high = mid
-       else
-          low = mid
-       end
-       mid = round(Int, (low+high)/2, RoundDown)
-   end
+    while t < tvec[mid] || t >= tvec[mid + 1] 
+        if t < tvec[mid]
+            high = mid
+        else
+            low = mid
+        end
+        mid = round(Int, (low + high) / 2, RoundDown)
+    end
 
-   return mid
+    return mid
 end
 
 
@@ -163,14 +164,14 @@ end
 Return position `rt`and Quaternion `qt` of `path::`[`ModiaMath.Path`](@ref) at path parameter `t::Number`.
 """
 function interpolate(path::Path, t::Number)
-   i    = get_interval(path, t)
-   tvec = path.t
-   tt::Float64  = convert(Float64, t)
-   fac::Float64 = (tt - tvec[i])/(tvec[i+1] - tvec[i])
-   rt = path.r[i] + fac*(path.r[i+1] - path.r[i])
-   qt = length(path.q) > 0 ? normalize( path.q[i] + fac*(path.q[i+1] - path.q[i]) ) : NulLQuaternion
+    i    = get_interval(path, t)
+    tvec = path.t
+    tt::Float64  = convert(Float64, t)
+    fac::Float64 = (tt - tvec[i]) / (tvec[i + 1] - tvec[i])
+    rt = path.r[i] + fac * (path.r[i + 1] - path.r[i])
+    qt = length(path.q) > 0 ? normalize(path.q[i] + fac * (path.q[i + 1] - path.q[i])) : NulLQuaternion
 
-   return (rt, qt)
+    return (rt, qt)
 end
 
 
@@ -181,9 +182,9 @@ end
 Return position `r` of `path::`[`ModiaMath.Path`](@ref) at path parameter `t::Number`.
 """
 function interpolate_r(path::Path, t::Number)::Vector3D
-   i    = get_interval(path, t)
-   tvec = path.t
-   tt::Float64  = convert(Float64, t)
-   fac::Float64 = (tt - tvec[i])/(tvec[i+1] - tvec[i])
-   return path.r[i] + fac*(path.r[i+1] - path.r[i])
+    i    = get_interval(path, t)
+    tvec = path.t
+    tt::Float64  = convert(Float64, t)
+    fac::Float64 = (tt - tvec[i]) / (tvec[i + 1] - tvec[i])
+    return path.r[i] + fac * (path.r[i + 1] - path.r[i])
 end

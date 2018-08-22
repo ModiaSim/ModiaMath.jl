@@ -62,71 +62,69 @@ hasValue(T)  = typeof(T) != NOTHING
 Generate a new variable with `v.value::ValueType`, `v.nominal::ElementType`.
 The argument list is described in module [`Variables`](@ref).
 """
-mutable struct RealVariable{ValueType, ElementType} <: ModiaMath.AbstractRealVariable
-   # Generic Attributes of every AbstractVariable (partially based on FMI 2.0)
-   _internal::ComponentInternal
-   value::ValueType                 # Actual value of variable (can be a scalar or an array)
-   info::AbstractString
-   causality::Causality
-   variability::Variability
-   start::ValueType                 # Initial value of variable
-   fixed::Bool                      # = true, start is fixed during initialization; = false, start is a guess value (can be changed during initialization)
-   analysis::VariableAnalysisType   # Analysis for which the Variable is used
+mutable struct RealVariable{ValueType,ElementType} <: ModiaMath.AbstractRealVariable
+    # Generic Attributes of every AbstractVariable (partially based on FMI 2.0)
+    _internal::ComponentInternal
+    value::ValueType                 # Actual value of variable (can be a scalar or an array)
+    info::AbstractString
+    causality::Causality
+    variability::Variability
+    start::ValueType                 # Initial value of variable
+    fixed::Bool                      # = true, start is fixed during initialization; = false, start is a guess value (can be changed during initialization)
+    analysis::VariableAnalysisType   # Analysis for which the Variable is used
 
-   # Attributes specific to Real variables
-   min::ElementType
-   max::ElementType
-   nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
-   flow::Bool
-   numericType::NumericType                                          # how the variable is used in the equations
-   integral::Union{NOTHING  , RealVariable{ValueType, ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-   derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-   unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
+    # Attributes specific to Real variables
+    min::ElementType
+    max::ElementType
+    nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
+    flow::Bool
+    numericType::NumericType                                          # how the variable is used in the equations
+    integral::Union{NOTHING,RealVariable{ValueType,ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    derivative::Union{NOTHING,RealVariable{ValueType,ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
 
-   # How the variable is stored in vectors
-   ivar::Int        # if value is stored in x/derx/residue vector: x/derx/residue[ ivar ] = first value of variable.value
-   iresult::Int     # if value is stored in result vector: result[ iresult ] = first value of variable.value
+    # How the variable is stored in vectors
+    ivar::Int        # if value is stored in x/derx/residue vector: x/derx/residue[ ivar ] = first value of variable.value
+    iresult::Int     # if value is stored in result vector: result[ iresult ] = first value of variable.value
 
-   function RealVariable{ValueType, ElementType}(
-      name, within, info, start, unit, fixed, min, max, nominal, flow, causality, variability, 
+    function RealVariable{ValueType,ElementType}(name, within, info, start, unit, fixed, min, max, nominal, flow, causality, variability, 
       numericType, integral, analysis) where {ValueType, ElementType}
 
-      variable = new(ComponentInternal(name,within), deepcopy(start), info, causality, variability, 
+        variable = new(ComponentInternal(name, within), deepcopy(start), info, causality, variability, 
                      start, fixed, analysis, min, max, nominal, flow, numericType, integral, nothing, unit, 0, 0) 
 
-      if typeof(within) != NOTHING
-         setfield!(within,Symbol(name),variable)
-      end
+        if typeof(within) != NOTHING
+            setfield!(within, Symbol(name), variable)
+        end
 
-      if hasValue(integral)
-         integral.derivative = variable      
-      end
+        if hasValue(integral)
+            integral.derivative = variable      
+        end
 
-      return variable      
-   end
+        return variable      
+    end
 end
 
-RealVariable{ValueType, ElementType}(
-     name        = NoNameDefined,
-     within      = nothing;
-     info        = "",
-     start       = nothing,
-     unit        = NoUnit,
-     fixed       = false,
-     min         = -ElementType(Inf),
-     max         =  ElementType(Inf),
-     nominal     =  ElementType(1.0), 
-     flow        =  false,
-     causality   =  Local, 
-     variability =  Continuous, 
-     integral    =  nothing, 
-     numericType =  WR,
-     analysis    =  ModiaMath.AllAnalysis) where {ValueType, ElementType} =
-         RealVariable{ValueType, ElementType}(name, within, info, start, unit, fixed, min, max, nominal, false, causality, variability, numericType, integral, analysis)
+RealVariable{ValueType,ElementType}(name=NoNameDefined,
+    within=nothing;
+    info="",
+    start=nothing,
+    unit=NoUnit,
+    fixed=false,
+    min=-ElementType(Inf),
+    max=ElementType(Inf),
+    nominal=ElementType(1.0), 
+    flow=false,
+    causality=Local, 
+    variability=Continuous, 
+    integral=nothing, 
+    numericType=WR,
+    analysis=ModiaMath.AllAnalysis) where {ValueType, ElementType} =
+        RealVariable{ValueType,ElementType}(name, within, info, start, unit, fixed, min, max, nominal, false, causality, variability, numericType, integral, analysis)
 
-function Base.show(io::IO, r::RealVariable{ValueType, ElementType}) where {ValueType, ElementType}
-   print(r.value, " ", r.unit)
-   if r.info != ""
+function Base.show(io::IO, r::RealVariable{ValueType,ElementType}) where {ValueType, ElementType}
+    print(r.value, " ", r.unit)
+    if r.info != ""
       # print(" # ", r.info)
    end
 end
@@ -164,39 +162,37 @@ The argument list is described in module [`Variables`](@ref).
 const RealSVector3 = RealSVector{3}
 
 
-RealScalar(
-     name        = NoNameDefined,
-     within      = nothing;
-     info        = "",
-     start       = 0.0,
-     unit        = NoUnit,
-     fixed       = false,
-     min         = -Inf,
-     max         =  Inf,
-     nominal     =  1.0, 
-     flow        = false,
-     causality   =  Local, 
-     variability =  Continuous, 
-     integral    =  nothing, 
-     numericType =  WR,
-     analysis    =  ModiaMath.AllAnalysis) =
+RealScalar(name=NoNameDefined,
+    within=nothing;
+    info="",
+    start=0.0,
+    unit=NoUnit,
+    fixed=false,
+    min=-Inf,
+    max=Inf,
+    nominal=1.0, 
+    flow=false,
+    causality=Local, 
+    variability=Continuous, 
+    integral=nothing, 
+    numericType=WR,
+    analysis=ModiaMath.AllAnalysis) =
          RealScalar(name, within, info, start, unit, fixed, min, max, nominal, flow, causality, variability, numericType, integral, analysis)
 
-RealSVector{Size}(
-     name        = NoNameDefined,
-     within      = nothing;
-     info        = "",
-     start       = zeros(Size),
-     unit        = NoUnit,
-     fixed       = false,
-     min         = -Inf,
-     max         =  Inf,
-     nominal     =  1.0, 
-     flow        = false,
-     causality   =  Local, 
-     variability =  Continuous, 
-     integral    =  nothing, 
-     numericType =  WR,
-     analysis    =  ModiaMath.AllAnalysis) where {Size} =
-         RealSVector{Size}(name, within, info, start, unit, fixed, min, max, nominal, flow, causality, variability, numericType, integral, analysis)
+RealSVector{Size}(name=NoNameDefined,
+    within=nothing;
+    info="",
+    start=zeros(Size),
+    unit=NoUnit,
+    fixed=false,
+    min=-Inf,
+    max=Inf,
+    nominal=1.0, 
+    flow=false,
+    causality=Local, 
+    variability=Continuous, 
+    integral=nothing, 
+    numericType=WR,
+    analysis=ModiaMath.AllAnalysis) where {Size} =
+        RealSVector{Size}(name, within, info, start, unit, fixed, min, max, nominal, flow, causality, variability, numericType, integral, analysis)
 

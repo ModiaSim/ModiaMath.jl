@@ -24,29 +24,29 @@ export SimulationStatistics, reInitializeStatistics!, set_nResultsForSimulationS
     mutable struct Logger - Log model evaluations
 """
 mutable struct Logger
-   log::Bool           # = true, if logging
+    log::Bool           # = true, if logging
 
-   # log categories
-   statistics::Bool
-   progress::Bool
-   infos::Bool
-   warnings::Bool
-   events::Bool
+    # log categories
+    statistics::Bool
+    progress::Bool
+    infos::Bool
+    warnings::Bool
+    events::Bool
 
-   Logger() = new(false, true, true, true, true, true)
+    Logger() = new(false, true, true, true, true, true)
 end
 
 function setLog!(logger::Logger, log::Bool)
-   logger.log = log
-   return nothing
+    logger.log = log
+    return nothing
 end
 
 function setAllLogCategories!(logger::Logger; default=true)
-   logger.statistics = default
-   logger.progress   = default
-   logger.infos      = default
-   logger.warnings   = default
-   logger.events     = default
+    logger.statistics = default
+    logger.progress   = default
+    logger.infos      = default
+    logger.warnings   = default
+    logger.events     = default
 end
 
 
@@ -66,25 +66,26 @@ If option reinit=true, all previous set categories are reinitialized to be no lo
 If reinit=false, previously set categories are not changed.
 """
 function setLogCategories!(logger::Logger, categories::Vector{Symbol}; reinit=true)
-   if reinit
-      setAllLogCategories!(logger;default=false)
-   end
-   for c in categories
-      if c == :LogStatistics
-         logger.statistics = true
-      elseif c == :LogProgress
-         logger.progress = true         
-      elseif c == :LogInfos
-         logger.infos = true
-      elseif c == :LogWarnings
-         logger.warnings = true
-      elseif c == :LogEvents
-         logger.events = true
-      else
-         warning("Log categorie ", c, " not known (will be ignored)")
-      end
-   end
-   return nothing
+    if reinit
+        setAllLogCategories!(logger;default=false)
+    end
+ 
+    for c in categories
+        if c == :LogStatistics
+            logger.statistics = true
+        elseif c == :LogProgress
+            logger.progress = true         
+        elseif c == :LogInfos
+            logger.infos = true
+        elseif c == :LogWarnings
+            logger.warnings = true
+        elseif c == :LogEvents
+            logger.events = true
+        else
+            warning("Log categorie ", c, " not known (will be ignored)")
+        end
+    end
+    return nothing
 end
 
 
@@ -96,8 +97,8 @@ Enable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractSi
 or ModiaMath.Logger)
 """
 function logOn!(logger::Logger)
-   logger.log = true
-   return nothing
+    logger.log = true
+    return nothing
 end
 
 
@@ -108,8 +109,8 @@ Disable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractS
 or ModiaMath.Logger)
 """
 function logOff!(logger::Logger)
-   logger.log = false
-   return nothing
+    logger.log = false
+    return nothing
 end
 
 
@@ -190,104 +191,107 @@ The following data is stored in this structure:
   taking the sparseness structure into account).
 """
 mutable struct SimulationStatistics
-   cpuTimeInitialization::Float64
-   cpuTimeIntegration::Float64
-   startTime::Float64
-   stopTime::Float64
-   interval::Float64
-   tolerance::Float64
-   nEquations::Int
-   nResults::Int
-   nSteps::Int
-   nResidues::Int
-   nZeroCrossings::Int
-   nJac::Int
-   nTimeEvents::Int
-   nStateEvents::Int
-   nRestartEvents::Int
-   nErrTestFails::Int
-   h0::Float64
-   hMin::Float64
-   hMax::Float64
-   orderMax::Int
-   sparseSolver::Bool
-   nGroups::Int
+    cpuTimeInitialization::Float64
+    cpuTimeIntegration::Float64
+    startTime::Float64
+    stopTime::Float64
+    interval::Float64
+    tolerance::Float64
+    nEquations::Int
+    nResults::Int
+    nSteps::Int
+    nResidues::Int
+    nZeroCrossings::Int
+    nJac::Int
+    nTimeEvents::Int
+    nStateEvents::Int
+    nRestartEvents::Int
+    nErrTestFails::Int
+    h0::Float64
+    hMin::Float64
+    hMax::Float64
+    orderMax::Int
+    sparseSolver::Bool
+    nGroups::Int
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-   SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
-        new(0.0,0.0,0.0,0.0,0.0,0.0,nEquations,0,0,0,0,0,0,0,0,0,floatmax(Float64),
-            floatmax(Float64),0.0,0,sparseSolver,nGroups)
-else
-   SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
-        new(0.0,0.0,0.0,0.0,0.0,0.0,nEquations,0,0,0,0,0,0,0,0,0,realmax(Float64),
-            realmax(Float64),0.0,0,sparseSolver,nGroups)
-end
+    @static if VERSION >= v"0.7.0-DEV.2005"
+        SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
+        new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, 0, 0, 0, 0, 0, 0, 0, 0, 0, floatmax(Float64),
+            floatmax(Float64), 0.0, 0, sparseSolver, nGroups)
+    else
+        SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
+        new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, 0, 0, 0, 0, 0, 0, 0, 0, 0, realmax(Float64),
+            realmax(Float64), 0.0, 0, sparseSolver, nGroups)
+    end
 
 end
 
 function reInitializeStatistics!(stat::SimulationStatistics,
                                  startTime::Float64, stopTime::Float64, interval::Float64, tolerance::Float64) 
-   stat.cpuTimeInitialization = 0.0
-   stat.cpuTimeIntegration    = 0.0
-   stat.startTime      = startTime
-   stat.stopTime       = stopTime
-   stat.interval       = interval
-   stat.tolerance      = tolerance
-   stat.nResults       = 0
-   stat.nSteps         = 0
-   stat.nResidues      = 0
-   stat.nZeroCrossings = 0
-   stat.nJac           = 0
-   stat.nTimeEvents    = 0
-   stat.nStateEvents   = 0
-   stat.nRestartEvents = 0
-   stat.nErrTestFails  = 0
-@static if VERSION >= v"0.7.0-DEV.2005"
-   stat.h0             = floatmax(Float64)
-   stat.hMin           = floatmax(Float64)
-else
-   stat.h0             = realmax(Float64)
-   stat.hMin           = realmax(Float64)
-end
-   stat.hMax           = 0.0
-   stat.orderMax       = 0                                
+    stat.cpuTimeInitialization = 0.0
+    stat.cpuTimeIntegration    = 0.0
+    stat.startTime      = startTime
+    stat.stopTime       = stopTime
+    stat.interval       = interval
+    stat.tolerance      = tolerance
+    stat.nResults       = 0
+    stat.nSteps         = 0
+    stat.nResidues      = 0
+    stat.nZeroCrossings = 0
+    stat.nJac           = 0
+    stat.nTimeEvents    = 0
+    stat.nStateEvents   = 0
+    stat.nRestartEvents = 0
+    stat.nErrTestFails  = 0
+ 
+    @static if VERSION >= v"0.7.0-DEV.2005"
+        stat.h0             = floatmax(Float64)
+        stat.hMin           = floatmax(Float64)
+    else
+        stat.h0             = realmax(Float64)
+        stat.hMin           = realmax(Float64)
+    end
+    stat.hMax           = 0.0
+    stat.orderMax       = 0                                
 end
 
 
 import Base.show
 Base.print(io::IO, stat::SimulationStatistics) = show(io, stat)
+
 function Base.show(io::IO, stat::SimulationStatistics)
-   @printf(io,"        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n", 
-                                           stat.cpuTimeInitialization+stat.cpuTimeIntegration, 
+    @printf(io,"        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n", 
+                                           stat.cpuTimeInitialization + stat.cpuTimeIntegration, 
                                            stat.cpuTimeInitialization, stat.cpuTimeIntegration)
-   println(io,"        startTime      = ", stat.startTime, " s")
-   println(io,"        stopTime       = ", stat.stopTime, " s")
-   println(io,"        interval       = ", stat.interval, " s")
-   println(io,"        tolerance      = ", stat.tolerance)
-   println(io,"        nEquations     = ", stat.nEquations)
-   println(io,"        nResults       = ", stat.nResults)
-   println(io,"        nSteps         = ", stat.nSteps)
-   println(io,"        nResidues      = ", stat.nResidues, " (includes residue calls for Jacobian)")
-   println(io,"        nZeroCrossings = ", stat.nZeroCrossings)
-   println(io,"        nJac           = ", stat.nJac)
-   println(io,"        nTimeEvents    = ", stat.nTimeEvents)
-   println(io,"        nStateEvents   = ", stat.nStateEvents)
-   println(io,"        nRestartEvents = ", stat.nRestartEvents)
-   println(io,"        nErrTestFails  = ", stat.nErrTestFails)
-   @printf(io,"        h0             = %.2g s\n", stat.h0)
-   @printf(io,"        hMin           = %.2g s\n", stat.hMin)
-   @printf(io,"        hMax           = %.2g s\n", stat.hMax)
-   println(io,"        orderMax       = ", stat.orderMax)
-   println(io,"        sparseSolver   = ", stat.sparseSolver)
-   if stat.sparseSolver
-      println(io,"        nGroups        = ", stat.nGroups)
-   end
+    println(io, "        startTime      = ", stat.startTime, " s")
+    println(io, "        stopTime       = ", stat.stopTime, " s")
+    println(io, "        interval       = ", stat.interval, " s")
+    println(io, "        tolerance      = ", stat.tolerance)
+    println(io, "        nEquations     = ", stat.nEquations)
+    println(io, "        nResults       = ", stat.nResults)
+    println(io, "        nSteps         = ", stat.nSteps)
+    println(io, "        nResidues      = ", stat.nResidues, " (includes residue calls for Jacobian)")
+    println(io, "        nZeroCrossings = ", stat.nZeroCrossings)
+    println(io, "        nJac           = ", stat.nJac)
+    println(io, "        nTimeEvents    = ", stat.nTimeEvents)
+    println(io, "        nStateEvents   = ", stat.nStateEvents)
+    println(io, "        nRestartEvents = ", stat.nRestartEvents)
+    println(io, "        nErrTestFails  = ", stat.nErrTestFails)
+    @printf(io, "        h0             = %.2g s\n", stat.h0)
+    @printf(io, "        hMin           = %.2g s\n", stat.hMin)
+    @printf(io, "        hMax           = %.2g s\n", stat.hMax)
+    println(io, "        orderMax       = ", stat.orderMax)
+    println(io, "        sparseSolver   = ", stat.sparseSolver)
+    
+    if stat.sparseSolver
+        println(io, "        nGroups        = ", stat.nGroups)
+    end
 end
 
 
 function set_nResultsForSimulationStatistics!(stat::SimulationStatistics, nt::Int)
-   stat.nResults = nt
-   return nothing
+    stat.nResults = nt
+    return nothing
 end
 
 
