@@ -34,10 +34,10 @@ Reference Modelica model:
 module Simulate_FreeBodyRotation
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-   using LinearAlgebra
-   DIAGONAL(m) = Diagonal(m)
+    using LinearAlgebra
+    DIAGONAL(m) = Diagonal(m)
 else
-   DIAGONAL(m) = diagm(m)
+    DIAGONAL(m) = diagm(m)
 end
 
 using ModiaMath
@@ -49,49 +49,49 @@ using StaticArrays
 #                             q0     = [0.1, 0.5, 0.0, 1.0],
 # q0     = [0.08908708063747484, 0.445435403187374, 0.0, 0.8908708063747479],
 
-@component FreeBodyRotation(;I      = SMatrix{3,3,Float64,9}(DIAGONAL([1.0,2.0,3.0])),
-                             A      = SVector{3,Float64}([3.0,4.0,5.0]),
-                             freqHz = SVector{3,Float64}([0.3,0.2,0.1]),
-                             phase  = SVector{3,Float64}([0,0.5235987755983,1.0471975511966]),
-                             q0     = SVector{4,Float64}([0.1, 0.5, 0.0, 1.0]),
-                             w0     = SVector{3,Float64}(zeros(3))) begin
-   @assert(size(I)==(3,3))
-   #@assert(isposdef(I))
-   @assert(length(A)==3)
-   @assert(length(freqHz)==3)
-   @assert(length(phase)==3)
-   @assert(minimum(A) > 0.0)
+@component FreeBodyRotation(;I=SMatrix{3,3,Float64,9}(DIAGONAL([1.0,2.0,3.0])),
+                             A=SVector{3,Float64}([3.0,4.0,5.0]),
+                             freqHz=SVector{3,Float64}([0.3,0.2,0.1]),
+                             phase=SVector{3,Float64}([0,0.5235987755983,1.0471975511966]),
+                             q0=SVector{4,Float64}([0.1, 0.5, 0.0, 1.0]),
+                             w0=SVector{3,Float64}(zeros(3))) begin
+    @assert(size(I) == (3, 3))
+    #@assert(isposdef(I))
+    @assert(length(A) == 3)
+    @assert(length(freqHz) == 3)
+    @assert(length(phase) == 3)
+    @assert(minimum(A) > 0.0)
 
-   q         = RealSVector{4}(numericType=ModiaMath.XD_IMP                , info="Quaternions",                         start=q0, fixed=false)
-   derq      = RealSVector{4}(numericType=ModiaMath.DER_XD_IMP, integral=q, info="der(q)"     ,          unit="1/s")
-   w         = RealSVector3(  numericType=ModiaMath.XD_IMP                , info="Angular velocity",     unit="rad/s",  start=w0, fixed=true)
-   derw      = RealSVector3(  numericType=ModiaMath.DER_XD_IMP, integral=w, info="Angular acceleration", unit="rad/s^2")
-   tau       = RealSVector3(  numericType=ModiaMath.WR                    , info="Driving torque",       unit="N*m")
+    q         = RealSVector{4}(numericType=ModiaMath.XD_IMP, info="Quaternions",                         start=q0, fixed=false)
+    derq      = RealSVector{4}(numericType=ModiaMath.DER_XD_IMP, integral=q, info="der(q)",          unit="1/s")
+    w         = RealSVector3(numericType=ModiaMath.XD_IMP, info="Angular velocity",     unit="rad/s",  start=w0, fixed=true)
+    derw      = RealSVector3(numericType=ModiaMath.DER_XD_IMP, integral=w, info="Angular acceleration", unit="rad/s^2")
+    tau       = RealSVector3(numericType=ModiaMath.WR, info="Driving torque",       unit="N*m")
 
-   residue_w = RealSVector3(  numericType=ModiaMath.FD_IMP                , info="Angular velocity residue")
-   residue_t = RealSVector3(  numericType=ModiaMath.FD_IMP                , info="Angular momentum equation residue")
-   residue_q = RealScalar(    numericType=ModiaMath.FC                    , info="Quaternion constraint residue")
+    residue_w = RealSVector3(numericType=ModiaMath.FD_IMP, info="Angular velocity residue")
+    residue_t = RealSVector3(numericType=ModiaMath.FD_IMP, info="Angular momentum equation residue")
+    residue_q = RealScalar(numericType=ModiaMath.FC, info="Quaternion constraint residue")
 end
 
 function ModiaMath.computeVariables!(b::FreeBodyRotation, sim::ModiaMath.SimulationState)
-   time::Float64 = ModiaMath.getTime(sim)
-   I             = b.I
-   A             = b.A
-   freqHz        = b.freqHz
-   phase         = b.phase
-   q             = b.q.value
-   derq          = b.derq.value
-   w             = b.w.value
-   derw          = b.derw.value
+    time::Float64 = ModiaMath.getTime(sim)
+    I             = b.I
+    A             = b.A
+    freqHz        = b.freqHz
+    phase         = b.phase
+    q             = b.q.value
+    derq          = b.derq.value
+    w             = b.w.value
+    derw          = b.derw.value
 
-   b.tau.value       = A .* sin.(2.0*pi*freqHz*time + phase)
-   b.residue_w.value = w - 2.0*([ q[4]  q[3] -q[2] -q[1];
+    b.tau.value       = A .* sin.(2.0 * pi * freqHz * time + phase)
+    b.residue_w.value = w - 2.0 * ([ q[4]  q[3] -q[2] -q[1];
                                  -q[3]  q[4]  q[1] -q[2];
-                                  q[2] -q[1]  q[4] -q[3]]*derq)
-   b.residue_t.value = I*derw + cross(w, I*w) - b.tau.value
-   b.residue_q.value = dot(q,q) - 1.0
+                                  q[2] -q[1]  q[4] -q[3]] * derq)
+    b.residue_t.value = I * derw + cross(w, I * w) - b.tau.value
+    b.residue_q.value = dot(q, q) - 1.0
 
-   return nothing
+    return nothing
 end
 
 simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)

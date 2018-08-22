@@ -8,7 +8,7 @@ Simulate PendulumDAE model with x_fixed=true.
 """
 module Simulate_PendulumDAE2
 
-include(joinpath("models","PendulumDAE.jl"))
+include(joinpath("models", "PendulumDAE.jl"))
 import .PendulumDAE
 
 import ModiaMath
