@@ -8,7 +8,7 @@ Simulate bouncing ball (model with state events and discontinuous change of DAE 
 """
 module Simulate_BouncingBall
 
-include(joinpath("models","BouncingBall.jl"))
+include(joinpath("models", "BouncingBall.jl"))
 import .BouncingBall
 import ModiaMath
 

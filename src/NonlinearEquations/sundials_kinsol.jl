@@ -16,34 +16,33 @@ import Sundials
 import ModiaMath
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-   using LinearAlgebra
+    using LinearAlgebra
 
-   @noinline function old_cfunction(f, r, a)
-      ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
-   end
+    @noinline function old_cfunction(f, r, a)
+        ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+    end
 
-   const CVOID = Cvoid
+    const CVOID = Cvoid
 else
-   const CVOID = Void
+    const CVOID = Void
 end
 
 
 mutable struct NonlinearEquationsInfo
-   extraInfo                # Model-specific extra information
-   name::String             # Name of equation system
-   ny::Int                  # Number of equations (length of y-vector)
-   getResidues!::Function   # Function of the nonlinear equation system
-   y0::Vector{Float64}      # The initial y vector (to print in error messages)
-   lastNorm_r::Float64
-   lastrScaledNorm_r::Float64
-   kin_mem::Ptr{CVOID}      # KINSOL pointer (to access all KINgetXXX functions)
+    extraInfo                # Model-specific extra information
+    name::String             # Name of equation system
+    ny::Int                  # Number of equations (length of y-vector)
+    getResidues!::Function   # Function of the nonlinear equation system
+    y0::Vector{Float64}      # The initial y vector (to print in error messages)
+    lastNorm_r::Float64
+    lastrScaledNorm_r::Float64
+    kin_mem::Ptr{CVOID}      # KINSOL pointer (to access all KINgetXXX functions)
 
-   function NonlinearEquationsInfo(name::String, ny::Int, getResidues!::Function; extraInfo=nothing)
-      @assert(ny >= 0)
-      new(extraInfo, name, ny, getResidues!, zeros(ny), 1.0, 1.0)
-   end
+    function NonlinearEquationsInfo(name::String, ny::Int, getResidues!::Function; extraInfo=nothing)
+        @assert(ny >= 0)
+        new(extraInfo, name, ny, getResidues!, zeros(ny), 1.0, 1.0)
+    end
 end
-
 
 function kinsol_f(y::Sundials.N_Vector, r::Sundials.N_Vector, eqInfo::NonlinearEquationsInfo)
     eqInfo.getResidues!(eqInfo, Sundials.asarray(y), Sundials.asarray(r))
@@ -57,28 +56,29 @@ end
 function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::Cstring,
                              message::Cstring, eqInfo::NonlinearEquationsInfo)
     if error_code > 0
-       # Print information text
-       println("\n\n!!! Warning from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
+        # Print information text
+        println("\n\n!!! Warning from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
                "(...) returned with a [", unsafe_string(KINmodule), "] error_code  = ",
-               error_code, ":\n", unsafe_string(message),"\n")
-   else
-       simulationModel = eqInfo.extraInfo
-       tables = ModiaMath.getVariableAndResidueValues(simulationModel)
-       if tables != nothing
-          println("\n\nLast used values in model:\n\n",
+               error_code, ":\n", unsafe_string(message), "\n")
+    else
+        simulationModel = eqInfo.extraInfo
+        tables = ModiaMath.getVariableAndResidueValues(simulationModel)
+
+        if tables != nothing
+            println("\n\nLast used values in model:\n\n",
                   tables[1], "\n\n",
                   tables[2], "\n\n")
-       end
+        end
 
-       if error_code == -11
-          str1 = "\nIt might be that the Jacobian is singular (= there are redundant equations).\n"
-       else
-          str1 = "\n"
-       end
+        if error_code == -11
+            str1 = "\nIt might be that the Jacobian is singular (= there are redundant equations).\n"
+        else
+            str1 = "\n"
+        end
 
-       if typeof(simulationModel) <: ModiaMath.AbstractSimulationModel
-          simState = simulationModel.simulationState
-          str2 = string(simState.name) * ": time = " * string(simState.time) *
+        if typeof(simulationModel) <: ModiaMath.AbstractSimulationModel
+            simState = simulationModel.simulationState
+            str2 = string(simState.name) * ": time = " * string(simState.time) *
                  ", stepsize of implicit Euler step = " * string(simState.hev) *
                  ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
                  (simState.nonlinearEquationsMode == 1 ? "\nGoal: compute consistent x." :
@@ -87,14 +87,14 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
                  "\nx        = " * string(simState.xev) *
                  "\nderx     = " * string(simState.derxev) *
                  "\nresidues = " * string(simState.residues)
-       else
-          str2 = ""
-       end
+        else
+            str2 = ""
+        end
 
-       error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
+        error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
              "(...) returned with a [", unsafe_string(KINmodule), "] error:\n    ",
-             unsafe_string(message),"\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
-             ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".",str1,str2)
+             unsafe_string(message), "\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
+             ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".", str1, str2)
     end
     return nothing
 end
@@ -105,66 +105,67 @@ end
 
 
 function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Float64};
-                                  FTOL::Float64 = eps(Float64)^(1/3),
-                                  yScale::Vector{Float64} = ones(length(y)),
-                                  rScale::Vector{Float64} = ones(length(y)))
-   # Create KINSOL and info structure
-   @assert(length(y) == eqInfo.ny)
-   kmem = Sundials.KINCreate()
-   if kmem == C_NULL
-      error("ModiaMath.NonlinearEquations.KINSOL.solveNonlinearEquations!: Failed to allocate KINSOL solver object")
-   end
-   eqInfo.kin_mem = kmem
-   eqInfo.y0 .= y
+                                  FTOL::Float64=eps(Float64)^(1 / 3),
+                                  yScale::Vector{Float64}=ones(length(y)),
+                                  rScale::Vector{Float64}=ones(length(y)))
+    # Create KINSOL and info structure
+    @assert(length(y) == eqInfo.ny)
+    kmem = Sundials.KINCreate()
+    if kmem == C_NULL
+        error("ModiaMath.NonlinearEquations.KINSOL.solveNonlinearEquations!: Failed to allocate KINSOL solver object")
+    end
+    eqInfo.kin_mem = kmem
+    eqInfo.y0 .= y
 
-   # Run KINSOL
-   try
-      # Set error handler function
-      @static if VERSION >= v"0.7.0-DEV.2005" 
-         Sundials.KINSetErrHandlerFn(kmem, old_cfunction(kinsol_ErrHandlerFn, Nothing, Tuple{Cint, Cstring, Cstring, Cstring, Ref{typeof(NonlinearEquationsInfo)}}), pointer_from_objref(eqInfo))
-      else
-         Sundials.KINSetErrHandlerFn(kmem, kinsol_ErrHandlerFnc, pointer_from_objref(eqInfo))
-      end
+    # Run KINSOL
+    try
+        # Set error handler function
+        @static if VERSION >= v"0.7.0-DEV.2005" 
+            Sundials.KINSetErrHandlerFn(kmem, old_cfunction(kinsol_ErrHandlerFn, Nothing, Tuple{Cint,Cstring,Cstring,Cstring,Ref{typeof(NonlinearEquationsInfo)}}), pointer_from_objref(eqInfo))
+        else
+            Sundials.KINSetErrHandlerFn(kmem, kinsol_ErrHandlerFnc, pointer_from_objref(eqInfo))
+        end
+ 
+        # Initialize KINSOL
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector,Sundials.N_Vector,Ref{typeof(NonlinearEquationsInfo)}}), Sundials.NVector(y))
+        else
+            Sundials.KINInit(kmem, kinsol_fc, y)
+        end
+        Sundials.KINSetUserData(kmem, eqInfo)
+        Sundials.KINSetFuncNormTol(kmem, FTOL)
+        Sundials.KINSetScaledStepTol(kmem, FTOL * FTOL)
 
-      # Initialize KINSOL
-      @static if VERSION >= v"0.7.0-DEV.2005"
-          Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector, Sundials.N_Vector, Ref{typeof(NonlinearEquationsInfo)}}), Sundials.NVector(y))
-      else
-          Sundials.KINInit(kmem, kinsol_fc , y)
-      end
-      Sundials.KINSetUserData(kmem, eqInfo)
-      Sundials.KINSetFuncNormTol(kmem, FTOL)
-      Sundials.KINSetScaledStepTol(kmem, FTOL*FTOL)
+        # Set maximum allowable scaled length mxnewtstep of the Newton step
+        # KINSOL defines a default of mxnewtstep = 1000*norm(y.*yScale).
+        # This fails if y is a zero vector. Therefore, mxnewtstep is changed to
+        # take only yScale into account.
+        Sundials.KINSetMaxNewtonStep(kmem, 1000.0 * norm(yScale, Inf))
 
-      # Set maximum allowable scaled length mxnewtstep of the Newton step
-      # KINSOL defines a default of mxnewtstep = 1000*norm(y.*yScale).
-      # This fails if y is a zero vector. Therefore, mxnewtstep is changed to
-      # take only yScale into account.
-      Sundials.KINSetMaxNewtonStep(kmem,1000.0*norm(yScale,Inf))
+        # Set linear solver
+        #   nnz_jac = nnz(sim.jac)
+        #   IDAKLU(mem, ny, nnz_jac)
+        #   IDAKLUSetOrdering(mem, KLUorderingChoice)
+        #   IDASlsSetSparseJacFn(mem);
+        #else
+        A = Sundials.SUNDenseMatrix(length(y), length(y))
+        LS = Sundials.SUNDenseLinearSolver(Sundials.NVector(y), A)
+        Sundials.KINDlsSetLinearSolver(kmem, LS, A)
+        #end
+        strategy = Sundials.KIN_LINESEARCH
 
-      # Set linear solver
-      #   nnz_jac = nnz(sim.jac)
-      #   IDAKLU(mem, ny, nnz_jac)
-      #   IDAKLUSetOrdering(mem, KLUorderingChoice)
-      #   IDASlsSetSparseJacFn(mem);
-      #else
-      A = Sundials.SUNDenseMatrix(length(y),length(y))
-      LS = Sundials.SUNDenseLinearSolver(Sundials.NVector(y),A)
-      Sundials.KINDlsSetLinearSolver(kmem, LS, A)
-      #end
-      strategy = Sundials.KIN_LINESEARCH
+        @static if VERSION >= v"0.7.0-DEV.2005"     
+            Sundials.KINSol(kmem, Sundials.NVector(y), strategy, Sundials.NVector(yScale), Sundials.NVector(rScale))
+        else
+            Sundials.KINSol(kmem, y, strategy, yScale, rScale)
+        end
 
-      @static if VERSION >= v"0.7.0-DEV.2005"     
-         Sundials.KINSol(kmem, Sundials.NVector(y), strategy, Sundials.NVector(yScale), Sundials.NVector(rScale))
-      else
-         Sundials.KINSol(kmem, y, strategy, yScale, rScale)
-      end
-   finally
-      # Free allocated memory
-      Sundials.KINFree([kmem])
-   end
+    finally
+        # Free allocated memory
+        Sundials.KINFree([kmem])
+    end
 
-   return nothing
+    return nothing
 end
 
 end

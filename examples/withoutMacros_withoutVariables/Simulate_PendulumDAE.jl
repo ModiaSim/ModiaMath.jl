@@ -8,7 +8,7 @@ Simulate PendulumDAE model (= index-3 model transformed to index-1 model)
 """
 module Simulate_PendulumDAE
 
-include(joinpath("models","PendulumDAE.jl"))
+include(joinpath("models", "PendulumDAE.jl"))
 import .PendulumDAE
 
 import ModiaMath
