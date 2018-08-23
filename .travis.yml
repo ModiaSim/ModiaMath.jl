@@ -25,9 +25,10 @@ git:
 #  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
 
 before_install:
-  - (sudo apt-get -qq update && sudo apt-get install -y python3 python3-matplotlib)
-  - julia -e 'Pkg.add("PyCall"); ENV["PYTHON"]=""; Pkg.build("PyCall")'
-  - julia -e 'Pkg.add("Conda"); using Conda; Conda.add("matplotlib"); Conda.add("basemap");'
+  - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'  
+#  - (sudo apt-get -qq update && sudo apt-get install -y python3 python3-matplotlib)
+#  - julia -e 'Pkg.add("PyCall"); ENV["PYTHON"]=""; Pkg.build("PyCall")'
+#  - julia -e 'Pkg.add("Conda"); using Conda; Conda.add("matplotlib"); Conda.add("basemap");'
 
 # script:
 #  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
