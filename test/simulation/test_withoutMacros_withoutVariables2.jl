@@ -26,27 +26,27 @@ import .BouncingBall
 
 @testset "\nTest ModiaMath: withoutMacros_withoutVariables/*.jl with events" begin
 
-  @testset "Simulate SimpleStateEvents" begin
-      m1 = SimpleStateEvents.Model()
-      result = ModiaMath.simulate!(m1, stopTime=10.0, interval=0.1)
-      time = result["time"]
-      f    = result["f"]
-      nStateEvents = m1.simulationState.statistics.nStateEvents
-      tEvents = [1.62283; 3.36771; 6.51321; 8.04188]
-      iEvents = [16+2, 33+2+2, 65+2+4, 80+2+6]
+    @testset "Simulate SimpleStateEvents" begin
+        m1 = SimpleStateEvents.Model()
+        result = ModiaMath.simulate!(m1, stopTime=10.0, interval=0.1)
+        time = result["time"]
+        f    = result["f"]
+        nStateEvents = m1.simulationState.statistics.nStateEvents
+        tEvents = [1.62283; 3.36771; 6.51321; 8.04188]
+        iEvents = [16 + 2, 33 + 2 + 2, 65 + 2 + 4, 80 + 2 + 6]
 
-      @test length(time) == 101+4*2
-      @test nStateEvents == 4
-      @test isapprox(tEvents, time[iEvents]; atol=0.001 )
-   end
+        @test length(time) == 101 + 4 * 2
+        @test nStateEvents == 4
+        @test isapprox(tEvents, time[iEvents]; atol=0.001 )
+    end
 
-   @testset "Simulate BouncingBall" begin
-      m2 = BouncingBall.Model()
-      result = ModiaMath.simulate!(m2, stopTime=3.0, interval=0.01)
-      nStateEvents = m2.simulationState.statistics.nStateEvents
+    @testset "Simulate BouncingBall" begin
+        m2 = BouncingBall.Model()
+        result = ModiaMath.simulate!(m2, stopTime=3.0, interval=0.01)
+        nStateEvents = m2.simulationState.statistics.nStateEvents
 
-      @test nStateEvents == 18
-   end
+        @test nStateEvents == 18
+    end
 
 end
 

@@ -143,7 +143,7 @@ integrator interface:
 | `WC`         | Computed by model; stored in result; only available at communication points |
 | `TIME`       | Copied from `t` into variable; independent variable time                    |
 """
-@enum NumericType XD_EXP=1  XD_IMP=2  XA=3  LAMBDA=4  MUE=5  DER_XD_EXP=6  DER_XD_IMP=7 FD_IMP=8  FC=9  WR=10  WC=11  TIME=12 NoNumericType=13
+@enum NumericType XD_EXP = 1  XD_IMP = 2  XA = 3  LAMBDA = 4  MUE = 5  DER_XD_EXP = 6  DER_XD_IMP = 7 FD_IMP = 8  FC = 9  WR = 10  WC = 11  TIME = 12 NoNumericType = 13
 
 
 """
@@ -204,9 +204,9 @@ import ModiaMath
 
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-   const NOTHING = Nothing
+    const NOTHING = Nothing
 else
-   const NOTHING = Void
+    const NOTHING = Void
 end
 
 

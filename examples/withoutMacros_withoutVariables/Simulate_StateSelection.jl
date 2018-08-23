@@ -8,7 +8,7 @@ DAE-model to test manual state selection of simple multibody system.
 """
 module Simulate_StateSelection
 
-include(joinpath("models","StateSelection.jl"))
+include(joinpath("models", "StateSelection.jl"))
 import .StateSelection
 import ModiaMath
 
