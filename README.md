@@ -1,5 +1,9 @@
 # ModiaMath
 
+[![Travis](https://travis-ci.org/ModiaSim/ModiaMath.jl.svg?branch=master)](https://travis-ci.org/ModiaSim/ModiaMath.jl)
+[![Coverage Status](https://coveralls.io/repos/github/ModiaSim/ModiaMath.jl/badge.svg?branch=master)](https://coveralls.io/github/ModiaSim/ModiaMath.jl?branch=master)
+[![codecov.io](http://codecov.io/github/ModiaSim/ModiaMath.jl/coverage.svg?branch=master)](http://codecov.io/github/ModiaSim/ModiaMath.jl?branch=master)
+
 ModiaMath provides a simulation engine and other mathematical utilities for packages
 [Modia](https://github.com/ModiaSim/Modia.jl) and [Modia3D](https://github.com/ModiaSim/Modia3D.jl)
 that are used to model physical systems such as electrical circuits, robots, or vehicles.
