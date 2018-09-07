@@ -17,6 +17,7 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [targets]
-test = ["Test", "Unitful"]
+test = ["Test", "Unitful", "StaticArrays"]
