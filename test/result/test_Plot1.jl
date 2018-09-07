@@ -17,4 +17,7 @@ result[:phi]  = sin.(t)
 
 ModiaMath.plot(result, :phi, heading="Sine(time)")
 
+# Test also that warn works for non-existing variables
+ModiaMath.plot(result, :SignalNotDefined, heading="Sine(time)")
+
 end

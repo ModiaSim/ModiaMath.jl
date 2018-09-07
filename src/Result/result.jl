@@ -34,8 +34,12 @@ If `xLabel=false` the legend of the x-vector should be an empty string (`""`).
 """
 function resultTimeSeries(result::SymbolDictResult, name, xLabel::Bool, xAxis)
     xsig = get(result, Symbol(xAxis), nothing)
-    if xsig == nothing
-        warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+    if xsig == nothing   
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end
 
@@ -44,7 +48,11 @@ function resultTimeSeries(result::SymbolDictResult, name, xLabel::Bool, xAxis)
 
     ysig = get(result, Symbol(name), nothing)
     if ysig == nothing
-        warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end 
 
@@ -60,7 +68,11 @@ resultHeading(result::StringDictResult) = ""
 function resultTimeSeries(result::StringDictResult, name, xLabel::Bool, xAxis)
     xsig = get(result, string(xAxis), nothing)
     if xsig == nothing
-        warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end
 
@@ -69,7 +81,11 @@ function resultTimeSeries(result::StringDictResult, name, xLabel::Bool, xAxis)
 
     ysig = get(result, string(name), nothing)
     if ysig == nothing
-        warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end 
 
@@ -85,7 +101,11 @@ resultHeading(result::StringDictAnyResult) = ""
 function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis)
     xsig = get(result, string(xAxis), nothing)
     if xsig == nothing
-        warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(string(xAxis), string(unit(xsig[1]))) : ""
@@ -93,7 +113,11 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
 
     ysig = get(result, string(name), nothing)
     if ysig == nothing
-        warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        end
         return (nothing, nothing, nothing, nothing)
     end 
 
@@ -152,12 +176,20 @@ function getSignal(seriesDict, name)
                 append!(ex2.args, ex1.args)
                 sig = @eval $ex2
             else
-                warn("\nModiaMath.plot: argument name (= ", name, ") is not correct.")
+                @static if VERSION >= v"0.7.0-DEV.2005"
+                    @warn "ModiaMath.plot: argument name (= $name) is not correct."
+                else
+                    warn("\nModiaMath.plot: argument name (= ", name, ") is not correct.")
+                end
                 sig = nothing
             end  
     
         else
-            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")     
+            @static if VERSION >= v"0.7.0-DEV.2005"
+                @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
+            else
+                warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+            end
             sig = nothing
             keyName = name
         end
