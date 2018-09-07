@@ -71,13 +71,21 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
     if pointer(simModel.y) === Sundials.__N_VGetArrayPointer_Serial(_y)
        # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
         y  = simModel.y
-        yp = simModel.yp
     else
         y  = Sundials.asarray(_y)
-        yp = Sundials.asarray(_yp) 
         println("\n!!! Info message from ModiaMath.simulate:\n",      
                  "    idasol_f assumption SimModel.y === _y is not valid; using asarray(_y).")
     end
+
+    if pointer(simModel.yp) === Sundials.__N_VGetArrayPointer_Serial(_yp)
+       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
+        yp = simModel.yp
+    else
+        yp = Sundials.asarray(_yp) 
+        println("\n!!! Info message from ModiaMath.simulate:\n",      
+                 "    idasol_f assumption SimModel.yp === _yp is not valid; using asarray(_yp).")
+    end
+
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
 
     # Copy simModel.r to _r
