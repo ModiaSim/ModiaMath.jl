@@ -32,7 +32,11 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 The package is registered in METADATA.jl and can be installed with Pkg.add.
 
 ```julia
+# Julia 0.6
 julia> Pkg.add("ModiaMath")
+
+# Julia 1.0: Currently recommended to add master 
+julia> ]add ModiaMath#master
 ```
 
 ModiaMath uses [PyPlot](https://github.com/JuliaPy/PyPlot.jl) for plotting.
@@ -104,10 +108,10 @@ In such a case, you might try these
 ## Status
 
 The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
-and with Julia `0.7.0` on Windows 7. ModiaMath cannot yet be upgraded to Julia 1.0.0, because PyPlot is not yet
-adapted to Julia 1.0.0 (otherwise, it should also work with Julia 1.0.0).
+and with Julia `0.7.0` and `1.0.0` on Windows 7. With Julia `0.7.0` and `1.0.0` from time to time gc crashes occur.
+The reason was not yet found.
 
-The ModiaMath version number is 0.2.1 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.2.2-dev.1 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 

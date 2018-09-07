@@ -1,7 +1,7 @@
 name = "ModiaMath"
 uuid = "80923050-9e1b-11e8-0c9e-c9f8e684994a"
 authors = ["Martin Otter <Martin.Otter@dlr.de>"]
-version = "0.2.1"
+version = "0.2.2-dev.1"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
