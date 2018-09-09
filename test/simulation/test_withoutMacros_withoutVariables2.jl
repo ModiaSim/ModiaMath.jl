@@ -9,13 +9,14 @@ Test function ModiaMath.simulate(..) with models that have events
 """
 module  test_withoutMacros_withoutVariables2
 
+import ModiaMath
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    using ModiaMath.Test
 end
 
-import ModiaMath
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "SimpleStateEvents.jl"))
 import .SimpleStateEvents

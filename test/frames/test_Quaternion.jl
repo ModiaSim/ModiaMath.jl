@@ -1,14 +1,18 @@
 module test_Quaternion
 
+import ModiaMath
+using  ModiaMath.StaticArrays
+using  ModiaMath.Unitful
+
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    using ModiaMath.Test
 end
 
-using StaticArrays
-using Unitful
-import ModiaMath
+
+
 
 angle1 = pi / 2
 angle2 = 90u"°"

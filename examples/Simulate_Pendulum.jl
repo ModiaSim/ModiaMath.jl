@@ -10,8 +10,7 @@ with ModiaMath.
 module Simulate_Pendulum
 
 using ModiaMath
-using StaticArrays
-
+using ModiaMath.StaticArrays
 
 @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90.0) begin
     @assert(L > 0.0)

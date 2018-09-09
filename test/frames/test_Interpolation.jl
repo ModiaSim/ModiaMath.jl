@@ -1,15 +1,15 @@
 module test_Interpolation
 
+import ModiaMath
+using  ModiaMath.Unitful
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
-    using LinearAlgebra
+    using ModiaMath.Test
+    using ModiaMath.LinearAlgebra
 end
 
-
-using Unitful
-import ModiaMath
 
 
 r = [ ModiaMath.Vector3D(1, 0, 0),

@@ -1,15 +1,18 @@
 module test_Plot4
 
+import ModiaMath
+using  ModiaMath.Unitful
+
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
     t = linspace(0.0, 10.0, 100)
 else
-    using Test
+    using ModiaMath.Test
     t = range(0.0, stop=10.0, length=100)
 end
 
-import ModiaMath
-using Unitful
+
 
 result = Dict{Symbol,AbstractVector}()
 result[:time] = t * u"s"

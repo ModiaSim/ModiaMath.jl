@@ -1,12 +1,13 @@
 module test_Variables
 
+import ModiaMath
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    using ModiaMath.Test
 end
 
-import ModiaMath
 
 mutable struct Revolute <: ModiaMath.AbstractComponentWithVariables
     _internal::ModiaMath.ComponentInternal

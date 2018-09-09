@@ -110,7 +110,7 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.2.2-dev.1 (2018-09-07)"
+const Version = "0.2.2-dev.2 (2018-09-09)"
 
 println(" \nImporting ModiaMath version ", Version)
 
@@ -149,5 +149,16 @@ using .Variables
 
 include("ModiaToModiaMath.jl")
 using .ModiaToModiaMath
+
+
+# Add import clauses used in examples and test
+import StaticArrays
+import Unitful
+import DataFrames
+
+@static if VERSION >= v"0.7.0-DEV.2005"
+    import LinearAlgebra
+    import Test
+end
 
 end # module 

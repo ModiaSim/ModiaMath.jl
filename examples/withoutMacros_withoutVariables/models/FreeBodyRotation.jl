@@ -31,15 +31,16 @@ For testing:
 module FreeBodyRotation
 
 import ModiaMath
+using  ModiaMath.StaticArrays
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
+    using ModiaMath.LinearAlgebra
     DIAGONAL(m) = Diagonal(m)
 else
     DIAGONAL(m) = diagm(m)
 end
 
-using StaticArrays
+
 
 mutable struct Model <: ModiaMath.AbstractSimulationModel
     simulationState::ModiaMath.SimulationState

@@ -5,8 +5,9 @@ Evaluate and test properties of StaticArrays
 """
 module test_StaticArrays
 
-using StaticArrays
-import DataFrames
+import ModiaMath
+import ModiaMath.DataFrames
+using  ModiaMath.StaticArrays
 
 @static if VERSION >= v"0.7.0-DEV.2005"
     const NOTHING = Nothing

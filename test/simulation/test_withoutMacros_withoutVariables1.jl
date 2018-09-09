@@ -9,14 +9,14 @@ and without Variables and without Macros
 """
 module test_withoutMacros_withoutVariables1
 
+import ModiaMath
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    using ModiaMath.Test
 end
 
-
-import ModiaMath
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "PT1.jl"))
 import .PT1

@@ -1,7 +1,7 @@
 name = "ModiaMath"
 uuid = "80923050-9e1b-11e8-0c9e-c9f8e684994a"
 authors = ["Martin Otter <Martin.Otter@dlr.de>"]
-version = "0.2.2-dev.1"
+version = "0.2.2-dev.2"
 
 [deps]
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
@@ -12,12 +12,5 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
-Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-
-[extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
-
-[targets]
-test = ["Test", "Unitful", "StaticArrays"]

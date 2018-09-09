@@ -33,15 +33,17 @@ Reference Modelica model:
 """
 module Simulate_FreeBodyRotation
 
+using ModiaMath
+using ModiaMath.StaticArrays
+
+
 @static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
+    using ModiaMath.LinearAlgebra
     DIAGONAL(m) = Diagonal(m)
 else
     DIAGONAL(m) = diagm(m)
 end
 
-using ModiaMath
-using StaticArrays
 
 #            q[1] = 0.1 changed to 0.08908708063747484
 #            q[2] = 0.5 changed to 0.445435403187374
