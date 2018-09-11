@@ -9,7 +9,7 @@ Provide variable types for simulation models.
 
 This module provides functions to declare simulation Variables as special structs that
 have a `value` and associated attributes. Furthermore, there are functions to copy
-the integrator interface variables (`x, derx, residue`) to the appropriate Variables and 
+the integrator interface variables (`x, derx, residue`) to the appropriate Variables and
 vice versa. Therefore, the modeler does not have to care about, how the values of the variables
 are mapped to the integrator interface. Typically, a model is constructed with
 macro [`@component`](@ref) using `RealXXX` variable declarations. Example:
@@ -21,7 +21,7 @@ macro [`@component`](@ref) using `RealXXX` variable declarations. Example:
   @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81) begin
      phi = RealScalar(start=pi/2, unit="rad"    , fixed=true,               numericType=ModiaMath.XD_EXP)
      w   = RealScalar(start=0.0 , unit="rad/s"  , fixed=true, integral=phi, numericType=ModiaMath.XD_EXP)
-     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP) 
+     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP)
      r   = RealSVector{2}(        unit="m"      ,                           numericType=ModiaMath.WC)
   end;
 ```
@@ -71,7 +71,7 @@ information about the variables in the model
 
 # Main developer
 
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/),
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 """
 module Variables
@@ -113,7 +113,7 @@ Defines how a variable is used in the integrator interface. The goal is to descr
  z &= f_z(x, t) \\\\
  0 &= f_d(\\dot{x}, x, t, z_i > 0) \\\\
  0 &= f_c(x, t, z_i > 0) \\\\
- J &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};  
+ J &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};
               \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular}
 \\end{align}
 ```
@@ -121,7 +121,7 @@ Defines how a variable is used in the integrator interface. The goal is to descr
 The integrator interface to the model is
 
 ```julia
-getModelResidues(m::AbstractSimulationModel, t::Float64, x::Vector{Float64},  
+getModelResidues(m::AbstractSimulationModel, t::Float64, x::Vector{Float64},
                  derx::Vector{Float64}, r::Vector{Float64}
 ```
 
@@ -177,7 +177,7 @@ and then this variable would not show up in the result, if `AnalysisType = Kinem
 
 
 """
-    @enum VariableAnalysisType AllAnalysis QuasiStaticAndDynamicAnalysis 
+    @enum VariableAnalysisType AllAnalysis QuasiStaticAndDynamicAnalysis
                                OnlyDynamicAnalysis NotUsedInAnalysis
 
 Type of analysis that can be carried out with the variable (e.g. a *force* would be defined
@@ -202,13 +202,7 @@ import DataStructures
 import DataFrames
 import ModiaMath
 
-
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const NOTHING = Nothing
-else
-    const NOTHING = Void
-end
-
+const NOTHING = Nothing
 
 # include code
 include("components.jl")

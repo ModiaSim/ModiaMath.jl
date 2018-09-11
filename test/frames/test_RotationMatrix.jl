@@ -1,23 +1,14 @@
 module test_RotationMatrix
 
 import ModiaMath
-using  ModiaMath.StaticArrays
-using  ModiaMath.Unitful
-
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-    using ModiaMath.LinearAlgebra
-end
-
-
-
+using StaticArrays
+using Unitful
+using Test
+using LinearAlgebra
 
 angle1 = pi / 2
 angle2 = 90u"°"
-    
+
 R1a = ModiaMath.rot1(angle1)
 R1b = ModiaMath.rot1(angle2)
 R1c = ModiaMath.rot_e([1,0,0], angle1)
@@ -51,7 +42,7 @@ R6a = ModiaMath.absoluteRotation(R1a, R2a)
 R6b = ModiaMath.rot123(angle1, angle1, 0.0)
 R7  = ModiaMath.relativeRotation(R1a, R6b)
 
-@testset "ModiaMath.Frames: test RotationMatrix" begin 
+@testset "ModiaMath.Frames: test RotationMatrix" begin
     @test isapprox(R1b, R1a)
     @test isapprox(R1c, R1a)
     @test isapprox(R1d, R1a)
@@ -67,7 +58,7 @@ R7  = ModiaMath.relativeRotation(R1a, R6b)
 
     @test isapprox(R4b, R4a)
     @test isapprox(R4c, R4a)
- 
+
     @test isapprox(R5, R1a)
 
     @test isapprox(v1, v1a)

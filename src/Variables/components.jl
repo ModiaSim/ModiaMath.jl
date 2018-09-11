@@ -1,7 +1,7 @@
 # License for this file: MIT (expat)
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 #
-# This file is part of module 
+# This file is part of module
 #   ModiaMath.Variables (ModiaMath/Variables/_module.jl)
 #
 
@@ -25,7 +25,7 @@ isNotInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(c
     name = ModiaMath.componentName(
                component::ModiaMath.AbstractComponentWithVariables)
 
-Return **name** of component (without the leading path) as Symbol. 
+Return **name** of component (without the leading path) as Symbol.
 """
 componentName(component::ModiaMath.AbstractComponentWithVariables) = component._internal.name
 
@@ -72,36 +72,18 @@ end
 
 
 function Base.show(io::IO, component::ModiaMath.AbstractComponentWithVariables)
-
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        for c in fieldnames(typeof(component))
-            field = getfield(component, c)
-            if typeof(field) <: ModiaMath.AbstractComponentWithVariables
-                println(io, "\n   ", c, " = ", field)
-            elseif typeof(field) <: AbstractVector
-                for i in 1:length(field)
-                    println(io, "   ", c, "[", i, "] = ", field[i])
-                end
-            elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
-                # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
-                println(io, "   ", c, " = ", field)
+    for c in fieldnames(typeof(component))
+        field = getfield(component, c)
+        if typeof(field) <: ModiaMath.AbstractComponentWithVariables
+            println(io, "\n   ", c, " = ", field)
+        elseif typeof(field) <: AbstractVector
+            for i in 1:length(field)
+                println(io, "   ", c, "[", i, "] = ", field[i])
             end
+        elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
+            # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
+            println(io, "   ", c, " = ", field)
         end
-    else
-        for c in fieldnames(component)
-            field = getfield(component, c)
-            if typeof(field) <: ModiaMath.AbstractComponentWithVariables
-                println(io, "\n   ", c, " = ", field)
-            elseif typeof(field) <: AbstractVector
-                for i in 1:length(field)
-                    println(io, "   ", c, "[", i, "] = ", field[i])
-                end
-            elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
-                # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
-                println(io, "   ", c, " = ", field)
-            end
-        end
-
     end
     print(io, "   )")
 end
@@ -141,14 +123,14 @@ end
 using Base.Meta:quot, isexpr
 
 """
-    @component ComponentName(arguments) begin ... end 
+    @component ComponentName(arguments) begin ... end
 
 Macro to generate a `mutable struct ComponentName`. An instance of this struct
 can be used as `simulationModel` in constructor [`ModiaMath.SimulationModel`](@ref)
 and can then be simulated with [`ModiaMath.simulate!`](@ref).
 
 The `arguments` must be **keyword arguments** and are used as keyword arguments for the
-generated constructor function `ComponentName. The code in `begin ... end` is 
+generated constructor function `ComponentName. The code in `begin ... end` is
 basically the body of the generated constructor function.
 All left-hand-side (scalar or vector) symbols present between `begin ... end`,
 as well as all keyword-arguments `arguments` are declared as fields in struct `ComponentName`.
@@ -162,10 +144,10 @@ using ModiaMath
    @assert(L > 0.0)
    @assert(m > 0.0)
    @assert(d >= 0.0)
-  
+
    phi = RealScalar(..)
    w   = RealScalar(..)
-   a   = RealScalar(..) 
+   a   = RealScalar(..)
    r   = RealSVector{2}(..)
 end
 
@@ -176,7 +158,7 @@ The symbols  `L, m, d, g, phi0_deg, phi, w, a, r` are used as fields in `pendulu
 (so `pendulum.L = 1.8`).
 """
 macro component(head, top_ex)
-    # @component Name(arguments) begin 
+    # @component Name(arguments) begin
     #    component1 = Component1(..)
     #    ...
     # end
@@ -188,7 +170,7 @@ macro component(head, top_ex)
     #    ...
     #    function Name(<arguments>)
     #       ##this  = new(ModiaMath.ComponentInternal(:Name, nothing), <arguments>)
-    #       < equations top_ex >   
+    #       < equations top_ex >
     #       ...
     #       ModiaMath.initComponent(##this, component1, :component1)
     #       ...
@@ -231,7 +213,7 @@ macro component(head, top_ex)
         # println("... keyword arguments = ", kwargs)
         for kw in kwargs
             # println("... kw = ", kw, ", kw.head = ", kw.head, ", kw.args = ", kw.args, ", name = ", kw.args[1])
-            # println("... kw.args[1] = ", kw.args[1], ", kw.args[2] = ", kw.args[2], ", typeof(..) = ", typeof(kw.args[2])) 
+            # println("... kw.args[1] = ", kw.args[1], ", kw.args[2] = ", kw.args[2], ", typeof(..) = ", typeof(kw.args[2]))
             symbol     = kw.args[1]
             # symbolType = typeof(kw.args[2])
             if in(symbol, namesSet)
@@ -239,10 +221,10 @@ macro component(head, top_ex)
                   "\n   ", kw,
                   "\nis defined twice.")
             end
-         
-            #push!(namesSet, :( $symbol::$symbolType ) )   
-            push!(namesSet, symbol)   
-            push!(helpArray, :($this.$symbol = $symbol))      
+
+            #push!(namesSet, :( $symbol::$symbolType ) )
+            push!(namesSet, symbol)
+            push!(helpArray, :($this.$symbol = $symbol))
         end
         # push!(fcp.args[2].args, Expr(:kw, :sceneOptions, :nothing))
     else
@@ -260,12 +242,12 @@ macro component(head, top_ex)
                   "\n   ", ex,
                   "\nis defined twice.")
             end
-            
+
             #rhs = ex.args[2]
             #if rhs.head == :call
             #   fcname = Symbol(rhs.args[1].args)
             # ??? how to figure out that fcname is a constructor of a stuct ???? If this could be figured out, fcname could be used as type in the struct (symbol::typeofSymbol)
-            #end       
+            #end
             push!(namesSet, symbol)
             push!(eq, :( ModiaMath.initComponent!($this, $symbol, $(quot(symbol))) ))
         end

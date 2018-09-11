@@ -1,42 +1,22 @@
-## Documentation: http://docs.travis-ci.com/user/languages/julia/
+# Documentation: http://docs.travis-ci.com/user/languages/julia/
 language: julia
 os:
-  - linux
-  - osx
+    - linux
+    - osx
 julia:
-  - 1.0
+    - 0.7
+    - 1.0
+    - nightly
+matrix:
+  allow_failures:
+    - julia: nightly
 notifications:
-  email: true
-git:
-  depth: 99999999
-
-## uncomment the following lines to allow failures on nightly julia
-## (tests will run but not make your overall status red)
-#matrix:
-#  allow_failures:
-#  - julia: nightly
-
-## uncomment and modify the following lines to manually install system packages
-#addons:
-#  apt: # apt-get for linux
-#    packages:
-#    - gfortran
-#before_script: # homebrew for mac
-#  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
-
+    email: true
+sudo: false
 before_install:
-  - julia -e 'ENV["PYTHON"]=""; using Pkg; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'  
-#  - (sudo apt-get -qq update && sudo apt-get install -y python3 python3-matplotlib)
-#  - julia -e 'Pkg.add("PyCall"); ENV["PYTHON"]=""; Pkg.build("PyCall")'
-#  - julia -e 'Pkg.add("Conda"); using Conda; Conda.add("matplotlib"); Conda.add("basemap");'
-
-## uncomment the following lines to override the default test script
-# script:
-#  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("ModiaMath"); Pkg.test("ModiaMath", coverage = true)' 
-
+    - julia --color=yes -e 'ENV["PYTHON"]=""; using Pkg; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia --color=yes -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("ModiaMath"); Pkg.test("ModiaMath"; coverage=true)'
 after_success:
-  # push coverage results to Coveralls
-  - julia -e 'using Pkg; cd(Pkg.dir("ModiaMath")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder()); Codecov.submit(Codecov.process_folder());'
-  # push coverage results to Codecov
-  # - julia -e 'cd(Pkg.dir("ModiaMath")); Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
+    - julia --color=yes -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder()); Codecov.submit(Codecov.process_folder());'

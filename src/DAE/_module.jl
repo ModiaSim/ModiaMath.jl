@@ -2,7 +2,7 @@
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    module ModiaMath.DAE 
+    module ModiaMath.DAE
 
 Interface between the [`ModiaMath.SimulationEngine`](@ref) and the index 1 DAE model.
 
@@ -44,7 +44,7 @@ or they can be called on a simulation model
 
 # Main developer
 
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/),
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 """
 module DAE
@@ -66,9 +66,7 @@ export SimulationState
 # export computeAndStoreResult!, terminate!, processEvent!, getEventIndicators
 
 import ModiaMath
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
-end
+using LinearAlgebra
 
 """
     @enum EventRestart NoRestart Restart FullRestart Terminate

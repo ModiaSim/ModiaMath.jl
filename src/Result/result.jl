@@ -1,7 +1,7 @@
 # License for this file: MIT (expat)
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 #
-# This file is part of module 
+# This file is part of module
 #   ModiaMath.Result (ModiaMath/Result/_module.jl)
 #
 
@@ -23,23 +23,19 @@ const SymbolDictResult = Dict{Symbol,AbstractVector}
 resultHeading(result::SymbolDictResult) = ""
 
 """
-    (xsig, xsigLegend, ysig, ysigLegend) = 
+    (xsig, xsigLegend, ysig, ysigLegend) =
            ModiaMath.resultTimeSeries(result, name, xLabel::Bool, xAxis)
 
 For a desired `result` data structure, this function has to be provided
 to return the x-vector (`xsig`), the y-vector (`ysig`) and the legend
-of the x-vector (`xsigLegend`), and of the y-vector (`ysigLegend`) as Strings, given 
+of the x-vector (`xsigLegend`), and of the y-vector (`ysigLegend`) as Strings, given
 the key of the y-vector (`name`) and the key of the x-vector (`xAxis`).
 If `xLabel=false` the legend of the x-vector should be an empty string (`""`).
 """
 function resultTimeSeries(result::SymbolDictResult, name, xLabel::Bool, xAxis)
     xsig = get(result, Symbol(xAxis), nothing)
-    if xsig == nothing   
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
-        end
+    if xsig == nothing
+        @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
     end
 
@@ -48,13 +44,9 @@ function resultTimeSeries(result::SymbolDictResult, name, xLabel::Bool, xAxis)
 
     ysig = get(result, Symbol(name), nothing)
     if ysig == nothing
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
-    end 
+    end
 
     ysigLegend = [appendUnit(string(name), string(unit(ysig[1])))]
     ysig       = ustrip.(ysig)
@@ -68,11 +60,7 @@ resultHeading(result::StringDictResult) = ""
 function resultTimeSeries(result::StringDictResult, name, xLabel::Bool, xAxis)
     xsig = get(result, string(xAxis), nothing)
     if xsig == nothing
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
     end
 
@@ -81,13 +69,9 @@ function resultTimeSeries(result::StringDictResult, name, xLabel::Bool, xAxis)
 
     ysig = get(result, string(name), nothing)
     if ysig == nothing
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
-    end 
+    end
 
     ysigLegend = [appendUnit(string(name), string(unit(ysig[1])))]
     ysig       = ustrip.(ysig)
@@ -101,11 +85,7 @@ resultHeading(result::StringDictAnyResult) = ""
 function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis)
     xsig = get(result, string(xAxis), nothing)
     if xsig == nothing
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument xAxis (= ", xAxis, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument xAxis (= $xAxis) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(string(xAxis), string(unit(xsig[1]))) : ""
@@ -113,13 +93,9 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
 
     ysig = get(result, string(name), nothing)
     if ysig == nothing
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
         return (nothing, nothing, nothing, nothing)
-    end 
+    end
 
     ysigLegend = [appendUnit(string(name), string(unit(ysig[1])))]
     ysig       = ustrip.(ysig)
@@ -136,12 +112,12 @@ if the model is a Modia3D.AbstractComponentWithVariables struct.
 """
 mutable struct ResultWithVariables
     "Dictionary of time series (elements can be Float64/Int64/Bool Vectors or Matrices)"
-    series::Dict{Symbol,Union{AbstractVector,AbstractMatrix}}  
+    series::Dict{Symbol,Union{AbstractVector,AbstractMatrix}}
 
     "Dictionary of variables (elements are <: ModiaMath.AbstractVariable with required fields value and unit)"
-    var::Dict{Symbol,Any}   
+    var::Dict{Symbol,Any}
 
-    "String used as optional heading of a plot window"                                   
+    "String used as optional heading of a plot window"
     resultHeading::String
 
     ResultWithVariables(series, var, resultHeading="") = new(series, var, resultHeading)
@@ -158,15 +134,11 @@ function getSignal(seriesDict, name)
         keyName = name
     else
         if nameAsString[end] == ']'
-            @static if VERSION >= v"0.7.0-DEV.2005"
-                indexRange = something(findlast("[", nameAsString), 0:-1)
-            else
-                indexRange = rsearch(nameAsString, "[")
-            end
+            indexRange = something(findlast("[", nameAsString), 0:-1)
             i = indexRange[1]
             @assert(i >= 2)
             keyName = Symbol(nameAsString[1:i - 1])
-    
+
             if haskey(seriesDict, keyName)
                 sig2 = seriesDict[keyName]
 
@@ -176,20 +148,12 @@ function getSignal(seriesDict, name)
                 append!(ex2.args, ex1.args)
                 sig = @eval $ex2
             else
-                @static if VERSION >= v"0.7.0-DEV.2005"
-                    @warn "ModiaMath.plot: argument name (= $name) is not correct."
-                else
-                    warn("\nModiaMath.plot: argument name (= ", name, ") is not correct.")
-                end
+                @warn "ModiaMath.plot: argument name (= $name) is not correct."
                 sig = nothing
-            end  
-    
-        else
-            @static if VERSION >= v"0.7.0-DEV.2005"
-                @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-            else
-                warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
             end
+
+        else
+            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
             sig = nothing
             keyName = name
         end
@@ -201,28 +165,23 @@ end
 function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis)
     seriesDict = result.series
     (ysig, ykeyName, yNameAsString) = getSignal(seriesDict, Symbol(name))
-    
+
     if ysig == nothing
-        return (nothing, nothing, nothing, nothing) 
+        return (nothing, nothing, nothing, nothing)
     end
-    
+
     yvar = result.var[ykeyName]
     if ndims(ysig) == 1
       # ysig is a vector
         ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
     else
       # sig has more as one dimension
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            ysigLegend = Array{String}(undef, length(yvar.value))
-        else
-            ysigLegend = Array{String}(length(yvar.value))
-        end
-
+        ysigLegend = Array{String}(undef, length(yvar.value))
         for i in eachindex(yvar.value)
             ysigLegend[i] = appendUnit(ModiaMath.indexToString(ykeyName, yvar.value, i), yvar.unit)
         end
     end
-    
+
     (xsig, xkeyName, xNameAsString) = getSignal(seriesDict, Symbol(xAxis))
     xsigLegend = xLabel ? appendUnit(xNameAsString, result.var[xkeyName].unit) : ""
     return (xsig, xsigLegend, ysig, ysigLegend)
@@ -230,4 +189,3 @@ end
 
 
 getHeading(result, heading) = heading != "" ? heading : resultHeading(result)
-

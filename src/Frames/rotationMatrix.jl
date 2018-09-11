@@ -5,7 +5,7 @@
 #   ModiaMath.Frames (ModiaMath/Frames/_module.jl)
 #
 
-@static if VERSION >= v"0.7.0-DEV.2005" @eval using LinearAlgebra end
+using LinearAlgebra
 
 """
     const ModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}
@@ -14,16 +14,16 @@ Describes the rotation from a frame 1 into a frame 2. An instance `R` of `Rotati
 has the following interpretation:
 
 ```julia
-R::RotationMatrix = [ex ey ez]   
+R::RotationMatrix = [ex ey ez]
 ```
 
 where `ex`, `ey`, `ez` are unit vectors in the direction of the x-axis, y-axis, and z-axis
 of frame 1, resolved in frame 2, respectively (for example ex=[1.0, 0.0, 0.0])
 Therefore, if `v1` is vector `v` resolved in frame 1 and `v2` is vector `v`
-resolved in frame 2, the following relationship holds: 
+resolved in frame 2, the following relationship holds:
 
 ```julia
-v2 = R*v1   
+v2 = R*v1
 v1 = R'*v2
 ```
 """
@@ -32,19 +32,11 @@ const RotationMatrix = SMatrix{3,3,Float64,9}
 
 
 """
-@static if VERSION >= v"0.7.0-DEV.2005"
     const ModiaMath.NullRotation = ModiaMath.RotationMatrix(Matrix(1.0I, 3, 3))
-else
-    const ModiaMath.NullRotation = ModiaMath.RotationMatrix(eye(3))
-end
 
 Constant RotationMatrix that defines no rotation from frame 1 to frame 2.
 """
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const NullRotation = SMatrix{3,3,Float64,9}(Matrix(1.0I, 3, 3))
-else
-    const NullRotation = SMatrix{3,3,Float64,9}(eye(3))
-end
+const NullRotation = SMatrix{3,3,Float64,9}(Matrix(1.0I, 3, 3))
 
 
 """
@@ -62,7 +54,7 @@ end
 """
     R = ModiaMath.rot1(angle)
 
-Return RotationMatrix R that rotates with angle `angle` along the x-axis of frame 1. 
+Return RotationMatrix R that rotates with angle `angle` along the x-axis of frame 1.
 """
 @inline function rot1(angle::Number)::RotationMatrix
    s = sin(angle)
@@ -76,7 +68,7 @@ end
 """
     R = ModiaMath.rot2(angle)
 
-Return RotationMatrix R that rotates with angle `angle` in [radian] along the y-axis of frame 1. 
+Return RotationMatrix R that rotates with angle `angle` in [radian] along the y-axis of frame 1.
 """
 @inline function rot2(angle::Number)::RotationMatrix
    s = sin(angle)
@@ -90,7 +82,7 @@ end
 """
     R = ModiaMath.rot3(angle)
 
-Return RotationMatrix R that rotates with angle `angle` in [radian] along the z-axis of frame 1. 
+Return RotationMatrix R that rotates with angle `angle` in [radian] along the z-axis of frame 1.
 """
 @inline function rot3(angle::Number)::RotationMatrix
    s = sin(angle)
@@ -126,16 +118,16 @@ rot_e(e::AbstractVector, angle::Number)::RotationMatrix    = rot_e( Vector3D(e),
 
 It is assumed that the two input vectors `nx` and `ny` are resolved in frame 1 and
 are directed along the x and y axis of frame 2.
-The function returns the RotationMatrix R to rotate from frame 1 to frame 2. 
+The function returns the RotationMatrix R to rotate from frame 1 to frame 2.
 
 The function is robust in the sense that it returns always a RotationMatrix R,
 even if `ny` is not orthogonal to `nx` or if one or both vectors have zero length.
-This is performed in the following way: 
-If `nx` and `ny` are not orthogonal to each other, first a unit vector `ey` is 
-determined that is orthogonal to `nx` and is lying in the plane spanned by 
-`nx` and `ny`. If `nx` and `ny` are parallel or nearly parallel to each other 
+This is performed in the following way:
+If `nx` and `ny` are not orthogonal to each other, first a unit vector `ey` is
+determined that is orthogonal to `nx` and is lying in the plane spanned by
+`nx` and `ny`. If `nx` and `ny` are parallel or nearly parallel to each other
 or `ny` is a vector with zero or nearly zero length, a vector `ey` is selected
-arbitrarily such that `ex` and `ey` are orthogonal to each other. 
+arbitrarily such that `ex` and `ey` are orthogonal to each other.
 If both `nx` and `ny` are vectors with zero or nearly zero length, an
 arbitrary rotation matrix is returned.
 
@@ -170,7 +162,7 @@ rot_nxy(nx::AbstractVector, ny::AbstractVector) = rot_nxy(Vector3D(nx), Vector3D
     v1 = ModiaMath.resolve1([R|q], v2)
 
 Transform vector v2 (v resolved in frame 2) to vector v1 (v resolved in frame 1)
-given either [`ModiaMath.RotationMatrix`](@ref) ` R` or 
+given either [`ModiaMath.RotationMatrix`](@ref) ` R` or
 [`ModiaMath.Quaternion`](@ref) ` q` (to rotate a frame 1 into a frame 2).
 """
 resolve1(R::RotationMatrix, v2::Vector3D)::Vector3D = R'*v2
@@ -182,7 +174,7 @@ resolve1(R::RotationMatrix, v2::AbstractVector)::Vector3D     = R'*Vector3D(v2)
     v2 = ModiaMath.resolve2([R|q], v1)
 
 Transform vector v1 (v resolved in frame 1) to vector v2 (v resolved in frame 2)
-given either [`ModiaMath.RotationMatrix`](@ref) ` R` or 
+given either [`ModiaMath.RotationMatrix`](@ref) ` R` or
 [`ModiaMath.Quaternion`](@ref) ` q` (to rotate a frame 1 into a frame 2).
 """
 resolve2(R::RotationMatrix, v1::Vector3D)::Vector3D = R*v1
@@ -190,24 +182,24 @@ resolve2(R::RotationMatrix, v1::AbstractVector)::Vector3D     = R*Vector3D(v1)
 
 
 """
-     R2 = ModiaMath.absoluteRotation(R1, R_rel) 
-     q2 = ModiaMath.absoluteRotation(q1, q_rel)   
+     R2 = ModiaMath.absoluteRotation(R1, R_rel)
+     q2 = ModiaMath.absoluteRotation(q1, q_rel)
 
 Return [`ModiaMath.RotationMatrix`](@ref)` R2` or [`ModiaMath.Quaternion`](@ref)` q2`
 defining the rotation from frame 0 to frame 2 from RotationMatrix `R1` or Quaternion `q1`that define the
 rotation from frame 0 to frame 1 and the relative RotationMatrix `R_rel` or the
 relative Quaternion `q_rel` that define the rotation from frame 1 to frame 2.
 """
-absoluteRotation(R1::RotationMatrix, R_rel::RotationMatrix)::RotationMatrix = R_rel*R1 
+absoluteRotation(R1::RotationMatrix, R_rel::RotationMatrix)::RotationMatrix = R_rel*R1
 
 
 
 """
-     R_rel = ModiaMath.relativeRotation(R1, R2) 
-     q_rel = ModiaMath.relativeRotation(q1, q2)   
+     R_rel = ModiaMath.relativeRotation(R1, R2)
+     q_rel = ModiaMath.relativeRotation(q1, q2)
 
 Return relative [`ModiaMath.RotationMatrix`](@ref)` R_rel` or relative
-[`ModiaMath.Quaternion`](@ref)` q_rel` defining the rotation from frame 1 to frame 2 
+[`ModiaMath.Quaternion`](@ref)` q_rel` defining the rotation from frame 1 to frame 2
 from absolute RotationMatrix `R1` or absolute Quaternion `q1`that define the
 rotation from frame 0 to frame 1 and the absolute RotationMatrix `R2` or the
 absolute Quaternion `q2` that define the rotation from frame 0 to frame 2.
@@ -216,18 +208,18 @@ relativeRotation(R1::RotationMatrix, R2::RotationMatrix)::RotationMatrix = R2*R1
 
 
 """
-     R_inv = ModiaMath.inverseRotation(R) 
-     q_inv = ModiaMath.inverseRotation(q)   
+     R_inv = ModiaMath.inverseRotation(R)
+     q_inv = ModiaMath.inverseRotation(q)
 
 Return inverse [`ModiaMath.RotationMatrix`](@ref)` R_inv` or inverse
-[`ModiaMath.Quaternion`](@ref)` q_inv` defining the rotation from frame 1 to frame 0 
+[`ModiaMath.Quaternion`](@ref)` q_inv` defining the rotation from frame 1 to frame 0
 from RotationMatrix `R` or Quaternion `q`that define the
 rotation from frame 0 to frame 1.
 """
 inverseRotation(R::RotationMatrix)::RotationMatrix = R'
 
 
-""" 
+"""
     angle = planarRotationAngle(e, v1, v2; angle_guess = 0.0)
 
 Return `angle` of a planar rotation, given the normalized axis of
@@ -255,12 +247,7 @@ isapprox(angle1, angle2)
 ```
 """
 @inline function planarRotationAngle(e::AbstractVector, v1::AbstractVector, v2::AbstractVector; angle_guess::Number=0.0)::Number
-   @static if VERSION >= v"0.7.0-DEV.2005"
-      angle1 = atan( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
-   else
-      angle1 = atan2( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
-   end
-
+   angle1 = atan( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
    pi2    = 2*pi
    return angle1 + pi2*round(Int, (pi+angle_guess-angle1)/(pi2), RoundDown)
 end
@@ -314,14 +301,14 @@ as close to angle_guess. If angle_guess = 0, angle1 is just returned. Otherwise:
        -pi < angle1 + 2*pi*N - angle_guess <= pi
        (-pi+angle_guess-angle1)/(2*pi) < N <= (pi+angle_guess-angle1)/(2*pi)
        -> N := round(Int, (pi+angle_guess-angle1)/(2*pi), RoundDown )
-    
-resulting in 
+
+resulting in
 
     (9) angle = angle1 + 2*pi*round(Int, (pi+angle_guess-angle1)/(2*pi))
 =#
 
 
-""" 
+"""
     e = eAxis(axis::Int)
 
 Return unit vector `e` in direction of axis `axis` (`axis` = 1,2,3 or -1,-2-,3).
@@ -338,7 +325,7 @@ e2 = ModiMath.eAxis(-2)   # d2 = Vector3D(0.0, -1.0, 0.0)
 """
 eAxis(axis::Int) = axis ==  1 ? Vector3D(  1.0,  0.0,  0.0) :
                    axis ==  2 ? Vector3D(  0.0,  1.0,  0.0) :
-                   axis ==  3 ? Vector3D(  0.0,  0.0,  1.0) : 
+                   axis ==  3 ? Vector3D(  0.0,  0.0,  1.0) :
                    axis == -1 ? Vector3D( -1.0,  0.0,  0.0) :
                    axis == -2 ? Vector3D(  0.0, -1.0,  0.0) :
                    axis == -3 ? Vector3D(  0.0,  0.0, -1.0) :

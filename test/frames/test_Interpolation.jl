@@ -1,16 +1,9 @@
 module test_Interpolation
 
 import ModiaMath
-using  ModiaMath.Unitful
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-    using ModiaMath.LinearAlgebra
-end
-
-
+using Unitful
+using Test
+using LinearAlgebra
 
 r = [ ModiaMath.Vector3D(1, 0, 0),
       ModiaMath.Vector3D(0, 1, 0),
@@ -25,7 +18,7 @@ t_end    = ModiaMath.t_pathEnd(path)
 println("t_end = ", t_end)
 println("path.t = ", path.t)
 
-@testset "ModiaMath.Frame: test interpolation" begin 
+@testset "ModiaMath.Frame: test interpolation" begin
     dist1 = norm(r[2] - r[1])
     dist2 = norm(r[3] - r[2])
 
@@ -41,7 +34,7 @@ end
 
 function checkInterpolation(path, t_end)
     dt       = 0.1
-    stopTime = 2.0 
+    stopTime = 2.0
     time     = 0.0
 
     while time <= stopTime + 1e-7
