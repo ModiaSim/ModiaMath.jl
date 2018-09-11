@@ -5,10 +5,10 @@
     module ModiaMath.Frames
 
 This module contains functions for **frames** that is coordinate systems in 3D.
-The orientation of a frame is described either with a 3x3 **rotation matrix** 
+The orientation of a frame is described either with a 3x3 **rotation matrix**
 or with a **quaternion vector** and its origin is described with a **Vector3D**:
 
-- `const `[`ModiaMath.RotationMatrix`](@ref) = SMatrix{3,3,Float64,9}`: 
+- `const `[`ModiaMath.RotationMatrix`](@ref) = SMatrix{3,3,Float64,9}`:
   Type of a Rotation matrix to rotate from a frame 1 into a frame 2.
 
 - `const `[`ModiaMath.Quaternion`](@ref) = SVector{4,Float64}`:
@@ -19,7 +19,7 @@ or with a **quaternion vector** and its origin is described with a **Vector3D**:
 
 The following constants are defined
 
-- `const `[`ModiaMath.NullRotation`](@ref): 
+- `const `[`ModiaMath.NullRotation`](@ref):
   RotationMatrix with no rotation from a frame 1 into a frame 2.
 
 - `const `[`ModiaMath.NullQuaternion`](@ref):
@@ -70,9 +70,9 @@ From the two possible solutions `q` the one is returned that is closer to `q_gue
 
 # Operations on Frames
 
-The following functions provide operations on frames. The orientation of a frame is 
-defined with argument `Rq` meaning it can be either a 
-[`ModiaMath.RotationMatrix`](@ref) ` R` or a 
+The following functions provide operations on frames. The orientation of a frame is
+defined with argument `Rq` meaning it can be either a
+[`ModiaMath.RotationMatrix`](@ref) ` R` or a
 [`ModiaMath.Quaternion`](@ref) ` q` (to rotate a frame 1 into a frame 2).
 
 | Function                                         | Description                                   |
@@ -89,15 +89,15 @@ defined with argument `Rq` meaning it can be either a
 
 # Interpolation of Frames
 
-Given a set of frames by a vector `r` of position vectors to their origins and 
+Given a set of frames by a vector `r` of position vectors to their origins and
 and an optional vector `q` of Quaternions of their absolute orientations, then
 the following functions interpolate linearly in these frames:
 
 | Function                                          | Description                                    |
 |:--------------------------------------------------|:-----------------------------------------------|
-| [`ModiaMath.Path`](@ref)(r,q)                     | Return path defined by a vector of frames      | 
-| [`ModiaMath.t_pathEnd`](@ref)(path)               | Return path parameter `t_end` of last frame    | 
-| [`ModiaMath.interpolate`](@ref)(path,t)           | Return `(rt,qt)` of Path at path parameter `t` | 
+| [`ModiaMath.Path`](@ref)(r,q)                     | Return path defined by a vector of frames      |
+| [`ModiaMath.t_pathEnd`](@ref)(path)               | Return path parameter `t_end` of last frame    |
+| [`ModiaMath.interpolate`](@ref)(path,t)           | Return `(rt,qt)` of Path at path parameter `t` |
 | [`ModiaMath.interpolate_r`](@ref)(path,t)         | Return `rt` of Path at path parameter `t`      |
 
 
@@ -115,13 +115,13 @@ R3 = ModiaMath.rot_e([1,0,0], pi/2)
 
 # Main developer
 
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/),
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 
 *The functions of this module are mostly a mapping of some of the functions
-of the Modelica Standard Library from Modelica 
+of the Modelica Standard Library from Modelica
 ([Modelica.Mechanics.MultiBody.Frames](https://doc.modelica.org/help/Modelica_Mechanics_MultiBody_Frames.html#Modelica.Mechanics.MultiBody.Frames))
-to Julia (taking advantage of Julia features 
+to Julia (taking advantage of Julia features
 such as multiple dispatch and unit package Unitful)*.
 """
 module Frames
@@ -142,9 +142,7 @@ export skew
 using StaticArrays
 import ModiaMath
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
-end
+using LinearAlgebra
 
 include("vector3D.jl")
 include("rotationMatrix.jl")

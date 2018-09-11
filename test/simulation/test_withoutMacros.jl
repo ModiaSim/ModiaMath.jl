@@ -5,12 +5,7 @@ module test_withoutMacros
 
 import ModiaMath
 
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-end
-
+using Test
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros", "Simulate_Pendulum.jl"))
 import .Simulate_Pendulum
@@ -21,8 +16,8 @@ import .Simulate_FreeBodyRotation
 freeBodyRotationWithoutMacro = ModiaMath.SimulationModel(Simulate_FreeBodyRotation.FreeBodyRotationWithoutMacro(), stopTime=5.0, tolerance=1e-8)
 
 
-@testset "ModiaMath: withoutMacro/Simulate_Pendulum.jl" begin 
-    result = ModiaMath.simulate!(pendulumWithoutMacro, stopTime=10.0, tolerance=1e-8, interval=0.1, log=true) 
+@testset "ModiaMath: withoutMacro/Simulate_Pendulum.jl" begin
+    result = ModiaMath.simulate!(pendulumWithoutMacro, stopTime=10.0, tolerance=1e-8, interval=0.1, log=true)
     phi = result.series[:phi]
     w   = result.series[:w]
 
@@ -31,7 +26,7 @@ freeBodyRotationWithoutMacro = ModiaMath.SimulationModel(Simulate_FreeBodyRotati
 end
 
 
-@testset "ModiaMath: withoutMacro/Simulate_FreeBodyRotation.jl" begin 
+@testset "ModiaMath: withoutMacro/Simulate_FreeBodyRotation.jl" begin
     result = ModiaMath.simulate!(freeBodyRotationWithoutMacro, log=true)
     ModiaMath.plot(result, [:q, :w, :derw, :tau])
 end

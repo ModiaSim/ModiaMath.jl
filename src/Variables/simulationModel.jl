@@ -1,7 +1,7 @@
 # License for this file: MIT (expat)
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 #
-# This file is part of module 
+# This file is part of module
 #   ModiaMath.Variables (ModiaMath/Variables/_module.jl)
 #
 
@@ -21,7 +21,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
     modelName::String
     simulationState::ModiaMath.SimulationState
     var::ModelVariables
-    model::ModiaMath.AbstractComponentWithVariables 
+    model::ModiaMath.AbstractComponentWithVariables
 
     function SimulationModel(model::ModiaMath.AbstractComponentWithVariables;
                              startTime = 0.0,
@@ -36,7 +36,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         x_fixed = fill(false,var.nx)
         ModiaMath.copy_start_to_x!(var,x,x_fixed)
 
-        simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
+        simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName;
                                                     x_fixed = x_fixed, nc = var.nfc,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,
@@ -46,20 +46,15 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                                                     defaultInterval  = interval,
                                                     hev = hev,
                                                     scaleConstraintsAtEvents = scaleConstraintsAtEvents)
-
         # model._internal.simulationState = simulationState
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            new(String(modelName), simulationState, var, model)
-        else
-            new(modelName, simulationState, var, model)
-        end
+        new(String(modelName), simulationState, var, model)
     end
-end 
+end
 
 print_ModelVariables(simulationModel::ModiaMath.AbstractSimulationModel) = print_ModelVariables(simulationModel.var)
 
 getVariableName(model,vcat,vindex) = ModiaMath.DAE.getVariableName(model,vcat,vindex;
-                                                                   xNames = model.var.x_names) 
+                                                                   xNames = model.var.x_names)
 
 getResultNames(model::Any) = model.var.result_names
 
@@ -111,10 +106,10 @@ end
 
 
 computeVariables!(model::ModiaMath.AbstractComponentWithVariables,
-                  simulationState::ModiaMath.SimulationState) = 
+                  simulationState::ModiaMath.SimulationState) =
           error("Function ModiaMath.computeVariables!(model) not defined for model ", typeof(model))
 
-function getModelResidues!(m::SimulationModel, t::Float64, _x::Vector{Float64}, _derx::Vector{Float64}, _r::Vector{Float64}, _w::Vector{Float64})  
+function getModelResidues!(m::SimulationModel, t::Float64, _x::Vector{Float64}, _derx::Vector{Float64}, _r::Vector{Float64}, _w::Vector{Float64})
     # Copy _x and _derx values to variables
     ModiaMath.copy_x_and_derx_to_variables!(t, _x, _derx, m.var)
 
@@ -123,7 +118,7 @@ function getModelResidues!(m::SimulationModel, t::Float64, _x::Vector{Float64}, 
     computeVariables!(m.model, m.simulationState)
 
     # Copy variables to residues
-    ModiaMath.copy_variables_to_residue!(m.var,_x,_derx,_r)  
+    ModiaMath.copy_variables_to_residue!(m.var,_x,_derx,_r)
     return nothing
 end
 

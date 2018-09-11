@@ -34,16 +34,8 @@ Reference Modelica model:
 module Simulate_FreeBodyRotation
 
 using ModiaMath
-using ModiaMath.StaticArrays
-
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using ModiaMath.LinearAlgebra
-    DIAGONAL(m) = Diagonal(m)
-else
-    DIAGONAL(m) = diagm(m)
-end
-
-
+using StaticArrays
+using LinearAlgebra
 
 #            q[1] = 0.1 changed to 0.08908708063747484
 #            q[2] = 0.5 changed to 0.445435403187374
@@ -72,7 +64,7 @@ mutable struct FreeBodyRotationWithoutMacro <: ModiaMath.AbstractComponentWithVa
     residue_t::RealSVector3
     residue_q::RealScalar
 
-    function FreeBodyRotationWithoutMacro(;I=DIAGONAL([1.0,2.0,3.0]),
+    function FreeBodyRotationWithoutMacro(;I=Diagonal([1.0,2.0,3.0]),
                                          A=[3.0,4.0,5.0],
                                          freqHz=[0.3,0.2,0.1],
                                          phase=[0,0.5235987755983,1.0471975511966],
@@ -85,14 +77,14 @@ mutable struct FreeBodyRotationWithoutMacro <: ModiaMath.AbstractComponentWithVa
         @assert(length(A) == 3)
         @assert(length(freqHz) == 3)
         @assert(length(phase) == 3)
-        @assert(minimum(A) > 0.0)   
-    
+        @assert(minimum(A) > 0.0)
+
         q         = RealSVector{4}(:q, this, numericType=ModiaMath.XD_IMP, info="Quaternions",                         start=q0, fixed=false)
         derq      = RealSVector{4}(:derq, this, numericType=ModiaMath.DER_XD_IMP, integral=q, info="der(q)",          unit="1/s")
         w         = RealSVector3(:w, this, numericType=ModiaMath.XD_IMP, info="Angular velocity",     unit="rad/s",  start=w0, fixed=true)
         derw      = RealSVector3(:derw, this, numericType=ModiaMath.DER_XD_IMP, integral=w, info="Angular acceleration", unit="rad/s^2")
         tau       = RealSVector3(:tau, this, numericType=ModiaMath.WR, info="Driving torque",       unit="N*m")
-     
+
         residue_w = RealSVector3(:residue_w, this, numericType=ModiaMath.FD_IMP, info="Angular velocity residue")
         residue_t = RealSVector3(:residue_t, this, numericType=ModiaMath.FD_IMP, info="Angular momentum equation residue")
         residue_q = RealScalar(:residue_q, this, numericType=ModiaMath.FC, info="Quaternion constraint residue")

@@ -1,22 +1,13 @@
 module test_Quaternion
 
 import ModiaMath
-using  ModiaMath.StaticArrays
-using  ModiaMath.Unitful
-
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-end
-
-
-
+using StaticArrays
+using Unitful
+using Test
 
 angle1 = pi / 2
 angle2 = 90u"°"
-    
+
 q1a = ModiaMath.qrot1(angle1)
 q1b = ModiaMath.qrot1(angle2)
 q1c = ModiaMath.qrot_e([1,0,0], angle1)
@@ -48,7 +39,7 @@ q6b = ModiaMath.qrot123(angle1, angle1, 0.0)
 q7  = ModiaMath.relativeRotation(q1a, q6b)
 
 
-@testset "ModiaMath.Frames: test Quaternions" begin 
+@testset "ModiaMath.Frames: test Quaternions" begin
     @test isapprox(q1b, q1a)
     @test isapprox(q1c, q1a)
     @test isapprox(q1d, q1a)
@@ -63,7 +54,7 @@ q7  = ModiaMath.relativeRotation(q1a, q6b)
     @test isapprox(q3d, q3a)
 
     @test isapprox(R4a, ModiaMath.from_q(q4a))
- 
+
     @test isapprox(q5, q1a)
 
     @test isapprox(v1, v1a)

@@ -15,18 +15,9 @@ module KINSOL
 import Sundials
 import ModiaMath
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
+using LinearAlgebra
 
-    @noinline function old_cfunction(f, r, a)
-        ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
-    end
-
-    const CVOID = Cvoid
-else
-    const CVOID = Void
-end
-
+const CVOID = Cvoid
 
 mutable struct NonlinearEquationsInfo
     extraInfo                # Model-specific extra information
@@ -49,9 +40,7 @@ function kinsol_f(y::Sundials.N_Vector, r::Sundials.N_Vector, eqInfo::NonlinearE
     return Cint(0)   # indicates normal return
 end
 
-@static if VERSION < v"0.7.0-DEV.2005"
-    const kinsol_fc = cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
-end
+const kinsol_fc = @cfunction(kinsol_f, Cint, (Sundials.N_Vector, Sundials.N_Vector, Ref{NonlinearEquationsInfo}))
 
 function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::Cstring,
                              message::Cstring, eqInfo::NonlinearEquationsInfo)
@@ -99,10 +88,7 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
     return nothing
 end
 
-@static if VERSION < v"0.7.0-DEV.2005"
-    const kinsol_ErrHandlerFnc = cfunction(kinsol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
-end
-
+const kinsol_ErrHandlerFnc = @cfunction(kinsol_ErrHandlerFn, Nothing, (Cint, Cstring, Cstring, Cstring, Ref{NonlinearEquationsInfo}))
 
 function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Float64};
                                   FTOL::Float64=eps(Float64)^(1 / 3),
@@ -120,18 +106,10 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
     # Run KINSOL
     try
         # Set error handler function
-        @static if VERSION >= v"0.7.0-DEV.2005" 
-            Sundials.KINSetErrHandlerFn(kmem, old_cfunction(kinsol_ErrHandlerFn, Nothing, Tuple{Cint,Cstring,Cstring,Cstring,Ref{typeof(NonlinearEquationsInfo)}}), pointer_from_objref(eqInfo))
-        else
-            Sundials.KINSetErrHandlerFn(kmem, kinsol_ErrHandlerFnc, pointer_from_objref(eqInfo))
-        end
- 
+        Sundials.KINSetErrHandlerFn(kmem, @cfunction(kinsol_ErrHandlerFn, Nothing, (Cint,Cstring,Cstring,Cstring,Ref{typeof(NonlinearEquationsInfo)})), pointer_from_objref(eqInfo))
+
         # Initialize KINSOL
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector,Sundials.N_Vector,Ref{typeof(NonlinearEquationsInfo)}}), Sundials.NVector(y))
-        else
-            Sundials.KINInit(kmem, kinsol_fc, y)
-        end
+        Sundials.KINInit(kmem, @cfunction(kinsol_f, Cint, (Sundials.N_Vector,Sundials.N_Vector,Ref{typeof(NonlinearEquationsInfo)})), Sundials.NVector(y))
         Sundials.KINSetUserData(kmem, eqInfo)
         Sundials.KINSetFuncNormTol(kmem, FTOL)
         Sundials.KINSetScaledStepTol(kmem, FTOL * FTOL)
@@ -154,12 +132,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
         #end
         strategy = Sundials.KIN_LINESEARCH
 
-        @static if VERSION >= v"0.7.0-DEV.2005"     
-            Sundials.KINSol(kmem, Sundials.NVector(y), strategy, Sundials.NVector(yScale), Sundials.NVector(rScale))
-        else
-            Sundials.KINSol(kmem, y, strategy, yScale, rScale)
-        end
-
+        Sundials.KINSol(kmem, Sundials.NVector(y), strategy, Sundials.NVector(yScale), Sundials.NVector(rScale))
     finally
         # Free allocated memory
         Sundials.KINFree([kmem])

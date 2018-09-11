@@ -1,7 +1,7 @@
 # License for this file: MIT (expat)
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 #
-# This file is part of module 
+# This file is part of module
 #   ModiaMath.SimulationEngine(ModiaMath/SimulationEngine/_module.jl)
 #
 
@@ -73,7 +73,7 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
         y  = simModel.y
     else
         y  = Sundials.asarray(_y)
-        println("\n!!! Info message from ModiaMath.simulate:\n",      
+        println("\n!!! Info message from ModiaMath.simulate:\n",
                  "    idasol_f assumption SimModel.y === _y is not valid; using asarray(_y).")
     end
 
@@ -81,66 +81,48 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
        # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
         yp = simModel.yp
     else
-        yp = Sundials.asarray(_yp) 
-        println("\n!!! Info message from ModiaMath.simulate:\n",      
+        yp = Sundials.asarray(_yp)
+        println("\n!!! Info message from ModiaMath.simulate:\n",
                  "    idasol_f assumption SimModel.yp === _yp is not valid; using asarray(_yp).")
     end
 
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
 
     # Copy simModel.r to _r
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
-    else
-        unsafe_copy!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
-    end
+    unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
     return Cint(0)   # indicates normal return
 end
-
-
-@static if VERSION >= v"0.7.0-DEV.2005"
-    @noinline function old_cfunction(f, r, a)
-        ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
-    end
-else
-    const idasol_fc = cfunction(idasol_f, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{IntegratorData}))
-end
-
 
 #------- root finding
 function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, gout::Ptr{Sundials.realtype}, simModel::IntegratorData)
-    simModel.statistics.nZeroCrossings += 1   
+    simModel.statistics.nZeroCrossings += 1
     sim      = simModel.simulationState
     sim.time = t
     ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, Sundials.asarray(y), Sundials.asarray(yp), simModel.z)
-    
+
     for i = 1:simModel.simulationState.nz
         unsafe_store!(gout, simModel.z[i], i)
-    end   
+    end
     return Cint(0)   # indicates normal return
-end
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    const idasol_gc = cfunction(idasol_g, Cint, (Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Ptr{Sundials.realtype}, Ref{IntegratorData}))
 end
 
 #=
 #-------- Jacobian
 function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, r::Sundials.N_Vector,
-                     jacKLU::SlsMat, simModel::IntegratorData, 
+                     jacKLU::SlsMat, simModel::IntegratorData,
                      tmp1::Sundials.N_Vector, tmp2::Sundials.N_Vector, tmp3::Sundials.N_Vector)
     # Compute non-zero values of jac
     sim      = simModel.simulationState
     sim.time = t
     h        = IDAGetCurrentStep(simModel.ida_mem)
     IDAGetErrWeights(simModel.ida_mem, simModel.eweight)
-       
-    ModiaMath.SparseJacobian.computeJacobian!(ModiaMath.DAE.getResidues!, simModel.model, simModel.simulationState, 
-                                              t, Sundials.asarray(y), Sundials.asarray(yp), Sundials.asarray(r), 
+
+    ModiaMath.SparseJacobian.computeJacobian!(ModiaMath.DAE.getResidues!, simModel.model, simModel.simulationState,
+                                              t, Sundials.asarray(y), Sundials.asarray(yp), Sundials.asarray(r),
                                               sim.cg, c_j, h, Sundials.asarray(simModel.eweight), Sundials.asarray(tmp1), sim.jac)
     simModel.statistics.nResidues += sim.cg.ngroups
-    
-    # Copy userData.jac to jacKLU   
+
+    # Copy userData.jac to jacKLU
     #   function call gives a Julia crash: CSCtoSlsMat!(simModel.cm.jac, jacKLU)
     #   Manually inlining the function works
     jac = sim.jac
@@ -152,18 +134,14 @@ function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N
     for i = 1:length(jac.colptr)
       unsafe_store!(jacKLU.colptrs, jac.colptr[i]-1, i)
     end
-    
+
     return Cint(0)   # indicates normal return
 end
 
 
-@static if VERSION < v"0.7.0-DEV.2005"
-    const idasol_sjacc = @cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
-                                                         Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
-else
-    const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
-                                                        Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
-end
+const idasol_sjacc = @cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype,
+                                Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
+                                Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
 =#
 
 
@@ -172,29 +150,24 @@ function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::
     modelName = simModel.model.modelName
     if error_code > 0
         # Print information text
-        println("\n\n!!! Warning from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
-               "(...) returned with [", unsafe_string(IDAmodule), "] error_code  = ", 
+        println("\n\n!!! Warning from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
+               "(...) returned with [", unsafe_string(IDAmodule), "] error_code  = ",
                error_code, ":\n", unsafe_string(message), "\n")
     elseif error_code < 0
         # Raise error
         time   = simModel.last_t
         norm_y = simModel.last_norm_y
-  
+
         if time > typemin(Float64)
-            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
-                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n", 
-                unsafe_string(message), "\n( norm( x(t=", @sprintf("%0.3g",time), " s) ) = ", @sprintf("%0.3g",norm_y), 
+            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
+                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n",
+                unsafe_string(message), "\n( norm( x(t=", @sprintf("%0.3g",time), " s) ) = ", @sprintf("%0.3g",norm_y),
                 "; if this value is large, the model is unstable )\n")
         else
-            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 
-                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n", 
-                unsafe_string(message), "\n")       
+            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
+                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n",
+                unsafe_string(message), "\n")
         end
     end
     nothing
 end
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    const idasol_ErrHandlerFnc = cfunction(idasol_ErrHandlerFn, Void, (Cint, Cstring, Cstring, Cstring, Ref{IntegratorData}))
-end
-

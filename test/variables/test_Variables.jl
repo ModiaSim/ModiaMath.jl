@@ -1,13 +1,7 @@
 module test_Variables
 
 import ModiaMath
-
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-end
-
+using Test
 
 mutable struct Revolute <: ModiaMath.AbstractComponentWithVariables
     _internal::ModiaMath.ComponentInternal
@@ -21,17 +15,17 @@ mutable struct Revolute <: ModiaMath.AbstractComponentWithVariables
         this = new(ModiaMath.ComponentInternal(:Revolute))
         phi = ModiaMath.RealScalar(:phi, this, start=phi0, unit="rad",     fixed=true, info="Relative rotation angle",                     numericType=drive ? ModiaMath.WR : ModiaMath.XD_EXP)
         w   = ModiaMath.RealScalar("w", this, start=w0, unit="rad/s",   fixed=true, info="Relative angular velocity",     integral=phi, numericType=drive ? ModiaMath.WR : ModiaMath.XD_EXP,     analysis=ModiaMath.OnlyDynamicAnalysis)
-        a   = ModiaMath.RealScalar("a", this, start=0.0, unit="rad/s^2",             info="Relative angular acceleration", integral=w, numericType=drive ? ModiaMath.WR : ModiaMath.DER_XD_EXP, analysis=ModiaMath.OnlyDynamicAnalysis) 
+        a   = ModiaMath.RealScalar("a", this, start=0.0, unit="rad/s^2",             info="Relative angular acceleration", integral=w, numericType=drive ? ModiaMath.WR : ModiaMath.DER_XD_EXP, analysis=ModiaMath.OnlyDynamicAnalysis)
         tau = ModiaMath.RealScalar(:tau, this, start=0.0, unit="N*m",                 info="Driving torque",                              numericType=ModiaMath.WR,                                analysis=ModiaMath.QuasiStaticAndDynamicAnalysis)
         return this
     end
 end
 
 function Base.show(io::IO, rev::Revolute)
-    print("Revolute(", 
-         "\n    phi = ", rev.phi, 
-         "\n    w   = ", rev.w, 
-         "\n    a   = ", rev.a, 
+    print("Revolute(",
+         "\n    phi = ", rev.phi,
+         "\n    w   = ", rev.w,
+         "\n    a   = ", rev.a,
          "\n    tau = ", rev.tau,
          "\n   )")
 end
@@ -47,7 +41,7 @@ mutable struct Frame <: ModiaMath.AbstractComponentWithVariables
     w::ModiaMath.RealSVector3
 
     a::ModiaMath.RealSVector3
-    z::ModiaMath.RealSVector3   
+    z::ModiaMath.RealSVector3
 
     f::ModiaMath.RealSVector3
     t::ModiaMath.RealSVector3
@@ -86,8 +80,8 @@ mutable struct Frame <: ModiaMath.AbstractComponentWithVariables
 end
 
 function Base.show(io::IO, frame::Frame)
-    print("Revolute(", 
-         "\n    r = ", frame.r, 
+    print("Revolute(",
+         "\n    r = ", frame.r,
          "\n    q = ", frame.q,
          "\n    v = ", frame.v,
          "\n    w = ", frame.w,
@@ -123,22 +117,22 @@ end
 
 
 
-@testset "ModiaMath: test_Variables.jl" begin 
+@testset "ModiaMath: test_Variables.jl" begin
 
-   
-    @testset "Dynamic analysis" begin # ------------------------------ Dynamic analysis 
+
+    @testset "Dynamic analysis" begin # ------------------------------ Dynamic analysis
         r0 = [1.0,2.0,3.0]
         q0 = [0.5,0.5,0.0,sqrt(0.5^2 + 0.5^2)]
         robot = Robot(phi10=1.0, phi20=2.0, var10=3.0, r0=r0, q0=q0)
         robot.rev1.a.value = 10 * 2.22
         robot.rev2.a.value = 10 * 4.44
-   
-        println("\n... robot = ", robot) 
-   
+
+        println("\n... robot = ", robot)
+
         println("\n... Print variables of robot")
         m = ModiaMath.ModelVariables(robot)
         ModiaMath.print_ModelVariables(m)
-   
+
         println("\n... Copy start values to x")
         x       = zeros(5 + 7 + 6)
         x_fixed = fill(false, 5 + 7 + 6)
@@ -148,20 +142,20 @@ end
         append!(x0_fixed, false)
         @test isapprox(x, x0)
         @test x_fixed == x0_fixed
-  
+
         println("\n... Copy x and der_x to variables")
         x    = [1.11, 2.22 , 3.33, 4.44, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 1.1, 2.2, 3.3, 4.4, 5.5, 6.6 , 5.55]
-        derx = [2.22, 22.2, 4.44, 44.4, 1.1, 2.2, 3.3, 4.44, 5.55, 6.66, 7.77, 1.11, 2.22, 3.33, 4.44, 5.55, 6.66, 0.0]  
+        derx = [2.22, 22.2, 4.44, 44.4, 1.1, 2.2, 3.3, 4.44, 5.55, 6.66, 7.77, 1.11, 2.22, 3.33, 4.44, 5.55, 6.66, 0.0]
         ModiaMath.copy_x_and_derx_to_variables!(0.5, x, derx, m)
         @test isapprox(x, [robot.rev1.phi.value, robot.rev1.w.value, robot.rev2.phi.value, robot.rev2.w.value,
                             robot.frame.r.value[1], robot.frame.r.value[2], robot.frame.r.value[3],
-                            robot.frame.q.value[1], robot.frame.q.value[2], robot.frame.q.value[3], robot.frame.q.value[4], 
+                            robot.frame.q.value[1], robot.frame.q.value[2], robot.frame.q.value[3], robot.frame.q.value[4],
                             robot.frame.v.value[1], robot.frame.v.value[2], robot.frame.v.value[3],
                             robot.frame.w.value[1], robot.frame.w.value[2], robot.frame.w.value[3],
                             robot.var1.value], rtol=1e-15)
         @test isapprox(derx[2], robot.rev1.a.value, rtol=1e-15)
         @test isapprox(derx[4], robot.rev2.a.value, rtol=1e-15)
-   
+
         println("\n... Copy variables to residues")
         residues = zeros(5 + 7 + 6)
         ModiaMath.copy_variables_to_residue!(m, x, derx, residues)
@@ -173,25 +167,25 @@ end
 
     @testset "Kinematic analysis 1" begin   # ---------------------------- Kinematic analysis 1
         robot2 = Robot2(phi10=1.0, phi20=2.0)
-        println("\n... robot2 = ", robot2) 
-   
+        println("\n... robot2 = ", robot2)
+
         println("\n... Print variables of robot2")
         m = ModiaMath.ModelVariables(robot2, analysis=ModiaMath.KinematicAnalysis)
         ModiaMath.print_ModelVariables(m)
-   
+
         println("\n... Copy start values to x")
         x       = [1.11]
         x_fixed = [false]
         ModiaMath.copy_start_to_x!(m, x, x_fixed)
         @test isapprox(x, [0.0])
         @test x_fixed == [true]
-   
+
         println("\n... Copy x and der_x to variables")
         x    = fill(2.1, 1)
-        derx = fill(3.2, 1)  
+        derx = fill(3.2, 1)
         ModiaMath.copy_x_and_derx_to_variables!(0.5, x, derx, m)
         @test isapprox(x, [m.var[2].value], rtol=1e-15)    # var[2] = _dummy_x
-   
+
         println("\n... Copy variables to residues")
         residues = zeros(m.nx)
         ModiaMath.copy_variables_to_residue!(m, x, derx, residues)
@@ -202,25 +196,25 @@ end
 
     @testset "Kinematic analysis 2" begin   # ---------------------------- Kinematic analysis 2
         robot3 = Robot3(phi10=1.0, phi20=2.0, phi30=-2.0)
-        println("\n... robot3 = ", robot3) 
-   
+        println("\n... robot3 = ", robot3)
+
         println("\n... Print variables of robot3")
         m = ModiaMath.ModelVariables(robot3, analysis=ModiaMath.KinematicAnalysis)
         ModiaMath.print_ModelVariables(m)
-   
+
         println("\n... Copy start values to x")
         x = zeros(m.nx)
         x_fixed = fill(false, m.nx)
         ModiaMath.copy_start_to_x!(m, x, x_fixed)
         @test isapprox(x, [-2.0])
         @test x_fixed == [true]
-   
+
         println("\n... Copy x and der_x to variables")
         x    = [1.11]
         derx = [2.22]
         ModiaMath.copy_x_and_derx_to_variables!(0.5, x, derx, m)
-        @test isapprox(x, [robot3.rev3.phi.value], rtol=1e-15)  
-   
+        @test isapprox(x, [robot3.rev3.phi.value], rtol=1e-15)
+
         println("\n... Copy variables to residues")
         residues = zeros(m.nx)
         ModiaMath.copy_variables_to_residue!(m, x, derx, residues)

@@ -13,7 +13,7 @@ Martin Otter, [DLR - Institute of System Dynamics and Control](https://www.dlr.d
 """
 module Logging
 
-@static if VERSION >= v"0.7.0-DEV.2005" @eval using Printf end
+using Printf
 
 export Logger, setLog!, setAllLogCategories!, setLogCategories!
 export isLogStatistics, isLogProgress, isLogInfos, isLogWarnings, isLogEvents
@@ -53,7 +53,7 @@ end
 """
     ModiaMath.setLogCategories!(obj, categories; reinit=true)
 
-Set log categories on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+Set log categories on obj (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger) as vector of symbols, e.g. setLogCategories!(simulationModel, [:LogProgess]).
 Supported categories:
 - `:LogStatistics`, print statistics information at end of simulation
@@ -69,12 +69,12 @@ function setLogCategories!(logger::Logger, categories::Vector{Symbol}; reinit=tr
     if reinit
         setAllLogCategories!(logger;default=false)
     end
- 
+
     for c in categories
         if c == :LogStatistics
             logger.statistics = true
         elseif c == :LogProgress
-            logger.progress = true         
+            logger.progress = true
         elseif c == :LogInfos
             logger.infos = true
         elseif c == :LogWarnings
@@ -93,7 +93,7 @@ end
 """
     ModiaMath.logOn!(obj)
 
-Enable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+Enable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger)
 """
 function logOn!(logger::Logger)
@@ -105,7 +105,7 @@ end
 """
     ModiaMath.logOff!(obj)
 
-Disable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+Disable logging on `obj` (of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger)
 """
 function logOff!(logger::Logger)
@@ -134,7 +134,7 @@ isLogProgress(logger::Logger) = logger.log && logger.progress
     ModiaMath.isLogInfos(obj)
 
 Return true, if logger settings require to print **info** messages of the model
-(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger).
 """
 isLogInfos(logger::Logger)      = logger.log && logger.infos
@@ -144,7 +144,7 @@ isLogInfos(logger::Logger)      = logger.log && logger.infos
     ModiaMath.isLogWarnings(obj)
 
 Return true, if logger settings require to print **warning** messages of the model
-(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger).
 """
 isLogWarnings(logger::Logger)   = logger.log && logger.warnings
@@ -154,7 +154,7 @@ isLogWarnings(logger::Logger)   = logger.log && logger.warnings
     ModiaMath.isLogEvents(obj)
 
 Return true, if logger settings require to print **event** messages of the model
-(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel, 
+(obj must be of type ModiaMath.SimulationState, ModiaMath.AbstractSimulationModel,
 or ModiaMath.Logger).
 """
 isLogEvents(logger::Logger)     = logger.log && logger.events
@@ -213,21 +213,14 @@ mutable struct SimulationStatistics
     orderMax::Int
     sparseSolver::Bool
     nGroups::Int
-
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
+    function SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int)
         new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, 0, 0, 0, 0, 0, 0, 0, 0, 0, floatmax(Float64),
             floatmax(Float64), 0.0, 0, sparseSolver, nGroups)
-    else
-        SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
-        new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, 0, 0, 0, 0, 0, 0, 0, 0, 0, realmax(Float64),
-            realmax(Float64), 0.0, 0, sparseSolver, nGroups)
     end
-
 end
 
 function reInitializeStatistics!(stat::SimulationStatistics,
-                                 startTime::Float64, stopTime::Float64, interval::Float64, tolerance::Float64) 
+                                 startTime::Float64, stopTime::Float64, interval::Float64, tolerance::Float64)
     stat.cpuTimeInitialization = 0.0
     stat.cpuTimeIntegration    = 0.0
     stat.startTime      = startTime
@@ -243,16 +236,10 @@ function reInitializeStatistics!(stat::SimulationStatistics,
     stat.nStateEvents   = 0
     stat.nRestartEvents = 0
     stat.nErrTestFails  = 0
- 
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        stat.h0             = floatmax(Float64)
-        stat.hMin           = floatmax(Float64)
-    else
-        stat.h0             = realmax(Float64)
-        stat.hMin           = realmax(Float64)
-    end
+    stat.h0             = floatmax(Float64)
+    stat.hMin           = floatmax(Float64)
     stat.hMax           = 0.0
-    stat.orderMax       = 0                                
+    stat.orderMax       = 0
 end
 
 
@@ -260,8 +247,8 @@ import Base.show
 Base.print(io::IO, stat::SimulationStatistics) = show(io, stat)
 
 function Base.show(io::IO, stat::SimulationStatistics)
-    @printf(io,"        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n", 
-                                           stat.cpuTimeInitialization + stat.cpuTimeIntegration, 
+    @printf(io,"        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n",
+                                           stat.cpuTimeInitialization + stat.cpuTimeIntegration,
                                            stat.cpuTimeInitialization, stat.cpuTimeIntegration)
     println(io, "        startTime      = ", stat.startTime, " s")
     println(io, "        stopTime       = ", stat.stopTime, " s")
@@ -282,7 +269,7 @@ function Base.show(io::IO, stat::SimulationStatistics)
     @printf(io, "        hMax           = %.2g s\n", stat.hMax)
     println(io, "        orderMax       = ", stat.orderMax)
     println(io, "        sparseSolver   = ", stat.sparseSolver)
-    
+
     if stat.sparseSolver
         println(io, "        nGroups        = ", stat.nGroups)
     end

@@ -15,13 +15,13 @@ natively in ModiaMath in the following way:
   @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81) begin
      phi = RealScalar(start=pi/2, unit="rad"    , fixed=true,               numericType=ModiaMath.XD_EXP)
      w   = RealScalar(start=0.0 , unit="rad/s"  , fixed=true, integral=phi, numericType=ModiaMath.XD_EXP)
-     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP) 
+     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP)
      r   = RealSVector{2}(        unit="m"      ,                           numericType=ModiaMath.WC)
   end;
 
-  function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState)  
+  function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState)
      L = p.L; m = p.m; d = p.d; g = p.g; phi = p.phi.value; w = p.w.value
-   
+
      p.a.value = (-m*g*L*sin(phi) - d*w) / (m*L^2)
 
      if ModiaMath.isStoreResult(sim)
@@ -89,7 +89,7 @@ abstract type AbstractComponentInternal end
 """
     type ModiaMath.AbstractVariable <: ModiMath.AbstractComponentWithVariables
 
-A Variable used as element of the DAE model description and is 
+A Variable used as element of the DAE model description and is
 included in the result (if no residue)
 """
 abstract type AbstractVariable <: AbstractComponentWithVariables end
@@ -156,9 +156,7 @@ import StaticArrays
 import Unitful
 import DataFrames
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    import LinearAlgebra
-    import Test
-end
+import LinearAlgebra
+import Test
 
-end # module 
+end # module

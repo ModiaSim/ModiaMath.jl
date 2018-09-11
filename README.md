@@ -33,10 +33,10 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 The package is registered in METADATA.jl and can be installed with Pkg.add.
 
 ```julia
-# Julia 0.6
+# Julia 0.7
 julia> Pkg.add("ModiaMath")
 
-# Julia 1.0: Currently recommended to add master 
+# Julia 1.0: Currently recommended to add master
 julia> ]add ModiaMath#master
 ```
 
@@ -109,7 +109,7 @@ In such a case, you might try these
 ## Status
 
 The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
-and with Julia `0.7.0` and `1.0.0` on Windows 7. Furthermore, the travis CL performed successful tests with 
+and with Julia `0.7.0` and `1.0.0` on Windows 7. Furthermore, the travis CL performed successful tests with
 Julia `1.0.0` on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
 
 The ModiaMath version number is 0.2.2-dev.1 and functionality and robustness is planned to be improved for the 1.0 version,

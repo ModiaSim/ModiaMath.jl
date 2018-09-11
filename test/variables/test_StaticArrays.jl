@@ -6,14 +6,10 @@ Evaluate and test properties of StaticArrays
 module test_StaticArrays
 
 import ModiaMath
-import ModiaMath.DataFrames
-using  ModiaMath.StaticArrays
+import DataFrames
+using StaticArrays
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const NOTHING = Nothing
-else
-    const NOTHING = Void
-end
+const NOTHING = Nothing
 
 function A_add_B!(C, A, B)
     for i = 1:length(A)
@@ -241,7 +237,7 @@ imin = indmin(elapsed)
 vmin = elapsed[imin]
 for i in 1:length(elapsed)
     table[i,2] = table[i,3] / vmin
-end 
+end
 
 println("\nnmax = ", nmax, "\n\ntable = ", table)
 
