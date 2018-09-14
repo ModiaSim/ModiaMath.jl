@@ -5,6 +5,9 @@ os:
   - osx
 julia:
   - 1.0
+  - 0.7
+  - 0.6
+
 notifications:
   email: true
 git:
@@ -25,7 +28,7 @@ git:
 #  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
 
 before_install:
-  - julia -e 'ENV["PYTHON"]=""; using Pkg; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'  
+  - julia -e 'ENV["PYTHON"]=""; using Pkg; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add("basemap"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'
 #  - (sudo apt-get -qq update && sudo apt-get install -y python3 python3-matplotlib)
 #  - julia -e 'Pkg.add("PyCall"); ENV["PYTHON"]=""; Pkg.build("PyCall")'
 #  - julia -e 'Pkg.add("Conda"); using Conda; Conda.add("matplotlib"); Conda.add("basemap");'
@@ -33,7 +36,7 @@ before_install:
 ## uncomment the following lines to override the default test script
 # script:
 #  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-#  - julia -e 'Pkg.clone(pwd()); Pkg.build("ModiaMath"); Pkg.test("ModiaMath", coverage = true)' 
+#  - julia -e 'Pkg.clone(pwd()); Pkg.build("ModiaMath"); Pkg.test("ModiaMath", coverage = true)'
 
 after_success:
   # push coverage results to Coveralls
