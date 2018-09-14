@@ -6,7 +6,6 @@ The following features are planned to be implemented before ModiaMath version 1.
 - **General**
   - Support of all features needed by Modia 1.0 and Modia3D 1.0.
   - Improved documentation.
-  - Changing to Julia 0.7.
 
 - **SimulationEngine**
   - Sparse Jacobian for IDA (mainly available, but not yet transferred to restructured simulation engine).
@@ -37,8 +36,9 @@ The following features are planned to be implemented before ModiaMath version 1.
   - Automatic plot layout for clocked variables.
   - Support of another plot package (besides PyPlot). Probably best to 
     support Plots.
-  - After changing to Julia 0.7, use named tuples to define line style elements, e.g.\
+  - Use named tuples to define line style elements, e.g.\
     `plot(result, ((name=:phi1, color=:blue), (name=:phi2, color=:red)) )`
+  - Add signals to existing window.
 
 - **Frames**
   - Support splines for the interpolation of Frames

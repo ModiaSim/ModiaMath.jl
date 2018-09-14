@@ -1,7 +1,10 @@
 julia 0.6
-Sundials
-StaticArrays
-DataStructures
 DataFrames
-Unitful
+DataStructures
+LinearAlgebra
+Printf
 PyPlot
+StaticArrays
+Sundials
+Test
+Unitful

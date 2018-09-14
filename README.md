@@ -36,8 +36,8 @@ The package is registered in METADATA.jl and can be installed with Pkg.add.
 # Julia 0.6
 julia> Pkg.add("ModiaMath")
 
-# Julia 1.0: Currently recommended to add master 
-julia> ]add ModiaMath#master
+# Julia 0.7 and 1.0
+julia> ]add ModiaMath
 ```
 
 ModiaMath uses [PyPlot](https://github.com/JuliaPy/PyPlot.jl) for plotting.
@@ -92,19 +92,26 @@ In such a case, you might try these
 ![PendulumPlot](https://ModiaSim.github.io/ModiaMath.jl/resources/images/pendulumPlot.svg)
 
 
-### To run examples:
+### To run examples and tests
 ```julia
+  # Only in Julia 0.7 and 1.0 (to make extra packages available that are used in examples and tests)
+  ]activate ModiaMath
+
+  # run examples
+  import ModiaMath
   include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")         # ODE as index-0 DAE
   include("$(ModiaMath.path)/examples/Simulate_FreeBodyRotation.jl") # index-1 DAE
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_PendulumDAE.jl") # index-3 DAE
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_SimpleStateEvents.jl")
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_BouncingBall.jl")
+
+  # run all tests
+  include("$(ModiaMath.path)/test/runtests.jl")
+
+  # Only in Julia 0.7 and 1.0 (to switch back to standard environment)
+  ]activate
 ```
 
-### To run tests:
-```julia
-  include("$(ModiaMath.path)/test/runtests.jl")
-```
 
 ## Status
 
@@ -112,7 +119,7 @@ The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubun
 and with Julia `0.7.0` and `1.0.0` on Windows 7. Furthermore, the travis CL performed successful tests with 
 Julia `1.0.0` on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
 
-The ModiaMath version number is 0.2.2-dev.1 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.2.1 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 

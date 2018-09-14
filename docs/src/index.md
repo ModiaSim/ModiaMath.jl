@@ -28,8 +28,14 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 ModiMath is registered in METADATA.jl and can be installed with Pkg.add.
 
 ```julia
+# Julia 0.6
 julia> Pkg.add("ModiaMath")
+
+# Julia 0.7 and 1.0
+julia> ]add ModiaMath
 ```
+
+### If automatic installation of PyPlot fails 
 
 A higher level [`ModiaMath.plot`](@ref) function is provided in ModiaMath to visualize the time series
 of simulation results in a convenient way. Other Julia plotting packages can also be used, but all the
@@ -44,7 +50,7 @@ using the Julia package manager often fails. The following installation order is
    Advantage: very robust; disadvantage: > 3 GByte memory needed;\
    ModiaMath is based on the Python 3.x version of Matplotlib where some keywords
    are different to the Python 2.x version.
-2. Include the path to the python executable in your `HOME/.juliarc.jl` file:\
+2. Include the path to the Python executable in your `HOME/.juliarc.jl` file:\
     `ENV["PYTHON"] = joinpath("....", "Anaconda3", "python.exe")`
 3. Start Julia, give the command `ENV["PYTHON"]` in the REPL, and check whether the path
    is correct (if you made a typo in the `.juliarc.jl` file, Julia might use another
@@ -53,3 +59,26 @@ using the Julia package manager often fails. The following installation order is
    `Pkg.build["PyCall"]`, exit Julia and start Julia again.
 5. Install PyPlot via `Pkg.add("PyPlot")`
 
+
+## Release Notes
+
+
+### Version 0.2.1
+
+- Adapted to Julia 0.7 and 1.0
+  (including using new package manager via Project.toml, Manifest.toml files
+  and adapting the README.md and documentation files).
+
+- Added buttons for Travis CL, code coverage and docs to README.md file.
+  (this includes adaptations to .travis.yml file). Note, Appveyor CL is not 
+  yet activated (although appveyor.yml file is present).
+
+- In case KINSOL fails, more run-time information is added to the error message.
+
+- Interface call to KINSOL slightly improved to avoid a gc-crash.
+
+
+
+### Version 0.2.0
+
+- First public release (for Julia 0.6)

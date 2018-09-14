@@ -158,7 +158,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     ModiaMath.setLog!(logger, log)
    
     #if ModiaMath.isLogInfos(logger)
-    println("... ModiaMath.simulate! (version 0.2.2-dev from 2018-09-07 11:04) to simulate model: ", sim.name)
+    println("... ModiaMath.simulate! (version 0.2.1 from 2018-09-14 09:30) to simulate model: ", sim.name)
     #end
 
     # Start timing measure

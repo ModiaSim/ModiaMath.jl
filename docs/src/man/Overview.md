@@ -132,11 +132,42 @@ This results in:
 ### To run examples:
 
 ```julia
-  include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")
-  include("$(ModiaMath.path)/examples/Simulate_FreeBodyRotation.jl")
-  include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_SimpleStateEvents.jl")
-  include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_BouncingBall.jl")
+# Only in Julia 0.7 and 1.0 (to make extra packages available that are used in examples and tests)
+]activate ModiaMath
+
+# run examples
+import ModiaMath
+include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")         # ODE as index-0 DAE
+include("$(ModiaMath.path)/examples/Simulate_FreeBodyRotation.jl") # index-1 DAE
+include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_PendulumDAE.jl") # index-3 DAE
+include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_SimpleStateEvents.jl")
+include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_BouncingBall.jl")
+
+# run all tests
+include("$(ModiaMath.path)/test/runtests.jl")
+
+# Only in Julia 0.7 and 1.0 (to switch back to standard environment)
+]activate
 ```
+
+Note, in Julia 0.7 and 1.0 there is the difficulty, that some of the examples and tests use
+additional packages and that these packages might not be known to your standard environment.
+Once you get error messages about missing packages, you might just add them. For example,
+if you get an error message that package `StaticArrays` is missing when running one of the examples,
+add this package via `]add StaticArrays`. The (slight) drawback of this approach is that the version
+of the added package might not be the version that was used when the ModiaMath example was developed
+and/or tested. Therefore the recommended way is to change the environment:
+
+```julia
+]activate ModiaMath
+
+   # run examples and/or tests
+
+]activate   
+```
+
+In this case the versions of the extra packages are used, that had been used when developing
+and/or testing the examples and tests.
 
 
 ## Package structure
