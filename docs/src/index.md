@@ -69,14 +69,15 @@ using the Julia package manager often fails. The following installation order is
   (including using new package manager via Project.toml, Manifest.toml files
   and adapting the README.md and documentation files).
 
-- Added buttons for Travis CL, code coverage and docs to README.md file.
+- Buttons for Travis CL, code coverage and docs added to README.md file.
   (this includes adaptations to .travis.yml file). Note, Appveyor CL is not 
   yet activated (although appveyor.yml file is present).
 
-- In case KINSOL fails, more run-time information is added to the error message.
-
 - Interface call to KINSOL slightly improved to avoid a gc-crash.
 
+- In case KINSOL fails, more run-time information is added to the error message.
+
+- Indentation was changed consistently to 4 spaces.
 
 
 ### Version 0.2.0
