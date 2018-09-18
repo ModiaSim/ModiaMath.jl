@@ -7,6 +7,12 @@
 
 
 #--------------------------- Utility plot functions
+""" 
+    addPlot(result, names, grid, xLabel, xAxis)
+
+Add the time series of one name (if names is one symbol/string) or with
+several names (if names is a tuple of symbols/strings) to the current diagram
+"""
 function addPlot(result, name::Symbol, grid::Bool, xLabel::Bool, xAxis)
     (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name, xLabel, xAxis)
     if xsig == nothing; return; end
@@ -39,6 +45,7 @@ function addPlot(result, collectionOfNames::Tuple, grid::Bool, xLabel::Bool, xAx
     end
 end
 
+addPlot(result, name::String, grid::Bool, xLabel::Bool, xAxis) =  addPlot(result, Symbol(name), grid, xLabel, xAxis)
 
 
 

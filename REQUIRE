@@ -1,7 +1,7 @@
 julia 0.6
 DataFrames
 DataStructures
-PyPlot
+Requires
 StaticArrays
 Sundials
 Unitful

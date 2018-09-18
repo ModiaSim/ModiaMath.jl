@@ -5,8 +5,16 @@ Evaluate and test properties of StaticArrays
 """
 module test_StaticArrays
 
-using StaticArrays
-import DataFrames
+import ModiaMath
+
+#  Desired:
+#    using  StaticArrays
+#    import DataFrames
+#  
+#  In order that these packages need not to be defined in the user environment, they are included via ModiaMath:
+using  ModiaMath.StaticArrays
+import ModiaMath.DataFrames
+
 
 @static if VERSION >= v"0.7.0-DEV.2005"
     const NOTHING = Nothing

@@ -3,13 +3,18 @@
 
 module test_SimulationExamples
 
+import ModiaMath
+
+# Desired:
+#   using Test
+#
+# In order that Test needs not to be defined in the user environment, it is included via ModiaMath:
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    using ModiaMath.Test
 end
 
-import ModiaMath
 
 include(joinpath(ModiaMath.path, "examples", "Simulate_Pendulum.jl"))
 import .Simulate_Pendulum

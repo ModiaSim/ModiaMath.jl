@@ -6,18 +6,6 @@
 #
 
 
-const headingSize = 10
-
-""" 
-    addPlot(result, names, grid, xLabel, xAxis)
-
-Add the time series of one name (if names is one symbol/string) or with
-several names (if names is a tuple of symbols/strings) to the current diagram
-"""
-addPlot(result, name::String, grid::Bool, xLabel::Bool, xAxis) =  addPlot(result, Symbol(name), grid, xLabel, xAxis)
-
-
-
 """
     ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, figure=1)
 

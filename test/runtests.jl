@@ -1,9 +1,14 @@
 module Runtests
 
+
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
+    # Desired:
+    #   using Test
+    # 
+    # In order that Test need not to be defined in the user environment, it is included via ModiaMath:
+    using ModiaMath.Test
 end
 
 @testset "Test ModiaMath" begin

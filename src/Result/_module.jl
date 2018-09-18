@@ -34,14 +34,36 @@ export RawResult, nResults, storeRawResult!
 
 
 # using/imports
-import PyPlot
 import ModiaMath
 using  Unitful
+using Requires
+
+# Constants
+const headingSize = 10
+
 
 # include code
 include("rawResult.jl")
 include("result.jl")
 include("plotResult.jl")
-include("plotResult_with_PyPlot.jl")
+
+
+# Dummy plot functions if PyPlot is not in the current environment
+include("plotResult_with_Nothing.jl")
+
+
+# If PyPlot is in the current environment, import it in the REPL and install plot functions based on PyPlot
+function __init__()
+    @eval Main begin
+        try
+            import PyPlot
+        catch
+            println("... ModiaMath.plot(..) calls will be ignored, since PyPlot not installed in current environment.")
+        end
+    end
+
+    @require PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee" include("plotResult_with_PyPlot.jl")
+end
+
 
 end

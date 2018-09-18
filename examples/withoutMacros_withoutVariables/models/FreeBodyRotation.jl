@@ -33,13 +33,18 @@ module FreeBodyRotation
 import ModiaMath
 
 @static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
+    using ModiaMath.LinearAlgebra    # should be "using LinearAlgebray", but included via ModiaMath
     DIAGONAL(m) = Diagonal(m)
 else
     DIAGONAL(m) = diagm(m)
 end
 
-using StaticArrays
+# Desired:
+#   using StaticArrays
+#
+# In order that StaticArrays need not to be defined in the user environment, it is included via ModiaMath:
+using ModiaMath.StaticArrays
+
 
 mutable struct Model <: ModiaMath.AbstractSimulationModel
     simulationState::ModiaMath.SimulationState

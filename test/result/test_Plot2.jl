@@ -1,14 +1,19 @@
 module test_Plot2
 
+import ModiaMath
+
+# Desired:
+#   using Test
+#
+# In order that Test needs not to be defined in the user environment, it is included via ModiaMath:
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
     t = linspace(0.0, 10.0, 100)
 else
-    using Test
+    using ModiaMath.Test
     t = range(0.0, stop=10.0, length=100)
 end
 
-import ModiaMath
 
 series = Dict{Symbol,Any}()
 series[:time] = t

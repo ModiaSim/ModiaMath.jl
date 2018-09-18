@@ -1,15 +1,24 @@
 module test_RotationMatrix
 
+import ModiaMath
+
+#  Desired:
+#    using Test
+#    using LinearAlgebra
+#    using StaticArrays
+#    using Unitful
+#  
+#  In order that these packages need not to be defined in the user environment, they are included via ModiaMath:
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
 else
-    using Test
-    using LinearAlgebra
+    using ModiaMath.Test
+    using ModiaMath.LinearAlgebra
 end
 
-using StaticArrays
-using Unitful
-import ModiaMath
+using ModiaMath.StaticArrays
+using ModiaMath.Unitful
+
 
 angle1 = pi / 2
 angle2 = 90u"°"

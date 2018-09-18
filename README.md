@@ -43,7 +43,10 @@ julia> ]add ModiaMath
 ```
 
 ModiaMath uses [PyPlot](https://github.com/JuliaPy/PyPlot.jl) for plotting.
-Installing `PyPlot` by just using the Julia package manager might fail.
+If `PyPlot` is not installed or is not available in your actual Julia environment,
+an information message is printed and the `ModiaMath.plot(..)` call is ignored.
+In order that plot windows are displayed, you need to add `PyPlot` to your actual environment
+via `]add PyPlot`. Installing `PyPlot` by just `]add PyPlot` might fail.
 In such a case, you might try these
 [installation instructions](https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1).
 
@@ -96,9 +99,6 @@ In such a case, you might try these
 
 ### To run examples and tests
 ```julia
-  # Only in Julia 0.7 and 1.0 (to make extra packages available that are used in examples and tests)
-  ]activate ModiaMath
-
   # run examples
   import ModiaMath
   include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")         # ODE as index-0 DAE
@@ -109,19 +109,16 @@ In such a case, you might try these
 
   # run all tests
   include("$(ModiaMath.path)/test/runtests.jl")
-
-  # Only in Julia 0.7 and 1.0 (to switch back to standard environment)
-  ]activate
 ```
 
 
 ## Status
 
 The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
-and with Julia `0.7.0` and `1.0.0` on Windows 7. Furthermore, the travis CL performed successful tests with 
-Julia `1.0.0` on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
+and with Julia `0.7.0` and `1.0.0` on Windows 7 and via the travis CL
+on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
 
-The ModiaMath version number is 0.2.1 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.2.2 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
