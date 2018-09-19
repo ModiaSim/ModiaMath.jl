@@ -33,5 +33,10 @@ ModiaMath.plot(result, :phi, heading="Sine(time)")
 ModiaMath.plot(result, :r, figure=2)
 ModiaMath.plot(result, "r[2]", figure=3)
 
+# Add next simulation run to plot
+result.series[:phi] = 1.2*sin.(t)
+result.series[:r]   = hcat(0.2 * cos.(t), 0.3 * sin.(t))
+ModiaMath.plot(result, :phi, heading="Sine(time)", figure=1, prefix="sim 2: ", reuse=true)
+ModiaMath.plot(result, :r  ,                       figure=2, prefix="sim 2: ", reuse=true)
 
 end

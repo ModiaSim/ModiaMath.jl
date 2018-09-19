@@ -7,7 +7,7 @@
 
 
 """
-    ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, figure=1)
+    ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, figure=1, prefix="", reuse=false)
 
 Plot time series of the result defined by the names keys (Symbol or String).
 The keys (and their units, if available in the result) are automatically used as legend.
@@ -33,6 +33,8 @@ Remaining arguments:
 - `grid::Bool`: Optional grid.
 - `xAxis`: Name of x-axis (Symbol or String).
 - `figure::Int`: Integer identifier of the window in which the diagrams shall be drawn.
+- `prefix::AbstractString`: String that is appended in front of every legend label (useful especially if reuse=true)
+- `reuse::Bool`: If figure already exists and reuse=false, clear the figure before adding the plot.
 
 # Examples
 ```julia
@@ -45,7 +47,7 @@ result = Dict{Symbol,Vector{Float64}}(
                            :w1  =>cos.(t)u"rad/s", :w2  => 0.6*cos.(t))
 
 # 1 signal in one diagram
-ModiaMath.plot(result, :phi1)
+ModiaMath.plot(result, :phi1)   # legend = "phi1 [rad]"
 
 # 3 signals in one diagram                                 
 ModiaMath.plot(result, (:phi1, :phi2, :w1), figure=2)
@@ -65,15 +67,19 @@ ModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);
                          (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  
 
 # Plot w1=f(phi1) in one diagram 
-ModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)                   
+ModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    
+
+# Append signal of the next simulation run to figure=1
+result[:phi1] = 0.5*result[:phi1]
+ModiaMath.plot(result, :phi1, prefix="Sim 2: ", reuse=true)   # legend = "Sim 2: phi1 [rad]"
 ```
 
 The 5th example above (2 diagrams in form of a vector) give the following plot:
 
 ![Figure 5](../../resources/images/plot_figure5.svg)
 """
-plot(result, names::String; heading="", grid=true, xAxis=:time, figure=1) =
-    plot(result, Symbol(names), heading=heading, grid=grid, xAxis=xAxis, figure=figure)
+plot(result, names::String; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) =
+    plot(result, Symbol(names), heading=heading, grid=grid, xAxis=xAxis, figure=figure, prefix=prefix, reuse=reuse)
 
-plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1) =
-    plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=xAxis, figure=figure)
+plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) =
+    plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=xAxis, figure=figure, prefix=prefix, reuse=reuse)

@@ -208,10 +208,10 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
     
     yvar = result.var[ykeyName]
     if ndims(ysig) == 1
-      # ysig is a vector
+        # ysig is a vector
         ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
     else
-      # sig has more as one dimension
+        # sig has more as one dimension
         @static if VERSION >= v"0.7.0-DEV.2005"
             ysigLegend = Array{String}(undef, length(yvar.value))
         else
