@@ -7,7 +7,8 @@
 
 
 """
-    ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, figure=1, prefix="", reuse=false)
+    ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, 
+                   figure=1, prefix="", reuse=false)
 
 Plot time series of the result defined by the names keys (Symbol or String).
 The keys (and their units, if available in the result) are automatically used as legend.
@@ -47,7 +48,8 @@ result = Dict{Symbol,Vector{Float64}}(
                            :w1  =>cos.(t)u"rad/s", :w2  => 0.6*cos.(t))
 
 # 1 signal in one diagram
-ModiaMath.plot(result, :phi1)   # legend = "phi1 [rad]"
+#   (legend = "phi1 [rad]")
+ModiaMath.plot(result, :phi1)   
 
 # 3 signals in one diagram                                 
 ModiaMath.plot(result, (:phi1, :phi2, :w1), figure=2)
@@ -70,8 +72,9 @@ ModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);
 ModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    
 
 # Append signal of the next simulation run to figure=1
+# (legend = "Sim 2: phi1 [rad]")
 result[:phi1] = 0.5*result[:phi1]
-ModiaMath.plot(result, :phi1, prefix="Sim 2: ", reuse=true)   # legend = "Sim 2: phi1 [rad]"
+ModiaMath.plot(result, :phi1, prefix="Sim 2: ", reuse=true)
 ```
 
 The 5th example above (2 diagrams in form of a vector) give the following plot:

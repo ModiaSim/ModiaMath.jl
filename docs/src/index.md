@@ -28,39 +28,46 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 ModiMath is registered in METADATA.jl and can be installed with Pkg.add.
 
 ```julia
-# Julia 0.6
+# Julia 0.6, 0.7, 1.0:
 julia> Pkg.add("ModiaMath")
 
-# Julia 0.7 and 1.0
+# alternatively in Julia 0.7 and 1.0:
 julia> ]add ModiaMath
 ```
 
-### If automatic installation of PyPlot fails 
-
-A higher level [`ModiaMath.plot`](@ref) function is provided in ModiaMath to visualize the time series
-of simulation results in a convenient way. Other Julia plotting packages can also be used, but all the
-tests and examples in ModiaMath, Modia and Modia3D use [`ModiaMath.plot`](@ref)). 
-It is based on the Julia interface package [`PyPlot`](https://github.com/JuliaPy/PyPlot.jl) which
-uses the [Matplotlib](http://matplotlib.org/) plotting library from Python. `PyPlot` need to be
-installed, if the examples and tests of ModiaMath shall be executed. Installing `PyPlot` by just 
-using the Julia package manager often fails. The following installation order is recommended:
-
-1. Install a Python 3.x distribution that contains Matplotlib.\
-   Recommended: [Anaconda distribution](https://www.anaconda.com/download/).\
-   Advantage: very robust; disadvantage: > 3 GByte memory needed;\
-   ModiaMath is based on the Python 3.x version of Matplotlib where some keywords
-   are different to the Python 2.x version.
-2. Include the path to the Python executable in your `HOME/.juliarc.jl` file:\
-    `ENV["PYTHON"] = joinpath("....", "Anaconda3", "python.exe")`
-3. Start Julia, give the command `ENV["PYTHON"]` in the REPL, and check whether the path
-   is correct (if you made a typo in the `.juliarc.jl` file, Julia might use another
-   Python executable and PyPlot might crash Julia).
-4. If you have used a different Python installation before, execute the command
-   `Pkg.build["PyCall"]`, exit Julia and start Julia again.
-5. Install PyPlot via `Pkg.add("PyPlot")`
+ModiaMath uses PyPlot for plotting.
+If `PyPlot` is not available in your current Julia environment
+an information message is printed and all `ModiaMath.plot(..)` calls are ignored.
+In order that plot windows are displayed, you need to add `PyPlot` to your current environment
+via `Pkg.add("PyPlot")`. Often this automatic installation fails and it is recommended to follow
+instead the instructions
+[Installing PyPlot in a robust way](https://github.com/ModiaSim/ModiaMath.jl/wiki/Installing-PyPlot-in-a-robust-way).
 
 
 ## Release Notes
+
+
+### Version 0.2.2
+
+- PyPlot was removed from the REQUIRE and Project.toml files and code was added,
+  so that PyPlot is automatically imported in ModiaMath if it is available in 
+  the current environment of the user.
+  The benefit is that ModiaMath can be used, even if PyPlot is not installed.
+  This is especially useful for ContinuousIntegration, because automatic
+  installation of PyPlot often fails.
+  Inspect the wiki page 
+  [Installing PyPlot in a robust way](https://github.com/ModiaSim/ModiaMath.jl/wiki/Installing-PyPlot-in-a-robust-way)
+  to install PyPlot in a robust way.
+
+- All extra packages used in examples and tests are now referenced via ModiaMath
+  (for example `using ModiaMath.StaticArrays` instead of `using StaticArrays`).
+  The benefit is that all examples and tests can be directly executed with `include`
+  (for example: `import ModiaMath; include($(ModiaMath.path)/examples/Simulate_Pendulum.jl)`)
+  provided `ModiaMath` is in the current environment. Previously, it was assumed that these
+  extra packages are present in the users environment and an error occured, if this was not the case.
+ 
+- New arguments `prefix` and `reuse` added to ModiaMath.plot(..) to add new plots 
+  (e.g. from a new simulation run) to an existing figure, without clearing the figure beforehand.
 
 
 ### Version 0.2.1

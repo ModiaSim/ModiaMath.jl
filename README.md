@@ -35,20 +35,20 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 The package is registered in METADATA.jl and can be installed with Pkg.add.
 
 ```julia
-# Julia 0.6
+# Julia 0.6, 0.7, 1.0:
 julia> Pkg.add("ModiaMath")
 
-# Julia 0.7 and 1.0
+# alternatively in Julia 0.7 and 1.0:
 julia> ]add ModiaMath
 ```
 
 ModiaMath uses [PyPlot](https://github.com/JuliaPy/PyPlot.jl) for plotting.
-If `PyPlot` is not installed or is not available in your actual Julia environment,
-an information message is printed and the `ModiaMath.plot(..)` call is ignored.
-In order that plot windows are displayed, you need to add `PyPlot` to your actual environment
-via `]add PyPlot`. Installing `PyPlot` by just `]add PyPlot` might fail.
-In such a case, you might try these
-[installation instructions](https://ModiaSim.github.io/ModiaMath.jl/latest/index.html#Installation-1).
+If `PyPlot` is not available in your current Julia environment
+an information message is printed and all `ModiaMath.plot(..)` calls are ignored.
+In order that plot windows are displayed, you need to add `PyPlot` to your current environment
+via `]add PyPlot`. Often this automatic installation fails and it is recommended to follow
+instead the instructions
+[Installing PyPlot in a robust way](https://github.com/ModiaSim/ModiaMath.jl/wiki/Installing-PyPlot-in-a-robust-way).
 
 
 ## Documentation

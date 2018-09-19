@@ -38,7 +38,6 @@ The following features are planned to be implemented before ModiaMath version 1.
     support Plots.
   - Use named tuples to define line style elements, e.g.\
     `plot(result, ((name=:phi1, color=:blue), (name=:phi2, color=:red)) )`
-  - Add signals to existing window.
 
 - **Frames**
   - Support splines for the interpolation of Frames

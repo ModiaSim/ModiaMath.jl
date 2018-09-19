@@ -9,7 +9,7 @@ The result data of [`ModiaMath.simulate!`](@ref) is returned in one of the
 formats supported by this module. The [`ModiaMath.plot`](@ref) function of this
 module allows to plot the result data by giving the signal names.
 The legends/labels of the plots are automatically constructed by the
-signal names and their unit. Example
+signal names and their unit. Example:
 
 ```julia
 ModiaMath.plot(result, [ (:phi,:r)      (:phi,:phi2,:w);
