@@ -47,6 +47,11 @@ instead the instructions
 ## Release Notes
 
 
+### Version 0.2.3
+
+- Wrong UUID of ModiaMath corrected (did not correspond to the UUID in Julias METADATA).
+
+
 ### Version 0.2.2
 
 - PyPlot was removed from the REQUIRE and Project.toml files and code was added,
