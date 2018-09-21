@@ -33,6 +33,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "index.html#Version-0.2.3-1",
+    "page": "Home",
+    "title": "Version 0.2.3",
+    "category": "section",
+    "text": "Wrong UUID of ModiaMath corrected (did not correspond to the UUID in Julias METADATA)."
+},
+
+{
     "location": "index.html#Version-0.2.2-1",
     "page": "Home",
     "title": "Version 0.2.2",
