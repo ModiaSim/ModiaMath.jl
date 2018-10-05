@@ -54,11 +54,15 @@ include("plotResult_with_Nothing.jl")
 
 # If PyPlot is in the current environment, import it in the REPL and install plot functions based on PyPlot
 function __init__()
-    @eval Main begin
-        try
-            import PyPlot
-        catch
-            println("... ModiaMath.plot(..) calls will be ignored, since PyPlot not installed in current environment.")
+    if !Requires.isprecompiling()  
+        @eval Main begin
+            try
+                import PyPlot
+            catch
+                println("    PyPlot not available (plot commands will be ignored).\n",
+                        "    Try to install PyPlot. See hints here:\n",
+                        "    https://github.com/ModiaSim/ModiaMath.jl/wiki/Installing-PyPlot-in-a-robust-way.")
+            end
         end
     end
 
