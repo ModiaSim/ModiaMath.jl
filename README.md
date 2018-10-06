@@ -115,10 +115,10 @@ instead the instructions
 ## Status
 
 The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
-and with Julia `0.7.0` and `1.0.0` on Windows 7 and via the travis CL
+and with Julia `0.7.0`, `1.0.0`, `1.0.1` on Windows 7 and via the travis CL
 on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
 
-The ModiaMath version number is 0.2.3 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.2.4 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
