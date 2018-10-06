@@ -91,18 +91,18 @@ function getResult(model::ModiaMath.AbstractSimulationModel, res::ModiaMath.RawR
     nt         = res.nt
     data       = res.data
 
-    seriesDict = Dict{Symbol,Union{AbstractVector,AbstractMatrix}}()
+    seriesDict = Dict{AbstractString,Any}()
     varDict    = Dict{Symbol,ModiaMath.AbstractVariable}()
     for v in model.var.result_var
         name    = instanceName(v)
         len     = length(v.value)
         iresult = v.iresult
         if len == 1
-            seriesDict[name] = @view data[1:nt, iresult]
+            seriesDict[string(name)] = @view data[1:nt, iresult]
         else
-            seriesDict[name] = @view data[1:nt, iresult:iresult+len-1]
+            seriesDict[string(name)] = @view data[1:nt, iresult:iresult+len-1]
         end
-        varDict[   name] = v
+        varDict[name] = v
    end
    result = ModiaMath.ResultWithVariables(seriesDict, varDict, model.modelName)
    return result, nt

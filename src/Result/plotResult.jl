@@ -8,7 +8,7 @@
 
 """
     ModiaMath.plot(result, names; heading="", grid=true, xAxis= :time, 
-                   figure=1, prefix="", reuse=false)
+                   figure=1, prefix="", reuse=false, maxLegend=10)
 
 Plot time series of the result defined by the names keys (Symbol or String).
 The keys (and their units, if available in the result) are automatically used as legend.
@@ -18,8 +18,6 @@ of the variable definition.
 
 # Arguments
 Argument `result` maybe one of the following:
-- A dictionary `Dict{Symbol,AbstractVector}`
-- A dictionary `Dict{String,AbstractVector}`
 - A dictionary `Dict{AbstractString,Any}`
 - An instance of struct [`ModiaMath.Result`](@ref)
 - An object for which function [`ModiaMath.resultTimeSeries`](@ref) is defined.
@@ -32,10 +30,13 @@ Argument `names` defines the diagrams to be drawn and the time series to be incl
 Remaining arguments:
 - `heading::AbstractString`: Optional heading above the diagram.
 - `grid::Bool`: Optional grid.
-- `xAxis`: Name of x-axis (Symbol or String).
+- `xAxis`: Name of x-axis (Symbol or AbstractString).
 - `figure::Int`: Integer identifier of the window in which the diagrams shall be drawn.
 - `prefix::AbstractString`: String that is appended in front of every legend label (useful especially if reuse=true)
 - `reuse::Bool`: If figure already exists and reuse=false, clear the figure before adding the plot.
+- `maxLegend::Int`: If the number of legend entries in one plot command > maxLegend, the legend is suppressed.
+  All curves have still their names as labels. The curves can be inspected by their names by clicking in the
+  toolbar of the plot on button `Edit axis, curve ..` and then on `Curves`.
 
 # Examples
 ```julia
@@ -43,16 +44,16 @@ import ModiaMath
 using Unitful
 
 t = linspace(0.0, 10.0, 100)
-result = Dict{Symbol,Vector{Float64}}(
-            :time=>t*u"s", :phi1=>sin.(t)u"rad", :phi2=>0.5*sin.(t),
-                           :w1  =>cos.(t)u"rad/s", :w2  => 0.6*cos.(t))
+result = Dict{AbstractString,Any}(
+            "time" => t*u"s", "phi1" => sin.(t)u"rad"  , "phi2" => 0.5*sin.(t),
+                              "w1"   => cos.(t)u"rad/s", "w2"   => 0.6*cos.(t))
 
 # 1 signal in one diagram
 #   (legend = "phi1 [rad]")
 ModiaMath.plot(result, :phi1)   
 
 # 3 signals in one diagram                                 
-ModiaMath.plot(result, (:phi1, :phi2, :w1), figure=2)
+ModiaMath.plot(result, ("phi1", :phi2, :w1), figure=2)
 
 # 3 diagrams in form of a vector (every diagram has one signal)                 
 ModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     
@@ -81,8 +82,8 @@ The 5th example above (2 diagrams in form of a vector) give the following plot:
 
 ![Figure 5](../../resources/images/plot_figure5.svg)
 """
-plot(result, names::String; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) =
-    plot(result, Symbol(names), heading=heading, grid=grid, xAxis=xAxis, figure=figure, prefix=prefix, reuse=reuse)
+plot(result, names::Symbol; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) =
+    plot(result, string(names), heading=heading, grid=grid, xAxis=string(xAxis), figure=figure, prefix=prefix, reuse=reuse, maxLegend=maxLegend)
 
-plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) =
-    plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=xAxis, figure=figure, prefix=prefix, reuse=reuse)
+plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) =
+    plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=string(xAxis), figure=figure, prefix=prefix, reuse=reuse, maxLegend=maxLegend)

@@ -22,8 +22,8 @@ pendulum = ModiaMath.SimulationModel(Simulate_Pendulum.Pendulum(L=0.5, m=1.0, d=
 
 @testset "ModiaMath: examples/Simulate_Pendulum.jl" begin 
     result = ModiaMath.simulate!(pendulum, stopTime=10.0, tolerance=1e-8, interval=0.1, log=true) 
-    phi = result.series[:phi]
-    w   = result.series[:w]
+    phi = result.series["phi"]
+    w   = result.series["w"]
 
     @test isapprox(phi[end], 0.120289; atol=1e-3 )
     @test isapprox(w[end], 0.273965; atol=1e-2 )

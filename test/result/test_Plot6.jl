@@ -16,8 +16,8 @@ end
 
 
 # Define signals
-result = Dict{Symbol,AbstractVector}(:time => t, :phi1 => sin.(t), :phi2 => 0.5 * sin.(t),
-                                               :w1  => cos.(t), :w2  => 0.6 * cos.(t))
+result = Dict{AbstractString,Any}("time" => t      , "phi1" => sin.(t)     , "phi2" => 0.5 * sin.(t),
+                                  "w1"   => cos.(t), "w2"   => 0.6 * cos.(t))
 
 # Plots
 ModiaMath.plot(result, :phi1)                                        # 1 signal in one diagram

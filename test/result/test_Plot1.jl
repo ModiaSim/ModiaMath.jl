@@ -16,14 +16,15 @@ end
 
 
 
-result = Dict{Symbol,AbstractVector}()
+result = Dict{AbstractString,Any}()
 
-result[:time] = t
-result[:phi]  = sin.(t)
+result["time"] = t
+result["phi"]  = sin.(t)
 
 ModiaMath.plot(result, :phi, heading="Sine(time)")
 
 # Test also that warn works for non-existing variables
-ModiaMath.plot(result, :SignalNotDefined, heading="Sine(time)")
+println("... Next plot should give a warning:")
+ModiaMath.plot(result, :SignalNotDefined, heading="Sine(time)", figure=2)
 
 end

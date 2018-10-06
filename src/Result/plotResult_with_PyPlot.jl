@@ -5,7 +5,7 @@
 #   ModiaMath.Result (ModiaMath/Result/_module.jl)
 #
 
-function prepend!(prefix::AbstractString, ysigLegend::Vector{String})
+function prepend!(prefix::AbstractString, ysigLegend::Vector{AbstractString})
    for i in eachindex(ysigLegend)
       ysigLegend[i] = prefix*ysigLegend[i]
    end
@@ -22,7 +22,7 @@ end
 Add the time series of one name (if names is one symbol/string) or with
 several names (if names is a tuple of symbols/strings) to the current diagram
 """
-function addPlot(result, name::Symbol, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool)
+function addPlot(result, name::AbstractString, grid::Bool, xLabel::Bool, xAxis::AbstractString, prefix::AbstractString, reuse::Bool, maxLegend::Integer)
     (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name, xLabel, xAxis)
     if xsig == nothing; return; end
     if ndims(ysig) == 1
@@ -33,19 +33,24 @@ function addPlot(result, name::Symbol, grid::Bool, xLabel::Bool, xAxis, prefix::
         end
     end
     PyPlot.grid(grid)
-    PyPlot.legend()
+    if length(ysigLegend) <= maxLegend
+       PyPlot.legend()
+    end
     if xLabel && !reuse
         PyPlot.xlabel(xsigLegend)
     end
 end
 
-function addPlot(result, collectionOfNames::Tuple, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool)
+function addPlot(result, collectionOfNames::Tuple, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer)
     xsigLegend = ""
+    xAxis2 = string(xAxis)
+    nLegend = 0
 
     for name in collectionOfNames
-        name2 = Symbol(name)
-        (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name2, xLabel, xAxis)
+        name2 = string(name)
+        (xsig, xsigLegend, ysig, ysigLegend) = resultTimeSeries(result, name2, xLabel, xAxis2)
         if xsig != nothing
+            nLegend = nLegend + length(ysigLegend)
             if ndims(ysig) == 1
                 PyPlot.plot(xsig, ysig, label=prefix*ysigLegend[1])
             else
@@ -57,24 +62,27 @@ function addPlot(result, collectionOfNames::Tuple, grid::Bool, xLabel::Bool, xAx
     end
 
     PyPlot.grid(grid)
-    PyPlot.legend()
+    if nLegend <= maxLegend
+       PyPlot.legend()
+    end
 
     if xLabel && !reuse && xsigLegend != nothing 
         PyPlot.xlabel(xsigLegend)
     end
 end
 
-addPlot(result, name::String, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool) =  addPlot(result, Symbol(name), grid, xLabel, xAxis, prefix, reuse)
+addPlot(result, name::Symbol, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer) =  
+        addPlot(result, string(name), grid, xLabel, string(xAxis), prefix, reuse, maxLegend)
 
 
 
 #--------------------------- Plot functions
-function plot(result, names::Symbol; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) 
+function plot(result, names::AbstractString; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) 
     PyPlot.figure(figure) 
     if !reuse
        PyPlot.clf()
     end
-    addPlot(result, names, grid, true, xAxis, prefix, reuse)
+    addPlot(result, names, grid, true, string(xAxis), prefix, reuse, maxLegend)
     heading2 = getHeading(result, heading)
     
     if heading2 != "" && !reuse
@@ -85,12 +93,12 @@ function plot(result, names::Symbol; heading::AbstractString="", grid::Bool=true
     end
 end
 
-function plot(result, names::Tuple; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) 
+function plot(result, names::Tuple; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) 
     PyPlot.figure(figure)
     if !reuse
        PyPlot.clf()
     end
-    addPlot(result, names, grid, true, xAxis, prefix, reuse)
+    addPlot(result, names, grid, true, string(xAxis), prefix, reuse, maxLegend)
 
     heading2 = getHeading(result, heading)
     
@@ -99,7 +107,8 @@ function plot(result, names::Tuple; heading::AbstractString="", grid::Bool=true,
     end
 end
 
-function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::Bool=true, xAxis=:time, figure::Int=1, prefix::AbstractString="", reuse::Bool=false) 
+function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) 
+    xAxis2 = string(xAxis)
     PyPlot.figure(figure)
     if !reuse
        PyPlot.clf()
@@ -113,7 +122,7 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
         xLabel = i == nrow
         for j = 1:ncol
             PyPlot.subplot(nrow, ncol, k)
-            addPlot(result, names[i,j], grid, xLabel, xAxis, prefix, reuse)
+            addPlot(result, names[i,j], grid, xLabel, xAxis2, prefix, reuse, maxLegend)
             k = k + 1
             if ncol == 1 && i == 1 && heading2 != "" && !reuse
                 PyPlot.title(heading2, size=headingSize)

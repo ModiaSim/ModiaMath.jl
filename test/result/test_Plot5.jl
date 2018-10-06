@@ -16,13 +16,13 @@ end
 
 
 
-series = Dict{Symbol,Union{AbstractVector,AbstractMatrix}}()
-series[:time] = t
-series[:phi]  = sin.(t)
-series[:phi2] = 0.5 * sin.(t)
-series[:w]    = cos.(t)
-series[:w2]   = 0.6 * cos.(t)
-series[:r]    = hcat(0.5 * sin.(t), 0.2 * sin.(t), 0.3 * cos.(t))
+series = Dict{AbstractString,Any}()
+series["time"] = t
+series["phi"]  = sin.(t)
+series["phi2"] = 0.5 * sin.(t)
+series["w"]    = cos.(t)
+series["w2"]   = 0.6 * cos.(t)
+series["r"]    = hcat(0.5 * sin.(t), 0.2 * sin.(t), 0.3 * cos.(t))
 
 
 time = ModiaMath.RealScalar(:time, unit="s")
