@@ -4,7 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/ModiaSim/ModiaMath.jl/badge.svg?branch=master)](https://coveralls.io/github/ModiaSim/ModiaMath.jl?branch=master)
 [![codecov.io](http://codecov.io/github/ModiaSim/ModiaMath.jl/coverage.svg?branch=master)](http://codecov.io/github/ModiaSim/ModiaMath.jl?branch=master)
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://ModiaSim.github.io/ModiaMath.jl/latest)
-[![The MIT License](https://img.shields.io/badge/license-MIT-orange.svg?style=flat-square)](https://github.com/ModiaSim/ModiaMath.jl/blob/master/LICENSE.md)
+[![The MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/ModiaSim/ModiaMath.jl/blob/master/LICENSE.md)
 
 
 ModiaMath provides a simulation engine and other mathematical utilities for packages
