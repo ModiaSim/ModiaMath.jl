@@ -1,11 +1,10 @@
 # ModiaMath
 
 [![Travis](https://travis-ci.org/ModiaSim/ModiaMath.jl.svg?branch=master)](https://travis-ci.org/ModiaSim/ModiaMath.jl)
-[![Coverage Status](https://coveralls.io/repos/github/ModiaSim/ModiaMath.jl/badge.svg?branch=master)](https://coveralls.io/github/ModiaSim/ModiaMath.jl?branch=master)
+[![AppVoyer](https://ci.appveyor.com/api/projects/status/github/ModiaSim/ModiaMath.jl?svg=true)](https://ci.appveyor.com/project/MartinOtter/modiamath-jl)
 [![codecov.io](http://codecov.io/github/ModiaSim/ModiaMath.jl/coverage.svg?branch=master)](http://codecov.io/github/ModiaSim/ModiaMath.jl?branch=master)
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://ModiaSim.github.io/ModiaMath.jl/latest)
 [![The MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/ModiaSim/ModiaMath.jl/blob/master/LICENSE.md)
-
 
 ModiaMath provides a simulation engine and other mathematical utilities for packages
 [Modia](https://github.com/ModiaSim/Modia.jl) and [Modia3D](https://github.com/ModiaSim/Modia3D.jl)
@@ -114,9 +113,9 @@ instead the instructions
 
 ## Status
 
-The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28
-and with Julia `0.7.0`, `1.0.0`, `1.0.1` on Windows 7 and via the travis CL
-on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0).
+The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubuntu 14.04, OpenSUSE42 and Fedora 28,
+with Julia `0.7.0`, `1.0.0`, `1.0.1` on Windows 7, via the travis CL
+on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0), and via the Appveyor CL on Windows.
 
 The ModiaMath version number is 0.2.4 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
