@@ -46,6 +46,18 @@ instead the instructions
 
 ## Release Notes
 
+### Version 0.2.5
+
+- ModiaMath result handling improved:
+  (a) The result may contain single values (such as parameter J=0.1).
+      When using plot(..) on such a result variable, a constant line is plotted
+      between the first and the last point of the xaxis.
+  (b) New function `ModiaMath.resultTable(result)` to transform the variable information
+      in the result data structure in a DataFrames table that can then be printed.
+  (c) New functions `ModiaMath.closeFigure(figure)` and
+      `ModiaMath.closeAllFigures()` to close a specific figure or close all figures.
+
+
 ### Version 0.2.4
 
 - **Non-backwards compatible change of ModiaMath.plot(..)**:

@@ -11,11 +11,16 @@ else
     using ModiaMath.Test
 end
 
+import ModiaMath
+
 @testset "Test ModiaMath" begin
     include(joinpath("result", "_includes.jl"))
     include(joinpath("variables", "_includes.jl"))
     include(joinpath("frames", "_includes.jl"))
     include(joinpath("simulation", "_includes.jl"))
+
+    println("\n... close all open figures.")
+    ModiaMath.closeAllFigures()
 end
 
 end
