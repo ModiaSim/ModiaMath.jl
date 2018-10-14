@@ -320,7 +320,11 @@ end
 
 
 function Base.show(io::IO, result::ResultWithVariables)
-    show(io, resultTable(result), summary=false, splitcols=true)
+    @static if VERSION >= v"0.7.0-DEV.2005" 
+        show(io, resultTable(result), summary=false, splitcols=true)
+    else
+        show(io, resultTable(result))
+    end
 end
 
 
