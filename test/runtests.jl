@@ -1,5 +1,6 @@
 module Runtests
 
+import ModiaMath
 
 @static if VERSION < v"0.7.0-DEV.2005"
     using Base.Test
@@ -11,7 +12,6 @@ else
     using ModiaMath.Test
 end
 
-import ModiaMath
 
 @testset "Test ModiaMath" begin
     include(joinpath("result", "_includes.jl"))
