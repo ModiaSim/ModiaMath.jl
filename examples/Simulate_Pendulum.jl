@@ -50,4 +50,7 @@ result = ModiaMath.simulate!(simulationModel; log=true)
 plot(result, [(:phi, :w) :a])
 #plot(result, "r[2]", xAxis="r[1]", figure=2)
 
+# ModiaMath.print_ModelVariables(simulationModel)
+# println("result variables = ", result)
+
 end

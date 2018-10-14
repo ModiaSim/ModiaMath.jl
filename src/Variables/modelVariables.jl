@@ -528,25 +528,32 @@ end
 
 
 """
-   table = print_ModelVariables(vars::ModelVariables)
+   table = print_ModelVariables(obj)
 
-Print all the variables in `vars` in form of DataFrames tables.
+Print all the variables in `obj` in form of DataFrames tables.
+`obj` can be of type ModiaMath.ModelVariables or ModiaMath.SimulationModel.
 """
 function print_ModelVariables(m::ModelVariables)
     variabletable = ModiaMath.get_variableTable(m.var)
-    println("\n\nvariables: ", variabletable)
-
     x_table = ModiaMath.get_xTable(m)
-    println("\n\nx vector: ", x_table)
-
     copyToVariableTable = ModiaMath.get_copyToVariableTable(m)
-    println("\n\ncopy to variables: ", copyToVariableTable)
-
     copyToResidueTable = ModiaMath.get_copyToResidueTable(m)
-    println("\n\ncopy to residue vector: ", copyToResidueTable)
-
     copyToResultTable = ModiaMath.get_copyToResultTable(m)
-    println("\n\ncopy to results: ", copyToResultTable)
+
+    @static if VERSION < v"0.7.0-DEV.2005"
+        println("\n\nvariables: ", variabletable)
+        println("\n\nx vector: ", x_table)
+        println("\n\ncopy to variables: ", copyToVariableTable)
+        println("\n\ncopy to residue vector: ", copyToResidueTable)
+        println("\n\ncopy to results: ", copyToResultTable)
+    else
+        print("\n\nvariables: ");                show(variabletable      , splitcols=true, summary=false)
+        print("\n\n\nx vector: ");               show(x_table            , splitcols=true, summary=false)
+        print("\n\n\ncopy to variables: ");      show(copyToVariableTable, splitcols=true, summary=false)
+        print("\n\n\ncopy to residue vector: "); show(copyToResidueTable , splitcols=true, summary=false)
+        print("\n\n\ncopy to results: ");        show(copyToResultTable  , splitcols=true, summary=false)
+        print("\n")
+    end
 end
 
 

@@ -31,4 +31,7 @@ ModiaMath.plot(result, [ (:phi), (:phi, :phi2, :w), (:w, :w2) ], heading="Vector
 
 ModiaMath.plot(result, [ "r", "r2[3]", "r2"], heading="Vector of plots", figure=2)
 
+# Print result variables
+println("\n... result variables = ", ModiaMath.resultTable(result))
+
 end

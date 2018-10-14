@@ -112,8 +112,14 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
     if ysig == nothing
         return (nothing, nothing, nothing, nothing) 
     end
-    
-    if ndims(ysig) == 1
+  
+    if ndims(ysig) == 0 
+        # ysig is a scalar
+        # Construct a constant time series with two points at the first and the last value of the time vector
+        ysigLegend = [appendUnit(yName, string(unit(ysig)))]
+        xsig = [xsig[1], xsig[end]]
+        ysig = [ysig   , ysig     ]
+    elseif ndims(ysig) == 1
         # ysig is a vector
         ysigLegend = [appendUnit(yName, string(unit(ysig[1])))]
     elseif ndims(ysig) == 2
@@ -144,6 +150,80 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
 end
 
 
+sizeToString(value::Any)    = string( size(value) ) 
+sizeToString(value::Number) = ""
+
+"""
+    table = resultTable(result)
+
+Return the variables stored in `result` in form of a DataFrames table
+(which can then be printed/showed in various forms).
+
+`Base.show(io, result)` is defined to print `resultTable(result)`,
+in case result is of type ModiaMath.ResultWithVariables.
+
+# Examples
+```julia
+import ModiaMath
+using  Unitful
+
+t = range(0.0, stop=10.0, length=100)
+result = Dict{AbstractString,Any}()
+result["time"] = t * u"s";
+result["phi"]  = sin.(t)u"rad";
+
+# Print table of the variables that are stored in result
+println("result variables = ", ModiaMath.resultTable(result))
+
+# Results in
+result variables =
+│ Row │ name   │ elType  │ sizeOrValue   │ unit   │
+│     │ String │ String  │ String        │ String │
+├─────┼────────┼─────────┼───────────────┼────────┤
+│ 1   │ phi    │ Float64 │ (100,)        │ rad    │
+│ 2   │ time   │ Float64 │ (100,)        │ s      │
+
+```
+
+"""
+function resultTable(result::StringDictAnyResult)
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], sizeOrValue=String[], unit=String[])
+
+    for key in sort( collect( keys(result) ) )
+        value = result[key]
+
+        # Determine unit as string (if columns have different units, provide unit per column)
+        strippedValue =  ustrip.(value) # Strip units from value
+        tvalue = typeof( strippedValue )
+        tsize  = ndims(value) > 0 ? sizeToString( strippedValue ) : string( strippedValue )
+        if tvalue <: Number
+            tunit = string( unit(value) )
+        elseif tvalue <: AbstractVector || (tvalue <: AbstractMatrix && size(value,2) == 1)
+            tunit = string( unit( value[1] ) )
+        elseif tvalue <: AbstractMatrix
+            tunit = string( unit( value[1] ) )
+            columnsHaveSameUnit = true
+            for i in 2:size(value,2)
+                if string( unit( value[1,i] ) ) != tunit 
+                    columnsHaveSameUnit = false
+                    break
+                end
+            end
+            if !columnsHaveSameUnit
+                tunit = "[" * tunit
+                for i in 2:size(value,2)
+                     tunit = tunit * ", " * string( unit( value[1,i] ) )
+                end
+                tunit = tunit * "]"
+            end 
+        else
+            tunit = "???"
+        end
+
+        push!(resultTable, [key, string( typeof(strippedValue[1]) ), tsize, tunit] )
+    end
+    return resultTable
+end
 
 
 """
@@ -170,30 +250,7 @@ resultHeading(result::ResultWithVariables) = result.resultHeading
 
 function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis)
     seriesDict = result.series
-    (ysig, ykeyName, yNameAsString) = getSignal(seriesDict, string(name))
-    symbol_ykeyName = Symbol(ykeyName)
 
-    if ysig == nothing
-        return (nothing, nothing, nothing, nothing) 
-    end
-    
-    yvar = result.var[symbol_ykeyName]
-    if ndims(ysig) == 1
-        # ysig is a vector
-        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
-    else
-        # sig has more as one dimension
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            ysigLegend = Array{String}(undef, length(yvar.value))
-        else
-            ysigLegend = Array{String}(length(yvar.value))
-        end
-
-        for i in eachindex(yvar.value)
-            ysigLegend[i] = appendUnit(ModiaMath.indexToString(symbol_ykeyName, yvar.value, i), yvar.unit)
-        end
-    end
-    
     # Get x-axis signal
     (xsig, xkeyName, xName) = getSignal(seriesDict, string(xAxis))
     if xsig == nothing 
@@ -208,8 +265,69 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(xName, result.var[Symbol(xkeyName)].unit) : ""
+
+
+    # Get y-axis signal(s)
+    (ysig, ykeyName, yNameAsString) = getSignal(seriesDict, string(name))
+    symbol_ykeyName = Symbol(ykeyName)
+
+    if ysig == nothing
+        return (nothing, nothing, nothing, nothing) 
+    end
+    
+    yvar = result.var[symbol_ykeyName]
+    if ndims(ysig) == 0 
+        # ysig is a scalar
+        # Construct a constant time series with two points at the first and the last value of the time vector
+        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
+        xsig = [xsig[1], xsig[end]]
+        ysig = [ysig   , ysig     ]
+
+    elseif ndims(ysig) == 1
+        # ysig is a vector
+        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
+
+    else
+        # sig has more as one dimension
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            ysigLegend = Array{String}(undef, length(yvar.value))
+        else
+            ysigLegend = Array{String}(length(yvar.value))
+        end
+
+        for i in eachindex(yvar.value)
+            ysigLegend[i] = appendUnit(ModiaMath.indexToString(symbol_ykeyName, yvar.value, i), yvar.unit)
+        end
+    end
+    
     return (xsig, xsigLegend, ysig, ysigLegend)
 end
+
+
+function resultTable(result::ResultWithVariables)
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], sizeOrValue=String[], unit=String[], info=String[])
+    series      = result.series
+    vars        = result.var
+
+    for key in sort( collect( keys(series) ) )
+        value = series[key]
+        var   = vars[Symbol(key)]
+        tsize = ndims(value) > 0 ? sizeToString( value ) : string( value )
+        push!(resultTable, [key, string( typeof(value[1]) ), tsize, var.unit, var.info] )
+    end
+    return resultTable
+end
+
+
+function Base.show(io::IO, result::ResultWithVariables)
+    @static if VERSION >= v"0.7.0-DEV.2005" 
+        show(io, resultTable(result), summary=false, splitcols=true)
+    else
+        show(io, resultTable(result))
+    end
+end
+
+
 
 
 getHeading(result, heading) = heading != "" ? heading : resultHeading(result)

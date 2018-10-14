@@ -2,7 +2,7 @@
 # Copyright 2017-2018, DLR Institute of System Dynamics and Control
 
 """
-    module Simulate_FreeBodyRotation 
+    module Simulate_FreeBodyRotation
 
 Simulate a free body rotation with quaternions:
 
@@ -103,5 +103,9 @@ end
 simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)
 result          = ModiaMath.simulate!(simulationModel, log=true)
 ModiaMath.plot(result, [:q, :w, :derw, :tau])
+
+# ModiaMath.print_ModelVariables(simulationModel)
+# println("result variables = ", result)
+
 
 end

@@ -39,6 +39,12 @@ ModiaMath.plot(result, "r[2:3]", figure=4)
 println("\n... Next plot should give a warning:")
 ModiaMath.plot(result, "phi", xAxis="r", figure=4)
 
+println("\n... figure=4 is closed")
+ModiaMath.closeFigure(4)
+
+# Print result variables
+println("\n... result variables = ", result)
+
 
 # Add next simulation run to plot
 result.series["phi"] = 1.2*sin.(t)

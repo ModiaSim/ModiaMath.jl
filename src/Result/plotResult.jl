@@ -87,3 +87,19 @@ plot(result, names::Symbol; heading::AbstractString="", grid::Bool=true, xAxis="
 
 plot(result, names::AbstractVector; heading::AbstractString="", grid::Bool=true, xAxis="time", figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10) =
     plot(result, reshape(names, length(names), 1); heading=heading, grid=grid, xAxis=string(xAxis), figure=figure, prefix=prefix, reuse=reuse, maxLegend=maxLegend)
+
+
+"""
+    ModiaMath.closeFigure(figure::Int)
+
+Closes figure with figure number `figure`.
+"""
+closeFigure(figure::Int) = nothing
+
+
+"""
+    ModiaMath.closeAllFigures()
+
+Closes all open figures.
+"""
+closeAllFigures() = nothing

@@ -137,3 +137,8 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
         #   PyPlot.subplots_adjust(top=0.88)
     end
 end
+
+closeFigure(figure::Int) = PyPlot.close(figure)
+closeAllFigures()        = PyPlot.close("all")
+
+

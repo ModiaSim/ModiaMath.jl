@@ -56,7 +56,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
     end
 end 
 
-print_ModelVariables(simulationModel::ModiaMath.AbstractSimulationModel) = print_ModelVariables(simulationModel.var)
+print_ModelVariables(simulationModel::SimulationModel) = print_ModelVariables(simulationModel.var)
 
 getVariableName(model,vcat,vindex) = ModiaMath.DAE.getVariableName(model,vcat,vindex;
                                                                    xNames = model.var.x_names) 

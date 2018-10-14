@@ -1,5 +1,7 @@
-module Runtests
+module runtestsWithModiaAndModia3D
 
+import Modia
+import Modia3D
 import ModiaMath
 
 @static if VERSION < v"0.7.0-DEV.2005"
@@ -13,14 +15,13 @@ else
 end
 
 
-@testset "Test ModiaMath" begin
-    include(joinpath("result", "_includes.jl"))
-    include(joinpath("variables", "_includes.jl"))
-    include(joinpath("frames", "_includes.jl"))
-    include(joinpath("simulation", "_includes.jl"))
+@testset "Test Modia and Modia3D" begin
+    include("$(Modia.ModiaDir)/test/runtests.jl")
+    include("$(Modia3D.path)/test/runtests.jl")
 
     println("\n... close all open figures.")
     ModiaMath.closeAllFigures()
 end
+
 
 end

@@ -38,4 +38,6 @@ result = ModiaMath.ResultWithVariables(series, var, "")
 ModiaMath.plot(result, [ (:phi, :r)      (:phi, :phi2, :w);
                          (:w, :w2, :phi2) (:phi, :w)      ], heading="Matrix of plots")
 
+# Print result variables
+println("\n... result variables = ", result)
 end
