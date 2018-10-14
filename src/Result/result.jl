@@ -177,17 +177,17 @@ println("result variables = ", ModiaMath.resultTable(result))
 
 # Results in
 result variables =
-│ Row │ name   │ elType  │ size   │ unit   │
-│     │ String │ String  │ String │ String │
-├─────┼────────┼─────────┼────────┼────────┤
-│ 1   │ phi    │ Float64 │ (100,) │ rad    │
-│ 2   │ time   │ Float64 │ (100,) │ s      │
+│ Row │ name   │ elType  │ sizeOrValue   │ unit   │
+│     │ String │ String  │ String        │ String │
+├─────┼────────┼─────────┼───────────────┼────────┤
+│ 1   │ phi    │ Float64 │ (100,)        │ rad    │
+│ 2   │ time   │ Float64 │ (100,)        │ s      │
 
 ```
 
 """
 function resultTable(result::StringDictAnyResult)
-    resultTable = DataFrames.DataFrame(name=String[], elType=String[], size=String[], unit=String[])
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], sizeOrValue=String[], unit=String[])
 
     for key in sort( collect( keys(result) ) )
         value = result[key]
@@ -195,7 +195,7 @@ function resultTable(result::StringDictAnyResult)
         # Determine unit as string (if columns have different units, provide unit per column)
         strippedValue =  ustrip.(value) # Strip units from value
         tvalue = typeof( strippedValue )
-        tsize  = sizeToString( strippedValue )
+        tsize  = ndims(value) > 0 ? sizeToString( strippedValue ) : string( strippedValue )
         if tvalue <: Number
             tunit = string( unit(value) )
         elseif tvalue <: AbstractVector || (tvalue <: AbstractMatrix && size(value,2) == 1)
@@ -305,14 +305,15 @@ end
 
 
 function resultTable(result::ResultWithVariables)
-    resultTable = DataFrames.DataFrame(name=String[], elType=String[], size=String[], unit=String[], info=String[])
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], sizeOrValue=String[], unit=String[], info=String[])
     series      = result.series
     vars        = result.var
 
     for key in sort( collect( keys(series) ) )
         value = series[key]
         var   = vars[Symbol(key)]
-        push!(resultTable, [key, string( typeof(value[1]) ), sizeToString(value), var.unit, var.info] )
+        tsize = ndims(value) > 0 ? sizeToString( value ) : string( value )
+        push!(resultTable, [key, string( typeof(value[1]) ), tsize, var.unit, var.info] )
     end
     return resultTable
 end
