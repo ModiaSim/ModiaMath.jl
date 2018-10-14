@@ -112,8 +112,14 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
     if ysig == nothing
         return (nothing, nothing, nothing, nothing) 
     end
-    
-    if ndims(ysig) == 1
+  
+    if ndims(ysig) == 0 
+        # ysig is a scalar
+        # Construct a constant time series with two points at the first and the last value of the time vector
+        ysigLegend = [appendUnit(yName, string(unit(ysig)))]
+        xsig = [xsig[1], xsig[end]]
+        ysig = [ysig   , ysig     ]
+    elseif ndims(ysig) == 1
         # ysig is a vector
         ysigLegend = [appendUnit(yName, string(unit(ysig[1])))]
     elseif ndims(ysig) == 2
@@ -244,30 +250,7 @@ resultHeading(result::ResultWithVariables) = result.resultHeading
 
 function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis)
     seriesDict = result.series
-    (ysig, ykeyName, yNameAsString) = getSignal(seriesDict, string(name))
-    symbol_ykeyName = Symbol(ykeyName)
 
-    if ysig == nothing
-        return (nothing, nothing, nothing, nothing) 
-    end
-    
-    yvar = result.var[symbol_ykeyName]
-    if ndims(ysig) == 1
-        # ysig is a vector
-        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
-    else
-        # sig has more as one dimension
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            ysigLegend = Array{String}(undef, length(yvar.value))
-        else
-            ysigLegend = Array{String}(length(yvar.value))
-        end
-
-        for i in eachindex(yvar.value)
-            ysigLegend[i] = appendUnit(ModiaMath.indexToString(symbol_ykeyName, yvar.value, i), yvar.unit)
-        end
-    end
-    
     # Get x-axis signal
     (xsig, xkeyName, xName) = getSignal(seriesDict, string(xAxis))
     if xsig == nothing 
@@ -282,6 +265,41 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(xName, result.var[Symbol(xkeyName)].unit) : ""
+
+
+    # Get y-axis signal(s)
+    (ysig, ykeyName, yNameAsString) = getSignal(seriesDict, string(name))
+    symbol_ykeyName = Symbol(ykeyName)
+
+    if ysig == nothing
+        return (nothing, nothing, nothing, nothing) 
+    end
+    
+    yvar = result.var[symbol_ykeyName]
+    if ndims(ysig) == 0 
+        # ysig is a scalar
+        # Construct a constant time series with two points at the first and the last value of the time vector
+        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
+        xsig = [xsig[1], xsig[end]]
+        ysig = [ysig   , ysig     ]
+
+    elseif ndims(ysig) == 1
+        # ysig is a vector
+        ysigLegend = [appendUnit(yNameAsString, yvar.unit)]
+
+    else
+        # sig has more as one dimension
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            ysigLegend = Array{String}(undef, length(yvar.value))
+        else
+            ysigLegend = Array{String}(length(yvar.value))
+        end
+
+        for i in eachindex(yvar.value)
+            ysigLegend[i] = appendUnit(ModiaMath.indexToString(symbol_ykeyName, yvar.value, i), yvar.unit)
+        end
+    end
+    
     return (xsig, xsigLegend, ysig, ysigLegend)
 end
 
