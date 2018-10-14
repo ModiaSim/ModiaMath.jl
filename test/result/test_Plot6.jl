@@ -30,4 +30,8 @@ ModiaMath.plot(result, [ (:phi1,)           (:phi2, :w1);
                          (:phi1, :phi2, :w1)  (:w2,)     ], figure=6)   # 4 diagrams in form of a matrix
 ModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)                   # Plot w1=f(phi1) in one diagram
 
+
+# Print result variables
+println("\n... result variables = ", ModiaMath.resultTable(result))
+
 end

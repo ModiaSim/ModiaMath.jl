@@ -29,14 +29,16 @@ generates the following plot:
 module Result
 
 export getStringDictResult, SymbolDictResult, StringDictResult, ResultWithVariables
-export resultHeading, resultTimeSeries, plot
+export resultHeading, resultTimeSeries, resultTable, plot
 export RawResult, nResults, storeRawResult!
+
 
 
 # using/imports
 import ModiaMath
+import DataFrames
 using  Unitful
-using Requires
+using  Requires
 
 # Constants
 const headingSize = 10

@@ -33,6 +33,11 @@ ModiaMath.plot(result, :phi, xAxis=:w, heading="phi=f(w)", figure=3)
 println("\n... Next plot should give a warning:")
 ModiaMath.plot(result, :phi, xAxis=:xAxisNotDefined, heading="phi=f(w)", figure=4)
 
+# Print result variables
+println("\n... result variables = ", ModiaMath.resultTable(result))
+
+
+
 # Add new simulation result
 result["phi"]  = 1.2*result["phi"]
 result["phi2"] = 1.1*result["phi2"]

@@ -27,4 +27,7 @@ ModiaMath.plot(result, :phi, heading="Sine(time)")
 println("... Next plot should give a warning:")
 ModiaMath.plot(result, :SignalNotDefined, heading="Sine(time)", figure=2)
 
+# Print result variables
+println("\n... result variables = ", ModiaMath.resultTable(result))
+
 end

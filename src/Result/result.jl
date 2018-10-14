@@ -144,6 +144,80 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
 end
 
 
+sizeToString(value::Any)    = string( size(value) ) 
+sizeToString(value::Number) = ""
+
+"""
+    table = resultTable(result)
+
+Return the variables stored in `result` in form of a DataFrames table
+(which can then be printed/showed in various forms).
+
+`Base.show(io, result)` is defined to print `resultTable(result)`,
+in case result is of type ModiaMath.ResultWithVariables.
+
+# Examples
+```julia
+import ModiaMath
+using  Unitful
+
+t = range(0.0, stop=10.0, length=100)
+result = Dict{AbstractString,Any}()
+result["time"] = t * u"s";
+result["phi"]  = sin.(t)u"rad";
+
+# Print table of the variables that are stored in result
+println("result variables = ", ModiaMath.resultTable(result))
+
+# Results in
+result variables =
+│ Row │ name   │ elType  │ size   │ unit   │
+│     │ String │ String  │ String │ String │
+├─────┼────────┼─────────┼────────┼────────┤
+│ 1   │ phi    │ Float64 │ (100,) │ rad    │
+│ 2   │ time   │ Float64 │ (100,) │ s      │
+
+```
+
+"""
+function resultTable(result::StringDictAnyResult)
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], size=String[], unit=String[])
+
+    for key in sort( collect( keys(result) ) )
+        value = result[key]
+
+        # Determine unit as string (if columns have different units, provide unit per column)
+        strippedValue =  ustrip.(value) # Strip units from value
+        tvalue = typeof( strippedValue )
+        tsize  = sizeToString( strippedValue )
+        if tvalue <: Number
+            tunit = string( unit(value) )
+        elseif tvalue <: AbstractVector || (tvalue <: AbstractMatrix && size(value,2) == 1)
+            tunit = string( unit( value[1] ) )
+        elseif tvalue <: AbstractMatrix
+            tunit = string( unit( value[1] ) )
+            columnsHaveSameUnit = true
+            for i in 2:size(value,2)
+                if string( unit( value[1,i] ) ) != tunit 
+                    columnsHaveSameUnit = false
+                    break
+                end
+            end
+            if !columnsHaveSameUnit
+                tunit = "[" * tunit
+                for i in 2:size(value,2)
+                     tunit = tunit * ", " * string( unit( value[1,i] ) )
+                end
+                tunit = tunit * "]"
+            end 
+        else
+            tunit = "???"
+        end
+
+        push!(resultTable, [key, string( typeof(strippedValue[1]) ), tsize, tunit] )
+    end
+    return resultTable
+end
 
 
 """
@@ -210,6 +284,27 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
     xsigLegend = xLabel ? appendUnit(xName, result.var[Symbol(xkeyName)].unit) : ""
     return (xsig, xsigLegend, ysig, ysigLegend)
 end
+
+
+function resultTable(result::ResultWithVariables)
+    resultTable = DataFrames.DataFrame(name=String[], elType=String[], size=String[], unit=String[], info=String[])
+    series      = result.series
+    vars        = result.var
+
+    for key in sort( collect( keys(series) ) )
+        value = series[key]
+        var   = vars[Symbol(key)]
+        push!(resultTable, [key, string( typeof(value[1]) ), sizeToString(value), var.unit, var.info] )
+    end
+    return resultTable
+end
+
+
+function Base.show(io::IO, result::ResultWithVariables)
+    show(io, resultTable(result), summary=false, splitcols=true)
+end
+
+
 
 
 getHeading(result, heading) = heading != "" ? heading : resultHeading(result)
