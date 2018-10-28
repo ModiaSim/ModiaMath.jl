@@ -53,8 +53,8 @@ instead the instructions
 
 ## Documentation
 
-- [**STABLE**](https://ModiaSim.github.io/ModiaMath.jl/stable) &mdash; *documentation of the last released version.*
-- [**LATEST**](https://ModiaSim.github.io/ModiaMath.jl/latest) &mdash; *in-development version of the documentation.*
+- [**STABLE**](https://modiasim.github.io/ModiaMath.jl/stable/) &mdash; *documentation of the last released version.*
+- [**LATEST**](https://modiasim.github.io/ModiaMath.jl/latest/) &mdash; *in-development version of the documentation.*
 
 
 ## Use
