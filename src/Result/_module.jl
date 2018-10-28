@@ -59,12 +59,34 @@ include("plotResult_with_Nothing.jl")
 function __init__()
     if !Requires.isprecompiling()  
         @eval Main begin
+            pyplotAvailable = false
             try
                 import PyPlot
+                global pyplotAvailable = true
             catch
                 println("    PyPlot not available (plot commands will be ignored).\n",
                         "    Try to install PyPlot. See hints here:\n",
                         "    https://github.com/ModiaSim/ModiaMath.jl/wiki/Installing-PyPlot-in-a-robust-way.")
+            end
+
+            if pyplotAvailable
+                try
+                    import PyCall
+                catch
+                    println("... From ModiaMath: PyCall is added, since needed to set default options for PyPlot")
+                    import Pkg
+                    Pkg.add("PyCall")
+                    import PyCall       
+                end
+
+                rc = PyCall.PyDict(PyPlot.matplotlib["rcParams"])
+                rc["axes.formatter.limits"] = [-3,3]
+                rc["font.size"]        = 8.0
+                rc["lines.linewidth"]  = 1.0
+                rc["grid.linewidth"]   = 0.5 
+                rc["axes.grid"]        = true
+                rc["axes.titlesize"]   = "medium"
+                rc["figure.titlesize"] = "medium"
             end
         end
     end

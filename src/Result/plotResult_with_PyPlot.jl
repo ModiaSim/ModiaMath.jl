@@ -86,7 +86,7 @@ function plot(result, names::AbstractString; heading::AbstractString="", grid::B
     heading2 = getHeading(result, heading)
     
     if heading2 != "" && !reuse
-        PyPlot.title(heading2, size=headingSize)    # Python 2.7: fontsize; Python 3.x: size
+        PyPlot.title(heading2)    # Python 2.7: fontsize; Python 3.x: size
       #PyPlot.suptitle(heading, fontsize=12)
       #PyPlot.tight_layout()
       #PyPlot.subplots_adjust(top=0.88)
@@ -103,7 +103,7 @@ function plot(result, names::Tuple; heading::AbstractString="", grid::Bool=true,
     heading2 = getHeading(result, heading)
     
     if heading2 != "" && !reuse
-        PyPlot.title(heading2, size=headingSize)    # Python 2.7: fontsize; Python 3.x: size
+        PyPlot.title(heading2)    # Python 2.7: fontsize; Python 3.x: size
     end
 end
 
@@ -125,14 +125,14 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
             addPlot(result, names[i,j], grid, xLabel, xAxis2, prefix, reuse, maxLegend)
             k = k + 1
             if ncol == 1 && i == 1 && heading2 != "" && !reuse
-                PyPlot.title(heading2, size=headingSize)
+                PyPlot.title(heading2)
             end
         end
     end
 
     # Add overall heading in case of a matrix of diagrams (ncol > 1)
     if ncol > 1 && heading2 != "" && !reuse
-        PyPlot.suptitle(heading2, size=headingSize)
+        PyPlot.suptitle(heading2)
         #   PyPlot.tight_layout()
         #   PyPlot.subplots_adjust(top=0.88)
     end
