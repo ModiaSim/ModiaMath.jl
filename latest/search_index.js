@@ -33,11 +33,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "index.html#Version-0.2.5-1",
+    "page": "Home",
+    "title": "Version 0.2.5",
+    "category": "section",
+    "text": "ModiaMath result handling improved:\nThe result may contain single values (such as parameter J=0.1). When using plot(..) on such a result variable, a constant line is plotted between the first and the last point of the x-axis.\nNew function ModiaMath.resultTable(result) to transform the variable information in the result data structure in a DataFrames table   (containing variable name + type + size ) that can then be printed.\nNew functions ModiaMath.closeFigure(figure) and ModiaMath.closeAllFigures() to close a specific figure or close all figures.\nChanging some default options of PyPlot. In particular, (a) the labels on the x- and y-axis use exponential notation (e.g. 1e5), if the numbers are larger as 1e3 or smaller as 1e-3 (PyPlot default is 1e7 and 1e-7), (b) smaller fonts and linewidth are used. Default options are changed via PyCall. If PyCall is not in the Julia environment, PyCall is added."
+},
+
+{
     "location": "index.html#Version-0.2.4-1",
     "page": "Home",
     "title": "Version 0.2.4",
     "category": "section",
-    "text": "Non-backwards compatible change of ModiaMath.plot(..): The function was changed to only support result dictionaries of the type Dict{AbstractString,Any} to simplify implementation and maintenance and to use the identical dictionary type as in Modia.ModiaMath.plot(..) improved: (a) For the dictionary type used by Modia, all elements of a variable vector     are plotted by giving the variable name, or one specific element of the variable vector is plotted by giving     the name and the vector index. (b) A new keyword argument maxLegend=10 introduced: If the number of entries in a legend exceeds this number,     no legend is included in the plot. Note, the curves can still be identified by clicking in the tool bar of the     plot window on button Edit axis, curve ... (c) If the plot function is used in the wrong way (e.g. signals shall be plotted that are not in the result dictionary, or selecting a     variable vector as x-axis), warning messages are printed and the call is ignored.Dependent packages updated to their newest versions. Especially, warnings from Unitful do no longer occur, due to the update to version 0.12.0.Issue with PyPlot warnings fixed: When ModiaMath was used in another package (e.g. in Modia or Modia3D), strange warning messages appeared when importing it. This issue was fixed with the solution sketched in discourse."
+    "text": "Non-backwards compatible change of ModiaMath.plot(..): The function was changed to only support result dictionaries of the type Dict{AbstractString,Any} to simplify implementation and maintenance and to use the identical dictionary type as in Modia.ModiaMath.plot(..) improved:\nFor the dictionary type used by Modia, all elements of a variable vector are plotted by giving the variable name, or one specific element of the variable vector is plotted by giving the name and the vector index.\nA new keyword argument maxLegend=10 introduced: If the number of entries in a legend exceeds this number, no legend is included in the plot. Note, the curves can still be identified by clicking in the tool bar of the plot window on button Edit axis, curve ...\nIf the plot function is used in the wrong way (e.g. signals shall be plotted that are not in the result dictionary, or selecting a variable vector as x-axis), warning messages are printed and the call is ignored.Dependent packages updated to their newest versions. Especially, warnings from Unitful do no longer occur, due to the update to version 0.12.0.Issue with PyPlot warnings fixed: When ModiaMath was used in another package (e.g. in Modia or Modia3D), strange warning messages appeared when importing it. This issue was fixed with the solution sketched in discourse."
 },
 
 {
@@ -217,11 +225,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "lib/Result.html#ModiaMath.Result.closeAllFigures-Tuple{}",
+    "page": "Result",
+    "title": "ModiaMath.Result.closeAllFigures",
+    "category": "method",
+    "text": "ModiaMath.closeAllFigures()\n\nCloses all open figures.\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/Result.html#ModiaMath.Result.closeFigure-Tuple{Int64}",
+    "page": "Result",
+    "title": "ModiaMath.Result.closeFigure",
+    "category": "method",
+    "text": "ModiaMath.closeFigure(figure::Int)\n\nCloses figure with figure number figure.\n\n\n\n\n\n"
+},
+
+{
     "location": "lib/Result.html#ModiaMath.Result.plot-Tuple{Any,Symbol}",
     "page": "Result",
     "title": "ModiaMath.Result.plot",
     "category": "method",
     "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, \n               figure=1, prefix=\"\", reuse=false, maxLegend=10)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{AbstractString,Any}\nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or AbstractString).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\nprefix::AbstractString: String that is appended in front of every legend label (useful especially if reuse=true)\nreuse::Bool: If figure already exists and reuse=false, clear the figure before adding the plot.\nmaxLegend::Int: If the number of legend entries in one plot command > maxLegend, the legend is suppressed. All curves have still their names as labels. The curves can be inspected by their names by clicking in the toolbar of the plot on button Edit axis, curve .. and then on Curves.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{AbstractString,Any}(\n            \"time\" => t*u\"s\", \"phi1\" => sin.(t)u\"rad\"  , \"phi2\" => 0.5*sin.(t),\n                              \"w1\"   => cos.(t)u\"rad/s\", \"w2\"   => 0.6*cos.(t))\n\n# 1 signal in one diagram\n#   (legend = \"phi1 [rad]\")\nModiaMath.plot(result, :phi1)   \n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (\"phi1\", :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    \n\n# Append signal of the next simulation run to figure=1\n# (legend = \"Sim 2: phi1 [rad]\")\nresult[:phi1] = 0.5*result[:phi1]\nModiaMath.plot(result, :phi1, prefix=\"Sim 2: \", reuse=true)\n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/Result.html#ModiaMath.Result.resultTable-Tuple{Dict{AbstractString,Any}}",
+    "page": "Result",
+    "title": "ModiaMath.Result.resultTable",
+    "category": "method",
+    "text": "table = resultTable(result)\n\nReturn the variables stored in result in form of a DataFrames table (which can then be printed/showed in various forms).\n\nBase.show(io, result) is defined to print resultTable(result), in case result is of type ModiaMath.ResultWithVariables.\n\nExamples\n\nimport ModiaMath\nusing  Unitful\n\nt = range(0.0, stop=10.0, length=100)\nresult = Dict{AbstractString,Any}()\nresult[\"time\"] = t * u\"s\";\nresult[\"phi\"]  = sin.(t)u\"rad\";\n\n# Print table of the variables that are stored in result\nprintln(\"result variables = \", ModiaMath.resultTable(result))\n\n# Results in\nresult variables =\n│ Row │ name   │ elType  │ sizeOrValue   │ unit   │\n│     │ String │ String  │ String        │ String │\n├─────┼────────┼─────────┼───────────────┼────────┤\n│ 1   │ phi    │ Float64 │ (100,)        │ rad    │\n│ 2   │ time   │ Float64 │ (100,)        │ s      │\n\n\n\n\n\n\n"
 },
 
 {
@@ -597,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Variables",
     "title": "ModiaMath.Variables.print_ModelVariables",
     "category": "method",
-    "text": "table = print_ModelVariables(vars::ModelVariables)\n\nPrint all the variables in vars in form of DataFrames tables.\n\n\n\n\n\n"
+    "text": "table = print_ModelVariables(obj)\n\nPrint all the variables in obj in form of DataFrames tables. obj can be of type ModiaMath.ModelVariables or ModiaMath.SimulationModel.\n\n\n\n\n\n"
 },
 
 {
