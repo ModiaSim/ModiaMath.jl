@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/ModiaSim/ModiaMath.jl.svg?branch=master)](https://travis-ci.org/ModiaSim/ModiaMath.jl)
 [![AppVoyer](https://ci.appveyor.com/api/projects/status/github/ModiaSim/ModiaMath.jl?svg=true)](https://ci.appveyor.com/project/MartinOtter/modiamath-jl)
 [![codecov.io](http://codecov.io/github/ModiaSim/ModiaMath.jl/coverage.svg?branch=master)](http://codecov.io/github/ModiaSim/ModiaMath.jl?branch=master)
-[![Stable](https://img.shields.io/badge/docs-latest-blue.svg)](https://ModiaSim.github.io/ModiaMath.jl/stable)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ModiaSim.github.io/ModiaMath.jl/stable)
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://ModiaSim.github.io/ModiaMath.jl/latest)
 [![The MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/ModiaSim/ModiaMath.jl/blob/master/LICENSE.md)
 
