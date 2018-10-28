@@ -49,13 +49,18 @@ instead the instructions
 ### Version 0.2.5
 
 - ModiaMath result handling improved:
-  (a) The result may contain single values (such as parameter J=0.1).
-      When using plot(..) on such a result variable, a constant line is plotted
-      between the first and the last point of the xaxis.
-  (b) New function `ModiaMath.resultTable(result)` to transform the variable information
-      in the result data structure in a DataFrames table that can then be printed.
-  (c) New functions `ModiaMath.closeFigure(figure)` and
-      `ModiaMath.closeAllFigures()` to close a specific figure or close all figures.
+  * The result may contain single values (such as parameter J=0.1).
+    When using plot(..) on such a result variable, a constant line is plotted
+    between the first and the last point of the x-axis.
+  * New function `ModiaMath.resultTable(result)` to transform the variable information
+    in the result data structure in a DataFrames table  
+    (containing variable name + type + size ) that can then be printed.
+  * New functions `ModiaMath.closeFigure(figure)` and
+    `ModiaMath.closeAllFigures()` to close a specific figure or close all figures.
+  * Changing some default options of PyPlot. In particular, (a) the labels on the x- and y-axis
+    use exponential notation (e.g. 1e5), if the numbers are larger as 1e3 or smaller as 1e-3
+    (PyPlot default is 1e7 and 1e-7), (b) smaller fonts and linewidth are used.
+    Default options are changed via PyCall. If PyCall is not in the Julia environment, PyCall is added.
 
 
 ### Version 0.2.4
@@ -65,14 +70,14 @@ instead the instructions
   simplify implementation and maintenance and to use the identical dictionary type as in Modia.
 
 - ModiaMath.plot(..) improved:
-  (a) For the dictionary type used by Modia, all elements of a variable vector
-      are plotted by giving the variable name, or one specific element of the variable vector is plotted by giving
-      the name and the vector index.
-  (b) A new keyword argument `maxLegend=10` introduced: If the number of entries in a legend exceeds this number,
-      no legend is included in the plot. Note, the curves can still be identified by clicking in the tool bar of the
-      plot window on button `Edit axis, curve ..`.
-  (c) If the plot function is used in the wrong way (e.g. signals shall be plotted that are not in the result dictionary, or selecting a
-      variable vector as x-axis), warning messages are printed and the call is ignored.
+  * For the dictionary type used by Modia, all elements of a variable vector
+    are plotted by giving the variable name, or one specific element of the variable vector is plotted by giving
+    the name and the vector index.
+  * A new keyword argument `maxLegend=10` introduced: If the number of entries in a legend exceeds this number,
+    no legend is included in the plot. Note, the curves can still be identified by clicking in the tool bar of the
+    plot window on button `Edit axis, curve ..`.
+  * If the plot function is used in the wrong way (e.g. signals shall be plotted that are not in the result dictionary, or selecting a
+    variable vector as x-axis), warning messages are printed and the call is ignored.
 
 - Dependent packages updated to their newest versions.
   Especially, warnings from Unitful do no longer occur, due to the update to version 0.12.0.
