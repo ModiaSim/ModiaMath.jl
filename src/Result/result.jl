@@ -103,7 +103,7 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(string(xAxis), string(unit(xsig[1]))) : ""
-    xsig       = ustrip.(xsig)
+    xsig       = convert.(Float64, ustrip.(xsig))
 
 
     # Get y-axis signals
@@ -143,7 +143,7 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
 
-    ysig = ustrip.(ysig)
+    ysig = convert.(Float64, ustrip.(ysig))
 
 
     return (xsig, xsigLegend, ysig, ysigLegend)
@@ -193,7 +193,7 @@ function resultTable(result::StringDictAnyResult)
         value = result[key]
 
         # Determine unit as string (if columns have different units, provide unit per column)
-        strippedValue =  ustrip.(value) # Strip units from value
+        strippedValue = ustrip.(value) # Strip units from value
         tvalue = typeof( strippedValue )
         tsize  = ndims(value) > 0 ? sizeToString( strippedValue ) : string( strippedValue )
         if tvalue <: Number

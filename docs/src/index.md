@@ -58,9 +58,14 @@ instead the instructions
   * New functions `ModiaMath.closeFigure(figure)` and
     `ModiaMath.closeAllFigures()` to close a specific figure or close all figures.
   * Changing some default options of PyPlot. In particular, (a) the labels on the x- and y-axis
-    use exponential notation (e.g. 1e5), if the numbers are larger as 1e3 or smaller as 1e-3
+    use exponential notation (e.g. 1e5), if the numbers are larger as 1e4 or smaller as 1e-3
     (PyPlot default is 1e7 and 1e-7), (b) smaller fonts and linewidth are used.
     Default options are changed via PyCall. If PyCall is not in the Julia environment, PyCall is added.
+  * If a vector or matrix of subplots is defined, then the x-axis labels
+    are only displayed for the last subplot row.
+  * Result data is always converted to Float64 before passing it to PyPlot.
+    Therefore, Julia numbers can be plotted, even if the types of the numbers are not supported by PyPlot
+    (for example rational numbers can be plotted).
 
 
 ### Version 0.2.4

@@ -16,9 +16,12 @@ Units can be either added by using package `Unitful` if result is just a diction
 can be added by using package `ModiaMath.Result`, where units are defined as elements
 of the variable definition. 
 
+
 # Arguments
 Argument `result` maybe one of the following:
-- A dictionary `Dict{AbstractString,Any}`
+- A dictionary `Dict{AbstractString,Any}`. Note, before passing data to the plot package,
+  it is converted to Float64. This allows to, for example, also plot rational numbers,
+  even if not supported by the plot package.
 - An instance of struct [`ModiaMath.Result`](@ref)
 - An object for which function [`ModiaMath.resultTimeSeries`](@ref) is defined.
 

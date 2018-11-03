@@ -121,7 +121,11 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
     for i = 1:nrow
         xLabel = i == nrow
         for j = 1:ncol
-            PyPlot.subplot(nrow, ncol, k)
+            ax=PyPlot.subplot(nrow, ncol, k)
+            if !xLabel
+                # Remove xaxis tick labels, if not the last row
+                ax[:set_xticklabels]([])
+            end
             addPlot(result, names[i,j], grid, xLabel, xAxis2, prefix, reuse, maxLegend)
             k = k + 1
             if ncol == 1 && i == 1 && heading2 != "" && !reuse

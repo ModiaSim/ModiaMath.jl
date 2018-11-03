@@ -80,7 +80,7 @@ function __init__()
                 end
 
                 rc = PyCall.PyDict(PyPlot.matplotlib["rcParams"])
-                rc["axes.formatter.limits"] = [-3,3]
+                rc["axes.formatter.limits"] = [-3,4]
                 rc["font.size"]        = 8.0
                 rc["lines.linewidth"]  = 1.0
                 rc["grid.linewidth"]   = 0.5 

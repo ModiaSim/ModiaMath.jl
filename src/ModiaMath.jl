@@ -59,6 +59,19 @@ For more information, see (https://github.com/ModiaSim/ModiaMath.jl/blob/master/
 """
 module ModiaMath
 
+"""
+    const path
+
+Absolute path of package directory of ModiaMath
+"""
+const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
+const Time = Float64   # Prepare for later Integer type of time
+const Version = "0.2.5-dev from 2018-11-03 07:00"
+
+println(" \nImporting ModiaMath version ", Version)
+
+
+
 # Exported symbols
 export @component
 export RealVariable, RealScalar, RealSVector, RealSVector3
@@ -103,16 +116,7 @@ A real [`ModiaMath.AbstractVariable`](@ref) (either scalar or array)
 abstract type AbstractRealVariable <: AbstractVariable end
 
 
-"""
-    const path
 
-Absolute path of package directory of ModiaMath
-"""
-const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
-const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.2.5-dev from 2018-10-28 08:47"
-
-println(" \nImporting ModiaMath version ", Version)
 
 
 getVariableAndResidueValues(extraInfo::Any) = nothing    # Return a variable value and a residue value table of nonlinear solver (for error message)
