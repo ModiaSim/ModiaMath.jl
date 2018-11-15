@@ -78,15 +78,28 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
 
         if typeof(simulationModel) <: ModiaMath.AbstractSimulationModel
             simState = simulationModel.simulationState
+            x_names     = String[simState.getVariableName(simState.model, ModiaMath.DAE.Category_X, i)  for i = 1:simState.nx]
+
             str2 = string(simState.name) * ": time = " * string(simState.time) *
                  ", stepsize of implicit Euler step = " * string(simState.hev) *
                  ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
                  (simState.nonlinearEquationsMode == 1 ? "\nGoal: compute consistent x." :
                   simState.nonlinearEquationsMode == 2 ? "\nGoal: compute consistent der(x)." : "") *
-                 "\nx_start  = " * string(eqInfo.y0) *
-                 "\nx        = " * string(simState.xev) *
-                 "\nderx     = " * string(simState.derxev) *
-                 "\nresidues = " * string(simState.residues)
+                 "\nx_names     = " * string(x_names) *
+                 "\nx_start     = " * string(eqInfo.y0) *
+                 "\nx_fixed     = " * string(simState.x_fixed) *
+                 "\nx           = " * string(simState.xev) *
+                 "\nderx        = " * string(simState.derxev) *
+                 "\nresidues    = " * string(simState.residues) * 
+                 "\nnx          = " * string(simState.nx) *
+                 "\nnd          = " * string(simState.nd) *
+                 "\nnc          = " * string(simState.nc) *
+                 "\nnw          = " * string(simState.nw) *
+                 "\nnz          = " * string(simState.nz) *
+                 "\nuse_x_fixed = " * string(simState.use_x_fixed) *
+                 "\ntolerance   = " * string(simState.tolerance) *
+                 "\nFTOL        = " * string(simState.FTOL)
+
         else
             str2 = ""
         end
