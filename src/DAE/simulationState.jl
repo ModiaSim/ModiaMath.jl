@@ -402,7 +402,7 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     sim.eqInfo.extraInfo = model
     sim.rawResult = ModiaMath.RawResult(nt, sim.getResultNames(model))
     sim.model     = model
-    sim.FTOL      = sim.tolerance    # eps(Float64)^(1 / 3)   # residue tolerance for nonlinear solver
+    sim.FTOL      = max(sim.tolerance, eps(Float64)^(1 / 3))   # eps(Float64)^(1 / 3)   # residue tolerance for nonlinear solver
     # println("... FTOL = ", sim.FTOL)
     sim.initialization = true
 
