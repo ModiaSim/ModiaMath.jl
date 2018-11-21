@@ -144,7 +144,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     sim.tolerance = isnan(tolerance) ? sim.defaultTolerance : convert(Float64, tolerance)
     sim.startTime = isnan(startTime) ? sim.defaultStartTime : convert(Float64, startTime)
     sim.stopTime  = isnan(stopTime)  ? sim.defaultStopTime  : convert(Float64, stopTime)
-    sim.interval  = isnan(interval)  ? sim.defaultInterval  : convert(Float64, interval)
+    sim.interval  = isnan(interval)  ? (isnan(sim.defaultInterval) ? (sim.stopTime - sim.startTime)/500.0 : sim.defaultInterval)  : convert(Float64, interval)
     sim.time      = sim.startTime
     @assert(sim.stopTime >= sim.startTime)
     @assert(sim.interval >= 0.0)

@@ -142,7 +142,7 @@ mutable struct SimulationState
                             defaultTolerance=1e-4, 
                             defaultStartTime=0.0,
                             defaultStopTime=1.0, 
-                            defaultInterval=(defaultStopTime - defaultStartTime) / 500.0)
+                            defaultInterval=NaN)
   
         # Check input arguments                                        
         @assert(nc >= 0)
@@ -170,7 +170,7 @@ mutable struct SimulationState
         @assert(0.0 <= maxSparsity <= 1.0)
         @assert(defaultTolerance > 0.0)
         @assert(defaultStopTime >= defaultStartTime)
-        @assert(defaultInterval > 0.0)
+        @assert(isnan(defaultInterval) || defaultInterval > 0.0)
 
         # Compute utility elements
         nd = nx - nc
