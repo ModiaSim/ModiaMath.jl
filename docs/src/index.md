@@ -46,7 +46,32 @@ instead the instructions
 
 ## Release Notes
 
+### Version 0.2.6-dev
+
+- ModiaMath initialization and simulation improved:
+  * Issue with defaultInterval fixed: 
+    Previously: defaultInterval = (defaultStopTime - defaultStartTime)/500.0. However, if stopTime 
+    was set to 10e5, then the defaultInterval was much too small. This was changed so that
+    defaultInterval is either explicitly given, or it is computed from the actual values of StopTime and StartTime.
+  * x\_nominal introduced in constructor of simulation state (DAE.SimulationState) and of
+    Modia interface (ModiaToModiaMath.ModiaSimulationModel):
+    If x\_nominal is explicitly provided in these constructor calls, it is used.
+    Otherwise `x_nominal[i]` is set to `max(abs(x_start[i]), 1e-7)`.
+  * x\_nominal is newly used in KINSOL to scale the unknowns and 
+    is used to compute the absolute tolerance for Sundials IDA.
+  * A bug was corrected in the initialization function, where rScale was reported to KINSOL,
+    but was also used for scaling of the residue (although this is performed in KINSOL).
+    
+
+
 ### Version 0.2.5
+
+- ModiaMath initialization improved:
+  * KINSOL tolerance FTOL takes IDA tolerance into acount.
+  * More information about the model is provided in case KINSOL fails.
+
+- Interface to Modia improved:
+  New keyword option hev (step size used for implicit Euler during initialization and at events) added to "simulate".
 
 - ModiaMath result handling improved:
   * The result may contain single values (such as parameter J=0.1).

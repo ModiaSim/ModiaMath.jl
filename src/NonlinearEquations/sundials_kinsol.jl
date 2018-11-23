@@ -88,6 +88,9 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
                  "\nx_names     = " * string(x_names) *
                  "\nx_start     = " * string(eqInfo.y0) *
                  "\nx_fixed     = " * string(simState.x_fixed) *
+                 "\nx_nominal   = " * string(simState.x_nominal) *
+                 "\nx_yScale    = " * string(simState.yScale) *
+                 "\nx_rScale    = " * string(simState.rScale) *
                  "\nx           = " * string(simState.xev) *
                  "\nderx        = " * string(simState.derxev) *
                  "\nresidues    = " * string(simState.residues) * 
