@@ -109,6 +109,7 @@ mutable struct SimulationState
     yNonlinearSolver::Vector{Float64}
     derxev::Vector{Float64}
     residues::Vector{Float64}
+    yScale::Vector{Float64}
     rScale::Vector{Float64}
     tev::Float64
     hev::Float64
@@ -130,7 +131,8 @@ mutable struct SimulationState
                             nz=0,
                             nw=0,
                             zDir::Vector{Int}=fill(0, nz),                   
-                            x_fixed::Vector{Bool}=fill(false, length(x_start)),                                                      
+                            x_fixed::Vector{Bool}=fill(false, length(x_start)),   
+                            x_nominal::Vector{Float64}=fill(NaN, length(x_start)),                                                   
                             x_errorControl::Vector{Bool}=fill(true, length(x_start)),
                             hev=1e-8,
                             scaleConstraintsAtEvents::Bool=true,               
@@ -142,7 +144,7 @@ mutable struct SimulationState
                             defaultTolerance=1e-4, 
                             defaultStartTime=0.0,
                             defaultStopTime=1.0, 
-                            defaultInterval=(defaultStopTime - defaultStartTime) / 500.0)
+                            defaultInterval=NaN)
   
         # Check input arguments                                        
         @assert(nc >= 0)
@@ -170,7 +172,24 @@ mutable struct SimulationState
         @assert(0.0 <= maxSparsity <= 1.0)
         @assert(defaultTolerance > 0.0)
         @assert(defaultStopTime >= defaultStartTime)
-        @assert(defaultInterval > 0.0)
+        @assert(isnan(defaultInterval) || defaultInterval > 0.0)
+
+        # Compute nominal values
+        x_nominal2 = ones(nx)
+        for i in 1:nx
+            if isnan( x_nominal[i] )
+                if abs(x_start[i]) > 1e-7
+                    x_nominal2[i] = abs(x_start[i])
+                end
+            else
+                x_nominal2[i] = x_nominal[i]
+            end
+        end
+
+        yScale = ones(nx)
+        for i = 1:nx
+            yScale[i] = 1/x_nominal2[i]
+        end
 
         # Compute utility elements
         nd = nx - nc
@@ -195,9 +214,9 @@ mutable struct SimulationState
             defaultInterval, NaN, ModiaMath.Logger(),
             ModiaMath.SimulationStatistics(nx, sparse, sparse ? cg.ngroups : 0),
             NaN, NaN, NaN, NaN,
-            x_start, x_fixed, ones(nx), x_errorControl, zeros(nw),  
+            x_start, x_fixed, x_nominal2, x_errorControl, zeros(nw),  
             eqInfo, 0, zeros(nx), zeros(nx), zeros(nx),
-            zeros(nx), zeros(nx), zeros(nx), ones(nx), 0.0, hev, 0.0, 
+            zeros(nx), zeros(nx), zeros(nx), yScale, ones(nx), 0.0, hev, 0.0, 
             scaleConstraintsAtEvents, false, false, false)
     end
 end
@@ -239,6 +258,7 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
     Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev, residues, sim.w)  
                               
    # Copy to eq-residues and scale with h
+#=
     if sim.scaleConstraintsAtEvents
         for i = 1:sim.nd
             r[i] = residues[i]
@@ -248,10 +268,11 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
             r[i] = residues[i] / hev
         end
     else
+=#
         for i = 1:sim.nx
             r[i] = residues[i]
         end
-    end
+#    end
     eqInfo.lastNorm_r = norm(r, Inf)
     eqInfo.lastrScaledNorm_r = norm(sim.rScale .* r, Inf)
    
@@ -294,7 +315,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsisten
         end
 
         sim.nonlinearEquationsMode = 1
-        ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; rScale=sim.rScale, FTOL=sim.FTOL)
+        ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; yScale=sim.yScale, rScale=sim.rScale, FTOL=sim.FTOL)
         sim.use_x_fixed = false
       
         # Copy result to sim.xev
@@ -341,7 +362,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsisten
     end
       
     sim.nonlinearEquationsMode = 2
-    ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; rScale=sim.rScale, FTOL=sim.FTOL) 
+    ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; yScale=sim.yScale, rScale=sim.rScale, FTOL=sim.FTOL) 
     sim.nonlinearEquationsMode = 0
 end
 
@@ -409,7 +430,7 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     # Initialize auxiliary arrays for event iteration   
     # println("... initialize!: scaleConstraintsAtEvents = ", sim.scaleConstraintsAtEvents, ", nc = ", sim.nc, ", nd = ", sim.nd)
     for i in eachindex(sim.xev),
-      sim.xev[i]    = sim.x_start[i]
+        sim.xev[i]    = sim.x_start[i]
         sim.derxev[i] = 0.0
     end
 
@@ -425,7 +446,16 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
             sim.rScale[i] = 1.0
         end
     end
+
+    # Determine meaningful scaling for residue
+    #   sim.time = sim.tev
+    #  Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev, sim.residues, sim.w) 
+    #  for i in eachindex(sim.rScale)
+    #    sim.rScale[i] = abs(sim.residues[i]) > 1.0 ? abs(sim.residues[i]) : 1.0
+    #  end
     # println("... initialize!: rScale = ", sim.rScale)
+    # println("                 yScale = ", sim.yScale)
+
    
     # Perform initial event iteration
     eventIteration!(model, sim, t0)

@@ -15,13 +15,13 @@ natively in ModiaMath in the following way:
   @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81) begin
      phi = RealScalar(start=pi/2, unit="rad"    , fixed=true,               numericType=ModiaMath.XD_EXP)
      w   = RealScalar(start=0.0 , unit="rad/s"  , fixed=true, integral=phi, numericType=ModiaMath.XD_EXP)
-     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP) 
+     a   = RealScalar(            unit="rad/s^2",             integral=w  , numericType=ModiaMath.DER_XD_EXP)
      r   = RealSVector{2}(        unit="m"      ,                           numericType=ModiaMath.WC)
   end;
 
-  function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState)  
+  function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState)
      L = p.L; m = p.m; d = p.d; g = p.g; phi = p.phi.value; w = p.w.value
-   
+
      p.a.value = (-m*g*L*sin(phi) - d*w) / (m*L^2)
 
      if ModiaMath.isStoreResult(sim)
@@ -66,7 +66,7 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.2.5 from 2018-11-15 11:51"
+const Version = "0.2.6-dev from 2018-11-23 14:52"
 
 println(" \nImporting ModiaMath version ", Version)
 
@@ -102,7 +102,7 @@ abstract type AbstractComponentInternal end
 """
     type ModiaMath.AbstractVariable <: ModiMath.AbstractComponentWithVariables
 
-A Variable used as element of the DAE model description and is 
+A Variable used as element of the DAE model description and is
 included in the result (if no residue)
 """
 abstract type AbstractVariable <: AbstractComponentWithVariables end
@@ -157,7 +157,7 @@ using .ModiaToModiaMath
 
 
 # Import packages that are used in examples and tests
-# (in order that there are no requirements on the environment 
+# (in order that there are no requirements on the environment
 #  in which the examples and tests are executed).
 import DataFrames
 import StaticArrays
@@ -170,4 +170,4 @@ end
 
 
 
-end # module 
+end # module
