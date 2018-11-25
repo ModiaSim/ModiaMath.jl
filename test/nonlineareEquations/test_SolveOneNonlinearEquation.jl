@@ -12,11 +12,10 @@ import ModiaMath
     using Base.Test
 else
     using ModiaMath.Test
-    using ModiaMath.LinearAlgebra
+    @eval using Printf
 end
 
 using ModiaMath: solveOneNonlinearEquation
-using Printf
 
 
 @testset "ModiaMath.NonlinearEquations: test solveOneNonlinearEquation" begin 
