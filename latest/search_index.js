@@ -1,7 +1,7 @@
 var documenterSearchIndex = {"docs": [
 
 {
-    "location": "#",
+    "location": "index.html#",
     "page": "Home",
     "title": "Home",
     "category": "page",
@@ -9,7 +9,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#ModiaMath.jl-Documentation-1",
+    "location": "index.html#ModiaMath.jl-Documentation-1",
     "page": "Home",
     "title": "ModiaMath.jl Documentation",
     "category": "section",
@@ -17,7 +17,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Installation-1",
+    "location": "index.html#Installation-1",
     "page": "Home",
     "title": "Installation",
     "category": "section",
@@ -25,7 +25,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Release-Notes-1",
+    "location": "index.html#Release-Notes-1",
     "page": "Home",
     "title": "Release Notes",
     "category": "section",
@@ -33,7 +33,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.6-dev-1",
+    "location": "index.html#Version-0.2.6-dev-1",
     "page": "Home",
     "title": "Version 0.2.6-dev",
     "category": "section",
@@ -41,7 +41,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.5-1",
+    "location": "index.html#Version-0.2.5-1",
     "page": "Home",
     "title": "Version 0.2.5",
     "category": "section",
@@ -49,7 +49,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.4-1",
+    "location": "index.html#Version-0.2.4-1",
     "page": "Home",
     "title": "Version 0.2.4",
     "category": "section",
@@ -57,7 +57,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.3-1",
+    "location": "index.html#Version-0.2.3-1",
     "page": "Home",
     "title": "Version 0.2.3",
     "category": "section",
@@ -65,7 +65,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.2-1",
+    "location": "index.html#Version-0.2.2-1",
     "page": "Home",
     "title": "Version 0.2.2",
     "category": "section",
@@ -73,7 +73,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.1-1",
+    "location": "index.html#Version-0.2.1-1",
     "page": "Home",
     "title": "Version 0.2.1",
     "category": "section",
@@ -81,7 +81,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "#Version-0.2.0-1",
+    "location": "index.html#Version-0.2.0-1",
     "page": "Home",
     "title": "Version 0.2.0",
     "category": "section",
@@ -89,7 +89,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#",
+    "location": "man/Overview.html#",
     "page": "Overview",
     "title": "Overview",
     "category": "page",
@@ -97,7 +97,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#Overview-1",
+    "location": "man/Overview.html#Overview-1",
     "page": "Overview",
     "title": "Overview",
     "category": "section",
@@ -105,7 +105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#Mathematical-Description-1",
+    "location": "man/Overview.html#Mathematical-Description-1",
     "page": "Overview",
     "title": "Mathematical Description",
     "category": "section",
@@ -113,7 +113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#Getting-Started-1",
+    "location": "man/Overview.html#Getting-Started-1",
     "page": "Overview",
     "title": "Getting Started",
     "category": "section",
@@ -121,7 +121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#To-define-a-model-1",
+    "location": "man/Overview.html#To-define-a-model-1",
     "page": "Overview",
     "title": "To define a model",
     "category": "section",
@@ -129,7 +129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#To-simulate-a-model-and-plot-results:-1",
+    "location": "man/Overview.html#To-simulate-a-model-and-plot-results:-1",
     "page": "Overview",
     "title": "To simulate a model and plot results:",
     "category": "section",
@@ -137,7 +137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#To-run-examples-and-tests:-1",
+    "location": "man/Overview.html#To-run-examples-and-tests:-1",
     "page": "Overview",
     "title": "To run examples and tests:",
     "category": "section",
@@ -145,7 +145,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Overview/#Package-structure-1",
+    "location": "man/Overview.html#Package-structure-1",
     "page": "Overview",
     "title": "Package structure",
     "category": "section",
@@ -153,7 +153,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Plans/#",
+    "location": "man/Plans.html#",
     "page": "Plans for version 1.0",
     "title": "Plans for version 1.0",
     "category": "page",
@@ -161,7 +161,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "man/Plans/#Plans-for-version-1.0-1",
+    "location": "man/Plans.html#Plans-for-version-1.0-1",
     "page": "Plans for version 1.0",
     "title": "Plans for version 1.0",
     "category": "section",
@@ -169,7 +169,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/SimulationEngine/#",
+    "location": "lib/SimulationEngine.html#",
     "page": "SimulationEngine",
     "title": "SimulationEngine",
     "category": "page",
@@ -177,7 +177,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/SimulationEngine/#ModiaMath.SimulationEngine",
+    "location": "lib/SimulationEngine.html#ModiaMath.SimulationEngine",
     "page": "SimulationEngine",
     "title": "ModiaMath.SimulationEngine",
     "category": "module",
@@ -185,7 +185,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/SimulationEngine/#ModiaMath.SimulationEngine.simulate!-Tuple{ModiaMath.AbstractSimulationModel}",
+    "location": "lib/SimulationEngine.html#ModiaMath.SimulationEngine.simulate!-Tuple{ModiaMath.AbstractSimulationModel}",
     "page": "SimulationEngine",
     "title": "ModiaMath.SimulationEngine.simulate!",
     "category": "method",
@@ -193,7 +193,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/SimulationEngine/#SimulationEngine-1",
+    "location": "lib/SimulationEngine.html#SimulationEngine-1",
     "page": "SimulationEngine",
     "title": "SimulationEngine",
     "category": "section",
@@ -201,7 +201,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#",
+    "location": "lib/Result.html#",
     "page": "Result",
     "title": "Result",
     "category": "page",
@@ -209,7 +209,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result",
+    "location": "lib/Result.html#ModiaMath.Result",
     "page": "Result",
     "title": "ModiaMath.Result",
     "category": "module",
@@ -217,7 +217,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.RawResult",
+    "location": "lib/Result.html#ModiaMath.Result.RawResult",
     "page": "Result",
     "title": "ModiaMath.Result.RawResult",
     "category": "type",
@@ -225,7 +225,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.ResultWithVariables",
+    "location": "lib/Result.html#ModiaMath.Result.ResultWithVariables",
     "page": "Result",
     "title": "ModiaMath.Result.ResultWithVariables",
     "category": "type",
@@ -233,7 +233,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.closeAllFigures-Tuple{}",
+    "location": "lib/Result.html#ModiaMath.Result.closeAllFigures-Tuple{}",
     "page": "Result",
     "title": "ModiaMath.Result.closeAllFigures",
     "category": "method",
@@ -241,7 +241,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.closeFigure-Tuple{Int64}",
+    "location": "lib/Result.html#ModiaMath.Result.closeFigure-Tuple{Int64}",
     "page": "Result",
     "title": "ModiaMath.Result.closeFigure",
     "category": "method",
@@ -249,7 +249,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.plot-Tuple{Any,Symbol}",
+    "location": "lib/Result.html#ModiaMath.Result.plot-Tuple{Any,Symbol}",
     "page": "Result",
     "title": "ModiaMath.Result.plot",
     "category": "method",
@@ -257,7 +257,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.resultTable-Tuple{Dict{AbstractString,Any}}",
+    "location": "lib/Result.html#ModiaMath.Result.resultTable-Tuple{Dict{AbstractString,Any}}",
     "page": "Result",
     "title": "ModiaMath.Result.resultTable",
     "category": "method",
@@ -265,7 +265,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#ModiaMath.Result.resultTimeSeries-Tuple{Dict{AbstractString,Any},Any,Bool,Any}",
+    "location": "lib/Result.html#ModiaMath.Result.resultTimeSeries-Tuple{Dict{AbstractString,Any},Any,Bool,Any}",
     "page": "Result",
     "title": "ModiaMath.Result.resultTimeSeries",
     "category": "method",
@@ -273,7 +273,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Result/#Result-1",
+    "location": "lib/Result.html#Result-1",
     "page": "Result",
     "title": "Result",
     "category": "section",
@@ -281,7 +281,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#",
+    "location": "lib/DAE.html#",
     "page": "DAE",
     "title": "DAE",
     "category": "page",
@@ -289,7 +289,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE",
+    "location": "lib/DAE.html#ModiaMath.DAE",
     "page": "DAE",
     "title": "ModiaMath.DAE",
     "category": "module",
@@ -297,7 +297,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.EventRestart",
+    "location": "lib/DAE.html#ModiaMath.DAE.EventRestart",
     "page": "DAE",
     "title": "ModiaMath.DAE.EventRestart",
     "category": "type",
@@ -305,7 +305,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.change!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
+    "location": "lib/DAE.html#ModiaMath.DAE.change!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
     "page": "DAE",
     "title": "ModiaMath.DAE.change!",
     "category": "method",
@@ -313,7 +313,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.edge!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
+    "location": "lib/DAE.html#ModiaMath.DAE.edge!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
     "page": "DAE",
     "title": "ModiaMath.DAE.edge!",
     "category": "method",
@@ -321,7 +321,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.getStartTime-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.getStartTime-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.getStartTime",
     "category": "method",
@@ -329,7 +329,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.getStopTime-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.getStopTime-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.getStopTime",
     "category": "method",
@@ -337,7 +337,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.getTime-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.getTime-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.getTime",
     "category": "method",
@@ -345,7 +345,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.getTolerance-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.getTolerance-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.getTolerance",
     "category": "method",
@@ -353,7 +353,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isAfterSimulationStart-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isAfterSimulationStart-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isAfterSimulationStart",
     "category": "method",
@@ -361,7 +361,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isEvent-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isEvent-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isEvent",
     "category": "method",
@@ -369,7 +369,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isInitial-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isInitial-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isInitial",
     "category": "method",
@@ -377,7 +377,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isStoreResult-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isStoreResult-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isStoreResult",
     "category": "method",
@@ -385,7 +385,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isTerminal-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isTerminal-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isTerminal",
     "category": "method",
@@ -393,7 +393,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.isZeroCrossing-Tuple{ModiaMath.DAE.SimulationState}",
+    "location": "lib/DAE.html#ModiaMath.DAE.isZeroCrossing-Tuple{ModiaMath.DAE.SimulationState}",
     "page": "DAE",
     "title": "ModiaMath.DAE.isZeroCrossing",
     "category": "method",
@@ -401,7 +401,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.negative!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
+    "location": "lib/DAE.html#ModiaMath.DAE.negative!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
     "page": "DAE",
     "title": "ModiaMath.DAE.negative!",
     "category": "method",
@@ -409,7 +409,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.positive!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
+    "location": "lib/DAE.html#ModiaMath.DAE.positive!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
     "page": "DAE",
     "title": "ModiaMath.DAE.positive!",
     "category": "method",
@@ -417,7 +417,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.setNextEvent!-Tuple{ModiaMath.DAE.SimulationState,Float64}",
+    "location": "lib/DAE.html#ModiaMath.DAE.setNextEvent!-Tuple{ModiaMath.DAE.SimulationState,Float64}",
     "page": "DAE",
     "title": "ModiaMath.DAE.setNextEvent!",
     "category": "method",
@@ -425,7 +425,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#ModiaMath.DAE.setNominal!-Tuple{ModiaMath.DAE.SimulationState,Array{Float64,1}}",
+    "location": "lib/DAE.html#ModiaMath.DAE.setNominal!-Tuple{ModiaMath.DAE.SimulationState,Array{Float64,1}}",
     "page": "DAE",
     "title": "ModiaMath.DAE.setNominal!",
     "category": "method",
@@ -433,7 +433,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/DAE/#DAE-1",
+    "location": "lib/DAE.html#DAE-1",
     "page": "DAE",
     "title": "DAE",
     "category": "section",
@@ -441,7 +441,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/NonlinearEquations/#",
+    "location": "lib/NonlinearEquations.html#",
     "page": "NonlinearEquations",
     "title": "NonlinearEquations",
     "category": "page",
@@ -449,7 +449,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/NonlinearEquations/#ModiaMath.NonlinearEquations",
+    "location": "lib/NonlinearEquations.html#ModiaMath.NonlinearEquations",
     "page": "NonlinearEquations",
     "title": "ModiaMath.NonlinearEquations",
     "category": "module",
@@ -457,7 +457,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/NonlinearEquations/#ModiaMath.NonlinearEquations.solveOneNonlinearEquation-Tuple{Function,Any,Any}",
+    "location": "lib/NonlinearEquations.html#ModiaMath.NonlinearEquations.solveOneNonlinearEquation-Tuple{Function,Any,Any}",
     "page": "NonlinearEquations",
     "title": "ModiaMath.NonlinearEquations.solveOneNonlinearEquation",
     "category": "method",
@@ -465,7 +465,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/NonlinearEquations/#ModiaMath.NonlinearEquations.KINSOL",
+    "location": "lib/NonlinearEquations.html#ModiaMath.NonlinearEquations.KINSOL",
     "page": "NonlinearEquations",
     "title": "ModiaMath.NonlinearEquations.KINSOL",
     "category": "module",
@@ -473,7 +473,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/NonlinearEquations/#NonlinearEquations-1",
+    "location": "lib/NonlinearEquations.html#NonlinearEquations-1",
     "page": "NonlinearEquations",
     "title": "NonlinearEquations",
     "category": "section",
@@ -481,7 +481,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#",
+    "location": "lib/Variables.html#",
     "page": "Variables",
     "title": "Variables",
     "category": "page",
@@ -489,7 +489,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables",
+    "location": "lib/Variables.html#ModiaMath.Variables",
     "page": "Variables",
     "title": "ModiaMath.Variables",
     "category": "module",
@@ -497,7 +497,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.AnalysisType",
+    "location": "lib/Variables.html#ModiaMath.Variables.AnalysisType",
     "page": "Variables",
     "title": "ModiaMath.Variables.AnalysisType",
     "category": "type",
@@ -505,7 +505,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.Causality",
+    "location": "lib/Variables.html#ModiaMath.Variables.Causality",
     "page": "Variables",
     "title": "ModiaMath.Variables.Causality",
     "category": "type",
@@ -513,7 +513,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.ModelVariables",
+    "location": "lib/Variables.html#ModiaMath.Variables.ModelVariables",
     "page": "Variables",
     "title": "ModiaMath.Variables.ModelVariables",
     "category": "type",
@@ -521,7 +521,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.NumericType",
+    "location": "lib/Variables.html#ModiaMath.Variables.NumericType",
     "page": "Variables",
     "title": "ModiaMath.Variables.NumericType",
     "category": "type",
@@ -529,7 +529,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.RealSVector",
+    "location": "lib/Variables.html#ModiaMath.Variables.RealSVector",
     "page": "Variables",
     "title": "ModiaMath.Variables.RealSVector",
     "category": "type",
@@ -537,7 +537,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.RealSVector3",
+    "location": "lib/Variables.html#ModiaMath.Variables.RealSVector3",
     "page": "Variables",
     "title": "ModiaMath.Variables.RealSVector3",
     "category": "type",
@@ -545,7 +545,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.RealScalar",
+    "location": "lib/Variables.html#ModiaMath.Variables.RealScalar",
     "page": "Variables",
     "title": "ModiaMath.Variables.RealScalar",
     "category": "type",
@@ -553,7 +553,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.RealVariable",
+    "location": "lib/Variables.html#ModiaMath.Variables.RealVariable",
     "page": "Variables",
     "title": "ModiaMath.Variables.RealVariable",
     "category": "type",
@@ -561,7 +561,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.SimulationModel",
+    "location": "lib/Variables.html#ModiaMath.Variables.SimulationModel",
     "page": "Variables",
     "title": "ModiaMath.Variables.SimulationModel",
     "category": "type",
@@ -569,7 +569,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.Variability",
+    "location": "lib/Variables.html#ModiaMath.Variables.Variability",
     "page": "Variables",
     "title": "ModiaMath.Variables.Variability",
     "category": "type",
@@ -577,7 +577,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.VariableAnalysisType",
+    "location": "lib/Variables.html#ModiaMath.Variables.VariableAnalysisType",
     "page": "Variables",
     "title": "ModiaMath.Variables.VariableAnalysisType",
     "category": "type",
@@ -585,7 +585,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.componentName-Tuple{ModiaMath.AbstractComponentWithVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.componentName-Tuple{ModiaMath.AbstractComponentWithVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.componentName",
     "category": "method",
@@ -593,7 +593,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.copy_start_to_x!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Bool,1}}",
+    "location": "lib/Variables.html#ModiaMath.Variables.copy_start_to_x!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Bool,1}}",
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_start_to_x!",
     "category": "method",
@@ -601,7 +601,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.copy_variables_to_residue!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Float64,1},Array{Float64,1}}",
+    "location": "lib/Variables.html#ModiaMath.Variables.copy_variables_to_residue!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Float64,1},Array{Float64,1}}",
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_variables_to_residue!",
     "category": "method",
@@ -609,7 +609,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.copy_x_and_derx_to_variables!-Tuple{Float64,Array{Float64,1},Array{Float64,1},ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.copy_x_and_derx_to_variables!-Tuple{Float64,Array{Float64,1},Array{Float64,1},ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_x_and_derx_to_variables!",
     "category": "method",
@@ -617,7 +617,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.fullName-Tuple{ModiaMath.AbstractComponentWithVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.fullName-Tuple{ModiaMath.AbstractComponentWithVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.fullName",
     "category": "method",
@@ -625,7 +625,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.get_copyToResidueTable-Tuple{ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.get_copyToResidueTable-Tuple{ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToResidueTable",
     "category": "method",
@@ -633,7 +633,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.get_copyToResultTable-Tuple{ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.get_copyToResultTable-Tuple{ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToResultTable",
     "category": "method",
@@ -641,7 +641,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.get_copyToVariableTable-Tuple{ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.get_copyToVariableTable-Tuple{ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.get_copyToVariableTable",
     "category": "method",
@@ -649,7 +649,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.get_xTable-Tuple{ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.get_xTable-Tuple{ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.get_xTable",
     "category": "method",
@@ -657,7 +657,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.initComponent!-Tuple{ModiaMath.AbstractComponentWithVariables,Any,Any}",
+    "location": "lib/Variables.html#ModiaMath.Variables.initComponent!-Tuple{ModiaMath.AbstractComponentWithVariables,Any,Any}",
     "page": "Variables",
     "title": "ModiaMath.Variables.initComponent!",
     "category": "method",
@@ -665,7 +665,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.instanceName-Tuple{ModiaMath.AbstractComponentWithVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.instanceName-Tuple{ModiaMath.AbstractComponentWithVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.instanceName",
     "category": "method",
@@ -673,7 +673,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.print_ModelVariables-Tuple{ModiaMath.Variables.ModelVariables}",
+    "location": "lib/Variables.html#ModiaMath.Variables.print_ModelVariables-Tuple{ModiaMath.Variables.ModelVariables}",
     "page": "Variables",
     "title": "ModiaMath.Variables.print_ModelVariables",
     "category": "method",
@@ -681,7 +681,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#ModiaMath.Variables.@component-Tuple{Any,Any}",
+    "location": "lib/Variables.html#ModiaMath.Variables.@component-Tuple{Any,Any}",
     "page": "Variables",
     "title": "ModiaMath.Variables.@component",
     "category": "macro",
@@ -689,7 +689,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables/#Variables-1",
+    "location": "lib/Variables.html#Variables-1",
     "page": "Variables",
     "title": "Variables",
     "category": "section",
@@ -697,7 +697,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#",
+    "location": "lib/Logging.html#",
     "page": "Logging",
     "title": "Logging",
     "category": "page",
@@ -705,7 +705,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging",
+    "location": "lib/Logging.html#ModiaMath.Logging",
     "page": "Logging",
     "title": "ModiaMath.Logging",
     "category": "module",
@@ -713,7 +713,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.Logger",
+    "location": "lib/Logging.html#ModiaMath.Logging.Logger",
     "page": "Logging",
     "title": "ModiaMath.Logging.Logger",
     "category": "type",
@@ -721,7 +721,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.SimulationStatistics",
+    "location": "lib/Logging.html#ModiaMath.Logging.SimulationStatistics",
     "page": "Logging",
     "title": "ModiaMath.Logging.SimulationStatistics",
     "category": "type",
@@ -729,7 +729,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.isLogEvents-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.isLogEvents-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogEvents",
     "category": "method",
@@ -737,7 +737,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.isLogInfos-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.isLogInfos-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogInfos",
     "category": "method",
@@ -745,7 +745,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.isLogProgress-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.isLogProgress-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogProgress",
     "category": "method",
@@ -753,7 +753,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.isLogStatistics-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.isLogStatistics-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogStatistics",
     "category": "method",
@@ -761,7 +761,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.isLogWarnings-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.isLogWarnings-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.isLogWarnings",
     "category": "method",
@@ -769,7 +769,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.logOff!-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.logOff!-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.logOff!",
     "category": "method",
@@ -777,7 +777,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.logOn!-Tuple{ModiaMath.Logging.Logger}",
+    "location": "lib/Logging.html#ModiaMath.Logging.logOn!-Tuple{ModiaMath.Logging.Logger}",
     "page": "Logging",
     "title": "ModiaMath.Logging.logOn!",
     "category": "method",
@@ -785,7 +785,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#ModiaMath.Logging.setLogCategories!-Tuple{ModiaMath.Logging.Logger,Array{Symbol,1}}",
+    "location": "lib/Logging.html#ModiaMath.Logging.setLogCategories!-Tuple{ModiaMath.Logging.Logger,Array{Symbol,1}}",
     "page": "Logging",
     "title": "ModiaMath.Logging.setLogCategories!",
     "category": "method",
@@ -793,7 +793,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Logging/#Logging-1",
+    "location": "lib/Logging.html#Logging-1",
     "page": "Logging",
     "title": "Logging",
     "category": "section",
@@ -801,7 +801,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#",
+    "location": "lib/Frames.html#",
     "page": "Frames",
     "title": "Frames",
     "category": "page",
@@ -809,7 +809,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames",
+    "location": "lib/Frames.html#ModiaMath.Frames",
     "page": "Frames",
     "title": "ModiaMath.Frames",
     "category": "module",
@@ -817,7 +817,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.NullQuaternion",
+    "location": "lib/Frames.html#ModiaMath.Frames.NullQuaternion",
     "page": "Frames",
     "title": "ModiaMath.Frames.NullQuaternion",
     "category": "constant",
@@ -825,7 +825,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.NullRotation",
+    "location": "lib/Frames.html#ModiaMath.Frames.NullRotation",
     "page": "Frames",
     "title": "ModiaMath.Frames.NullRotation",
     "category": "constant",
@@ -833,7 +833,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.ZeroVector3D",
+    "location": "lib/Frames.html#ModiaMath.Frames.ZeroVector3D",
     "page": "Frames",
     "title": "ModiaMath.Frames.ZeroVector3D",
     "category": "constant",
@@ -841,7 +841,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.Path",
+    "location": "lib/Frames.html#ModiaMath.Frames.Path",
     "page": "Frames",
     "title": "ModiaMath.Frames.Path",
     "category": "type",
@@ -849,7 +849,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.Quaternion",
+    "location": "lib/Frames.html#ModiaMath.Frames.Quaternion",
     "page": "Frames",
     "title": "ModiaMath.Frames.Quaternion",
     "category": "type",
@@ -857,7 +857,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.RotationMatrix",
+    "location": "lib/Frames.html#ModiaMath.Frames.RotationMatrix",
     "page": "Frames",
     "title": "ModiaMath.Frames.RotationMatrix",
     "category": "type",
@@ -865,7 +865,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.Vector3D",
+    "location": "lib/Frames.html#ModiaMath.Frames.Vector3D",
     "page": "Frames",
     "title": "ModiaMath.Frames.Vector3D",
     "category": "type",
@@ -873,7 +873,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.absoluteRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.absoluteRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.absoluteRotation",
     "category": "method",
@@ -881,7 +881,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.assertQuaternion-Tuple{AbstractArray{T,1} where T}",
+    "location": "lib/Frames.html#ModiaMath.Frames.assertQuaternion-Tuple{AbstractArray{T,1} where T}",
     "page": "Frames",
     "title": "ModiaMath.Frames.assertQuaternion",
     "category": "method",
@@ -889,7 +889,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.assertRotationMatrix-Tuple{AbstractArray{T,2} where T}",
+    "location": "lib/Frames.html#ModiaMath.Frames.assertRotationMatrix-Tuple{AbstractArray{T,2} where T}",
     "page": "Frames",
     "title": "ModiaMath.Frames.assertRotationMatrix",
     "category": "method",
@@ -897,7 +897,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.eAxis-Tuple{Int64}",
+    "location": "lib/Frames.html#ModiaMath.Frames.eAxis-Tuple{Int64}",
     "page": "Frames",
     "title": "ModiaMath.Frames.eAxis",
     "category": "method",
@@ -905,7 +905,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.from_R-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.from_R-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.from_R",
     "category": "method",
@@ -913,7 +913,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.from_q-Tuple{StaticArrays.SArray{Tuple{4},Float64,1,4}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.from_q-Tuple{StaticArrays.SArray{Tuple{4},Float64,1,4}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.from_q",
     "category": "method",
@@ -921,7 +921,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.interpolate-Tuple{ModiaMath.Frames.Path,Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.interpolate-Tuple{ModiaMath.Frames.Path,Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.interpolate",
     "category": "method",
@@ -929,7 +929,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.interpolate_r-Tuple{ModiaMath.Frames.Path,Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.interpolate_r-Tuple{ModiaMath.Frames.Path,Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.interpolate_r",
     "category": "method",
@@ -937,7 +937,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.inverseRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.inverseRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.inverseRotation",
     "category": "method",
@@ -945,7 +945,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.planarRotationAngle-Tuple{AbstractArray{T,1} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
+    "location": "lib/Frames.html#ModiaMath.Frames.planarRotationAngle-Tuple{AbstractArray{T,1} where T,AbstractArray{T,1} where T,AbstractArray{T,1} where T}",
     "page": "Frames",
     "title": "ModiaMath.Frames.planarRotationAngle",
     "category": "method",
@@ -953,7 +953,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot1-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot1-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot1",
     "category": "method",
@@ -961,7 +961,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot123-Tuple{Number,Number,Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot123-Tuple{Number,Number,Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot123",
     "category": "method",
@@ -969,7 +969,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot2-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot2-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot2",
     "category": "method",
@@ -977,7 +977,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot3-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot3-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot3",
     "category": "method",
@@ -985,7 +985,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot_e-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot_e-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot_e",
     "category": "method",
@@ -993,7 +993,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.qrot_nxy-Tuple{Any,Any}",
+    "location": "lib/Frames.html#ModiaMath.Frames.qrot_nxy-Tuple{Any,Any}",
     "page": "Frames",
     "title": "ModiaMath.Frames.qrot_nxy",
     "category": "method",
@@ -1001,7 +1001,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.relativeRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.relativeRotation-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3,3},Float64,2,9}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.relativeRotation",
     "category": "method",
@@ -1009,7 +1009,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.resolve1-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.resolve1-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.resolve1",
     "category": "method",
@@ -1017,7 +1017,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.resolve2-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.resolve2-Tuple{StaticArrays.SArray{Tuple{3,3},Float64,2,9},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.resolve2",
     "category": "method",
@@ -1025,7 +1025,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot1-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot1-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot1",
     "category": "method",
@@ -1033,7 +1033,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot123-Tuple{Number,Number,Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot123-Tuple{Number,Number,Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot123",
     "category": "method",
@@ -1041,7 +1041,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot2-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot2-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot2",
     "category": "method",
@@ -1049,7 +1049,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot3-Tuple{Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot3-Tuple{Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot3",
     "category": "method",
@@ -1057,7 +1057,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot_e-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},Number}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot_e-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},Number}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot_e",
     "category": "method",
@@ -1065,7 +1065,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.rot_nxy-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
+    "location": "lib/Frames.html#ModiaMath.Frames.rot_nxy-Tuple{StaticArrays.SArray{Tuple{3},Float64,1,3},StaticArrays.SArray{Tuple{3},Float64,1,3}}",
     "page": "Frames",
     "title": "ModiaMath.Frames.rot_nxy",
     "category": "method",
@@ -1073,7 +1073,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.skew-Tuple{AbstractArray{T,1} where T}",
+    "location": "lib/Frames.html#ModiaMath.Frames.skew-Tuple{AbstractArray{T,1} where T}",
     "page": "Frames",
     "title": "ModiaMath.Frames.skew",
     "category": "method",
@@ -1081,7 +1081,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#ModiaMath.Frames.t_pathEnd-Tuple{ModiaMath.Frames.Path}",
+    "location": "lib/Frames.html#ModiaMath.Frames.t_pathEnd-Tuple{ModiaMath.Frames.Path}",
     "page": "Frames",
     "title": "ModiaMath.Frames.t_pathEnd",
     "category": "method",
@@ -1089,7 +1089,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Frames/#Frames-1",
+    "location": "lib/Frames.html#Frames-1",
     "page": "Frames",
     "title": "Frames",
     "category": "section",
@@ -1097,7 +1097,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Utilities/#",
+    "location": "lib/Utilities.html#",
     "page": "Utilities",
     "title": "Utilities",
     "category": "page",
@@ -1105,7 +1105,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Utilities/#ModiaMath.Utilities",
+    "location": "lib/Utilities.html#ModiaMath.Utilities",
     "page": "Utilities",
     "title": "ModiaMath.Utilities",
     "category": "module",
@@ -1113,7 +1113,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Utilities/#ModiaMath.Utilities.printobj-Tuple{Any,Any}",
+    "location": "lib/Utilities.html#ModiaMath.Utilities.printobj-Tuple{Any,Any}",
     "page": "Utilities",
     "title": "ModiaMath.Utilities.printobj",
     "category": "method",
@@ -1121,7 +1121,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Utilities/#Utilities-1",
+    "location": "lib/Utilities.html#Utilities-1",
     "page": "Utilities",
     "title": "Utilities",
     "category": "section",
@@ -1129,7 +1129,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/ModiaMath/#",
+    "location": "lib/ModiaMath.html#",
     "page": "ModiaMath Constants and Types",
     "title": "ModiaMath Constants and Types",
     "category": "page",
@@ -1137,7 +1137,7 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/ModiaMath/#ModiaMath-Constants-and-Types-1",
+    "location": "lib/ModiaMath.html#ModiaMath-Constants-and-Types-1",
     "page": "ModiaMath Constants and Types",
     "title": "ModiaMath Constants and Types",
     "category": "section",
