@@ -15,6 +15,7 @@ makedocs(
         "lib/SimulationEngine.md"
         "lib/Result.md"
         "lib/DAE.md"
+        "lib/NonlinearEquations.md"
         "lib/Variables.md"
         "lib/Logging.md"
         "lib/Frames.md"

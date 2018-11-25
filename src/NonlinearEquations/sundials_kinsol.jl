@@ -6,7 +6,7 @@
 #
 
 """
-    KINSOL - Solve nonlinear equation system with Sundials KINSOL
+    module KINSOL - Solve nonlinear equation system with Sundials KINSOL
 
 The goal is to solve the same system several times with KINSOL.
 """
@@ -93,7 +93,7 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
                  "\nx_rScale    = " * string(simState.rScale) *
                  "\nx           = " * string(simState.xev) *
                  "\nderx        = " * string(simState.derxev) *
-                 "\nresidues    = " * string(simState.residues) * 
+                 "\nresidues    = " * string(simState.residues) *
                  "\nnx          = " * string(simState.nx) *
                  "\nnd          = " * string(simState.nd) *
                  "\nnc          = " * string(simState.nc) *
@@ -136,12 +136,12 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
     # Run KINSOL
     try
         # Set error handler function
-        @static if VERSION >= v"0.7.0-DEV.2005" 
+        @static if VERSION >= v"0.7.0-DEV.2005"
             Sundials.KINSetErrHandlerFn(kmem, old_cfunction(kinsol_ErrHandlerFn, Nothing, Tuple{Cint,Cstring,Cstring,Cstring,Ref{typeof(NonlinearEquationsInfo)}}), pointer_from_objref(eqInfo))
         else
             Sundials.KINSetErrHandlerFn(kmem, kinsol_ErrHandlerFnc, pointer_from_objref(eqInfo))
         end
- 
+
         # Initialize KINSOL
         @static if VERSION >= v"0.7.0-DEV.2005"
             Sundials.KINInit(kmem, old_cfunction(kinsol_f, Cint, Tuple{Sundials.N_Vector,Sundials.N_Vector,Ref{typeof(NonlinearEquationsInfo)}}), Sundials.NVector(y))
@@ -170,7 +170,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
         #end
         strategy = Sundials.KIN_LINESEARCH
 
-        @static if VERSION >= v"0.7.0-DEV.2005"     
+        @static if VERSION >= v"0.7.0-DEV.2005"
             Sundials.KINSol(kmem, Sundials.NVector(y), strategy, Sundials.NVector(yScale), Sundials.NVector(rScale))
         else
             Sundials.KINSol(kmem, y, strategy, yScale, rScale)

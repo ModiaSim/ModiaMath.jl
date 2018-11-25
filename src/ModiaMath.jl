@@ -66,7 +66,7 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.2.6-dev from 2018-11-23 14:52"
+const Version = "0.2.6-dev from 2018-11-25 10:16"
 
 println(" \nImporting ModiaMath version ", Version)
 
@@ -139,6 +139,7 @@ include(joinpath("Result", "_module.jl"))
 using .Result
 
 include(joinpath("NonlinearEquations", "_module.jl"))
+using .NonlinearEquations
 const NonlinearEquationsInfo   = NonlinearEquations.KINSOL.NonlinearEquationsInfo
 const solveNonlinearEquations! = NonlinearEquations.KINSOL.solveNonlinearEquations!
 

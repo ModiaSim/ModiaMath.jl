@@ -49,19 +49,23 @@ instead the instructions
 ### Version 0.2.6-dev
 
 - ModiaMath initialization and simulation improved:
-  * Issue with defaultInterval fixed: 
-    Previously: defaultInterval = (defaultStopTime - defaultStartTime)/500.0. However, if stopTime 
+  * Issue with defaultInterval fixed:
+    Previously: defaultInterval = (defaultStopTime - defaultStartTime)/500.0. However, if stopTime
     was set to 10e5, then the defaultInterval was much too small. This was changed so that
     defaultInterval is either explicitly given, or it is computed from the actual values of StopTime and StartTime.
   * x\_nominal introduced in constructor of simulation state (DAE.SimulationState) and of
     Modia interface (ModiaToModiaMath.ModiaSimulationModel):
     If x\_nominal is explicitly provided in these constructor calls, it is used.
     Otherwise `x_nominal[i]` is set to `max(abs(x_start[i]), 1e-7)`.
-  * x\_nominal is newly used in KINSOL to scale the unknowns and 
+  * x\_nominal is newly used in KINSOL to scale the unknowns and
     is used to compute the absolute tolerance for Sundials IDA.
   * A bug was corrected in the initialization function, where rScale was reported to KINSOL,
     but was also used for scaling of the residue (although this is performed in KINSOL).
-    
+
+- New function *ModiaMath.solveOneNonlinearEquation*:
+  Determines the solution of one non-linear algebraic equation `y=f(u)`
+  in one unknown `u` in a reliable and efficient way (using Brents algorithm).
+
 
 
 ### Version 0.2.5
@@ -78,7 +82,7 @@ instead the instructions
     When using plot(..) on such a result variable, a constant line is plotted
     between the first and the last point of the x-axis.
   * New function `ModiaMath.resultTable(result)` to transform the variable information
-    in the result data structure in a DataFrames table  
+    in the result data structure in a DataFrames table
     (containing variable name + type + size ) that can then be printed.
   * New functions `ModiaMath.closeFigure(figure)` and
     `ModiaMath.closeAllFigures()` to close a specific figure or close all figures.
