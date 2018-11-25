@@ -139,6 +139,7 @@ include(joinpath("Result", "_module.jl"))
 using .Result
 
 include(joinpath("NonlinearEquations", "_module.jl"))
+using .NonlinearEquations
 const NonlinearEquationsInfo   = NonlinearEquations.KINSOL.NonlinearEquationsInfo
 const solveNonlinearEquations! = NonlinearEquations.KINSOL.solveNonlinearEquations!
 
