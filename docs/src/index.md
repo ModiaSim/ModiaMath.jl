@@ -46,7 +46,7 @@ instead the instructions
 
 ## Release Notes
 
-### Version 0.2.6-dev
+### Version 0.2.6
 
 - ModiaMath initialization and simulation improved:
   * Issue with defaultInterval fixed:
@@ -61,6 +61,8 @@ instead the instructions
     is used to compute the absolute tolerance for Sundials IDA.
   * A bug was corrected in the initialization function, where rScale was reported to KINSOL,
     but was also used for scaling of the residue (although this is performed in KINSOL).
+  * If log=true, name-, start-, fixed-, nominal-values of the x-vector are printed before
+    initialization starts.
 
 - New function *ModiaMath.solveOneNonlinearEquation*:
   Determines the solution of one non-linear algebraic equation `y=f(u)`
