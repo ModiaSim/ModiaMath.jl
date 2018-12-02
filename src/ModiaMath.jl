@@ -66,7 +66,7 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.3.0-dev from 2018-12-02 21:13"
+const Version = "0.3.0-dev from 2018-12-02 23:57"
 
 println(" \nImporting ModiaMath version ", Version)
 

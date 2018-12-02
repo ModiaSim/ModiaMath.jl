@@ -88,7 +88,7 @@ mutable struct SimulationState
     time::ModiaMath.Time                        # Actual simulation time
     logger::ModiaMath.Logger                    # Logger object
     statistics::ModiaMath.SimulationStatistics  # Statistics object (complete after a full simulation run)
-    tolerance::Float64                          # Telative integration tolerance
+    tolerance::Float64                          # Relative integration tolerance
     startTime::Float64                          # Start time of the simulation
     stopTime::Float64                           # Stop time of the simulation
     interval::Float64                           # Interval of the simulation
@@ -221,11 +221,12 @@ end
 
 
 """
-    result = isNearlyEqual(x1,x2)
+    result = isNearlyEqual(x1, x2, x_nominal, tolerance)
     
 The function returns true if x1 and x2 are nearly equal
 """
-isNearlyEqual(x1::Float64, x2::Float64) = abs(x1) > 1e-8 ? abs(x1 - x2) / max(abs(x1)) <= 1e-8 : abs(x1 - x2) <= 1e-8
+isNearlyEqual(x1::Float64, x2::Float64, x_nominal::Float64, tolerance::Float64) = abs(x1 - x2) <= max(tolerance*max(abs(x1),abs(x2)), 0.1*x_nominal*tolerance)
+
 
 
 function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
@@ -251,11 +252,17 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
                 sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev
             end
         end
-    else
+    elseif sim.nc == 0
         # Unknowns are at the left limit
         for i in eachindex(y)
             sim.xev[i]    = sim.xev_old[i]
-            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev           
+            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
+        end
+    else # sim.nc > 0
+        # Unknowns are at the right limit
+        for i in eachindex(y)
+            sim.xev[i]    = y[i]
+            sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev           
         end
     end
    
@@ -310,11 +317,11 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
            end
 
        Re-Initialization at event:
-           # Assumption: Right limit of y is fixed (so the x-values returned from the event handling are not modified)
-           # Implicitly it is assumed that if the n-th derivative of x[i] appears, then
-           # at most the n-1-th derivative is discontinuous. 
-                y[i] = xev[i]
-           der(y[i]) = (xev[i] - z[i]) / hev
+           # If nc=0, then the DAE is regular with respect to the derivatives and
+           # the right limit of y can be fixed.
+           #
+           # If nc>0, the x-values returned from the event handling, might not fulfill the constraint equation.
+           # Therefore, an implicit Euler step must be made, where the left limit of y is fixed
     =#
 
     nx = sim.nx   
@@ -328,11 +335,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
   
     # Determine consistent xev, der(xev)
     if ModiaMath.isLogEvents(sim)
-        if sim.initialization
-            println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-        else
-            println("        determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-        end
+        println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
     end
 
     sim.tev = tev
@@ -348,7 +351,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
     # Print log message
     if ModiaMath.isLogInfos(sim)
         for i = 1:nx
-            if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i])
+            if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i], sim.x_nominal[i], sim.tolerance)
                 xname = sim.getVariableName(model, Category_X, i)
                 println("            ", xname, " = ", sim.xev_beforeEvent[i], " changed to ", sim.xev[i])
             end
@@ -378,9 +381,9 @@ function eventIteration!(model, sim::SimulationState, tev::Float64)
         end
       
         # Fix event branches and determine new consistent sim.derxev_start (and sim.xev_start during initialization)
-        eh.event = false
-        reinitialize!(model, sim, tev)
+        eh.event   = false
         eh.initial = false
+        reinitialize!(model, sim, tev)
     end
 end
 
@@ -421,7 +424,8 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     # Print initial values   
     if ModiaMath.isLogEvents(sim)
         println("        initial values:")
-        x_table = DataFrames.DataFrame(name=sim.rawResult.names[2:1+sim.nx], start=sim.x_start, fixed=sim.x_fixed, nominal=sim.x_nominal)
+        x_table = DataFrames.DataFrame(name=String[sim.getVariableName(model, Category_X, i)  for i = 1:sim.nx],
+                                       start=sim.x_start, fixed=sim.x_fixed, nominal=sim.x_nominal)
 
         @static if VERSION < v"0.7.0-DEV.2005"
             println(x_table)
