@@ -456,7 +456,28 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     # println("... initialize!: rScale = ", sim.rScale)
     # println("                 yScale = ", sim.yScale)
 
-   
+    # Print initial values   
+    if ModiaMath.isLogEvents(sim)
+        println("        initial values:")
+        x_table = DataFrames.DataFrame(name=sim.rawResult.names[2:1+sim.nx], start=sim.x_start, fixed=sim.x_fixed, nominal=sim.x_nominal)
+
+        @static if VERSION < v"0.7.0-DEV.2005"
+            println(x_table)
+        else
+            # Print x_table, but indented and type-information removed from the heading
+            io = IOBuffer()
+            show(io, x_table, summary=false, rowlabel=:x)
+            str=String(take!(io))
+            newline = isequal('\n')
+            i1=findfirst(newline, str)
+            i2=findnext(newline, str, i1+1)
+            i3=findnext(newline, str, i2+1)
+            str2="          " * str[i1+1:i2] * str[i3+1:end]
+            str3=replace(str2, "\n" => "\n          ")
+            println(str3, "\n")
+        end
+    end
+
     # Perform initial event iteration
     eventIteration!(model, sim, t0)
     sim.initialization = false   
