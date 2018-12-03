@@ -119,7 +119,7 @@ The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubun
 with Julia `0.7.0`, `1.0.0`, `1.0.1` on Windows 7, via the travis CL
 on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0), and via the Appveyor CL on Windows.
 
-The ModiaMath version number is 0.2.5 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.3.0 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 

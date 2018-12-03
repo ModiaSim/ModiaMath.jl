@@ -46,6 +46,15 @@ instead the instructions
 
 ## Release Notes
 
+### Version 0.3.0
+
+- ModiaMath initialization and re-initialization improved:
+  * Initialization and re-initialization considerably changed
+    (now only one nonlinear equation is solved and no longer two nonlinear equations).
+  * By this change, several issues in the initialization were fixed.
+  * x\_nominal also supported for ModiaMath.Variables.
+
+
 ### Version 0.2.6
 
 - ModiaMath initialization and simulation improved:
