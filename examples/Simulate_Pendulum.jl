@@ -23,10 +23,10 @@ using ModiaMath.StaticArrays
     @assert(m > 0.0)
     @assert(d >= 0.0)
   
-    phi = RealScalar(start=phi0_deg*pi/180, unit="rad"    , fixed=true, info="Relative rotation angle",                     numericType=ModiaMath.XD_EXP)
-    w   = RealScalar(start=0.0            , unit="rad/s"  , fixed=true, info="Relative angular velocity",     integral=phi, numericType=ModiaMath.XD_EXP)
-    a   = RealScalar(                       unit="rad/s^2",             info="Relative angular acceleration", integral=w  , numericType=ModiaMath.DER_XD_EXP) 
-    r   = RealSVector{2}(                   unit="m"      ,             info="Tip position of pendulum"     ,               numericType=ModiaMath.WC)
+    phi = RealScalar(start=phi0_deg*pi/180, unit="rad"    , fixed=true, nominal=1.0, info="Relative rotation angle",                     numericType=ModiaMath.XD_EXP)
+    w   = RealScalar(start=0.0            , unit="rad/s"  , fixed=true, nominal=1.0, info="Relative angular velocity",     integral=phi, numericType=ModiaMath.XD_EXP)
+    a   = RealScalar(                       unit="rad/s^2",                          info="Relative angular acceleration", integral=w  , numericType=ModiaMath.DER_XD_EXP) 
+    r   = RealSVector{2}(                   unit="m"      ,                          info="Tip position of pendulum"     ,               numericType=ModiaMath.WC)
 end
 
 function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState)  

@@ -144,9 +144,10 @@ end
         ModiaMath.print_ModelVariables(m)
    
         println("\n... Copy start values to x")
-        x       = zeros(5 + 7 + 6)
-        x_fixed = fill(false, 5 + 7 + 6)
-        ModiaMath.copy_start_to_x!(m, x, x_fixed)
+        x         = zeros(5 + 7 + 6)
+        x_fixed   = fill(false, 5 + 7 + 6)
+        x_nominal = fill(2.0, 5 + 7 + 6)
+        ModiaMath.copy_start_to_x!(m, x, x_fixed, x_nominal)
         x0 = [1.0, 0.0, 2.0, 0.0, 1.0, 2.0, 3.0, 0.5, 0.5, 0.0, sqrt(0.5^2 + 0.5^2), 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0 ]
         x0_fixed = fill(true, 17)
         append!(x0_fixed, false)
@@ -184,9 +185,10 @@ end
         ModiaMath.print_ModelVariables(m)
    
         println("\n... Copy start values to x")
-        x       = [1.11]
-        x_fixed = [false]
-        ModiaMath.copy_start_to_x!(m, x, x_fixed)
+        x         = [1.11]
+        x_fixed   = [false]
+        x_nominal = [3.0]
+        ModiaMath.copy_start_to_x!(m, x, x_fixed, x_nominal)
         @test isapprox(x, [0.0])
         @test x_fixed == [true]
    
@@ -214,8 +216,9 @@ end
    
         println("\n... Copy start values to x")
         x = zeros(m.nx)
-        x_fixed = fill(false, m.nx)
-        ModiaMath.copy_start_to_x!(m, x, x_fixed)
+        x_fixed   = fill(false, m.nx)
+        x_nominal = fill(10.0 , m.nx)
+        ModiaMath.copy_start_to_x!(m, x, x_fixed, x_nominal)
         @test isapprox(x, [-2.0])
         @test x_fixed == [true]
    

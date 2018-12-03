@@ -83,8 +83,6 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
             str2 = string(simState.name) * ": time = " * string(simState.time) *
                  ", stepsize of implicit Euler step = " * string(simState.hev) *
                  ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
-                 (simState.nonlinearEquationsMode == 1 ? "\nGoal: compute consistent x." :
-                  simState.nonlinearEquationsMode == 2 ? "\nGoal: compute consistent der(x)." : "") *
                  "\nx_names     = " * string(x_names) *
                  "\nx_start     = " * string(eqInfo.y0) *
                  "\nx_fixed     = " * string(simState.x_fixed) *
@@ -99,7 +97,6 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
                  "\nnc          = " * string(simState.nc) *
                  "\nnw          = " * string(simState.nw) *
                  "\nnz          = " * string(simState.nz) *
-                 "\nuse_x_fixed = " * string(simState.use_x_fixed) *
                  "\ntolerance   = " * string(simState.tolerance) *
                  "\nFTOL        = " * string(simState.FTOL)
 

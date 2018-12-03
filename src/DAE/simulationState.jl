@@ -88,7 +88,7 @@ mutable struct SimulationState
     time::ModiaMath.Time                        # Actual simulation time
     logger::ModiaMath.Logger                    # Logger object
     statistics::ModiaMath.SimulationStatistics  # Statistics object (complete after a full simulation run)
-    tolerance::Float64                          # Telative integration tolerance
+    tolerance::Float64                          # Relative integration tolerance
     startTime::Float64                          # Start time of the simulation
     stopTime::Float64                           # Stop time of the simulation
     interval::Float64                           # Interval of the simulation
@@ -102,7 +102,6 @@ mutable struct SimulationState
         
     # Auxiliary storage needed during initialization and at events
     eqInfo::ModiaMath.NonlinearEquationsInfo
-    nonlinearEquationsMode::Int
     xev_old::Vector{Float64}
     xev_beforeEvent::Vector{Float64}
     xev::Vector{Float64}
@@ -116,7 +115,6 @@ mutable struct SimulationState
     FTOL::Float64
     scaleConstraintsAtEvents::Bool
     initialization::Bool
-    use_x_fixed::Bool
       
     # Information updated during simulation   
     storeResult::Bool             # = true, if DAE is called to store results of variables
@@ -215,19 +213,20 @@ mutable struct SimulationState
             ModiaMath.SimulationStatistics(nx, sparse, sparse ? cg.ngroups : 0),
             NaN, NaN, NaN, NaN,
             x_start, x_fixed, x_nominal2, x_errorControl, zeros(nw),  
-            eqInfo, 0, zeros(nx), zeros(nx), zeros(nx),
+            eqInfo, zeros(nx), zeros(nx), zeros(nx),
             zeros(nx), zeros(nx), zeros(nx), yScale, ones(nx), 0.0, hev, 0.0, 
-            scaleConstraintsAtEvents, false, false, false)
+            scaleConstraintsAtEvents, false, false)
     end
 end
 
 
 """
-    result = isNearlyEqual(x1,x2)
+    result = isNearlyEqual(x1, x2, x_nominal, tolerance)
     
 The function returns true if x1 and x2 are nearly equal
 """
-isNearlyEqual(x1::Float64, x2::Float64) = abs(x1) > 1e-8 ? abs(x1 - x2) / max(abs(x1)) <= 1e-8 : abs(x1 - x2) <= 1e-8
+isNearlyEqual(x1::Float64, x2::Float64, x_nominal::Float64, tolerance::Float64) = abs(x1 - x2) <= max(tolerance*max(abs(x1),abs(x2)), 0.1*x_nominal*tolerance)
+
 
 
 function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
@@ -240,25 +239,39 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
     residues = sim.residues
     hev      = sim.hev
    
-   # Copy unknowns (y) to xev and derxev
-    for i in eachindex(y)
-        if sim.use_x_fixed && sim.x_fixed[i]
-         # Unknowns are at the left limit
+    # Copy unknowns (y) to xev and derxev
+    if sim.initialization
+        for i in eachindex(y)
+            if sim.x_fixed[i]
+                # Unknowns are at the left limit
+                sim.xev[i]    = sim.xev_old[i]
+                sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev           
+            else
+                # Unknowns are at the right limit
+                sim.xev[i]    = y[i]
+                sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev
+            end
+        end
+    elseif sim.nc == 0
+        # Unknowns are at the left limit
+        for i in eachindex(y)
             sim.xev[i]    = sim.xev_old[i]
-            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev           
-        else
-         # Unknowns are at the right limit
+            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
+        end
+    else # sim.nc > 0
+        # Unknowns are at the right limit
+        for i in eachindex(y)
             sim.xev[i]    = y[i]
-            sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev
+            sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev           
         end
     end
    
-   # Compute residues
+    # Compute residues
     sim.time = sim.tev
     Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev, residues, sim.w)  
                               
-   # Copy to eq-residues and scale with h
-#=
+   # Copy to eq-residues and scale with h   
+   #=
     if sim.scaleConstraintsAtEvents
         for i = 1:sim.nd
             r[i] = residues[i]
@@ -268,11 +281,11 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
             r[i] = residues[i] / hev
         end
     else
-=#
+    =#
         for i = 1:sim.nx
             r[i] = residues[i]
         end
-#    end
+    #end
     eqInfo.lastNorm_r = norm(r, Inf)
     eqInfo.lastrScaledNorm_r = norm(sim.rScale .* r, Inf)
    
@@ -284,7 +297,33 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
 end
 
 
-function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsistent::Bool)
+function reinitialize!(model, sim::SimulationState, tev::Float64)
+    #=
+       DAE:
+           0 = f(der(y),y)
+
+       Initial equation:
+           0 = f(z)  ->  solve for z
+
+       Initialization:
+           if x_fixed[i]
+              # Right limit of y is fixed
+                   y[i] = x_start[i]
+              der(y[i]) = (x_start[i] - z[i]) / hev
+           else
+              # Left limit of y is fixed
+                   y[i] = z[i]
+              der(y[i]) = (z[i] - x_start[i]) / hev
+           end
+
+       Re-Initialization at event:
+           # If nc=0, then the DAE is regular with respect to the derivatives and
+           # the right limit of y can be fixed.
+           #
+           # If nc>0, the x-values returned from the event handling, might not fulfill the constraint equation.
+           # Therefore, an implicit Euler step must be made, where the left limit of y is fixed
+    =#
+
     nx = sim.nx   
     nd = sim.nd
     nc = sim.nc
@@ -294,82 +333,35 @@ function reinitialize!(model, sim::SimulationState, tev::Float64, xevIsConsisten
         sim.xev_old[i] = sim.xev[i]   
     end
   
-    if !xevIsConsistent
-        # xev is potentially not consistent; determine consistent xev
-        if ModiaMath.isLogEvents(sim)
-            println("        determine consistent DAE variables x (with implicit Euler step; step size = ", sim.hev, ")")
-            if sim.initialization
-                println("            (fixed attribute defines whether unknowns are left or right limit values)")
-            end
-        end
-        sim.tev = tev
-        sim.eqInfo.lastNorm_r        = 1.0
-        sim.eqInfo.lastrScaledNorm_r = 1.0      
-    
-        for i in eachindex(sim.yNonlinearSolver)
-            sim.yNonlinearSolver[i] = sim.xev[i]
-        end
-    
-        if sim.initialization
-            sim.use_x_fixed = true
-        end
-
-        sim.nonlinearEquationsMode = 1
-        ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; yScale=sim.yScale, rScale=sim.rScale, FTOL=sim.FTOL)
-        sim.use_x_fixed = false
-      
-        # Copy result to sim.xev
-        for i = 1:nx
-            sim.xev[i] = sim.yNonlinearSolver[i]
-        end
-      
-        # Only during initialization: Copy fixed = true values
-        if sim.initialization
-            for i = 1:nx
-                if sim.x_fixed[i] 
-                    sim.xev[i] = sim.xev_old[i]
-                end
-            end
-        end
-      
-        # Copy xev to xev_old    
-        for i = 1:nx
-            sim.xev_old[i] = sim.xev[i]
-        end
+    # Determine consistent xev, der(xev)
+    if ModiaMath.isLogEvents(sim)
+        println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
     end
+
+    sim.tev = tev
+    sim.eqInfo.lastNorm_r        = 1.0
+    sim.eqInfo.lastrScaledNorm_r = 1.0      
+    
+    for i in eachindex(sim.yNonlinearSolver)
+        sim.yNonlinearSolver[i] = sim.xev[i]
+    end
+
+    ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; yScale=sim.yScale, rScale=sim.rScale, FTOL=sim.FTOL)
 
     # Print log message
     if ModiaMath.isLogInfos(sim)
         for i = 1:nx
-            if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i])
+            if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i], sim.x_nominal[i], sim.tolerance)
                 xname = sim.getVariableName(model, Category_X, i)
                 println("            ", xname, " = ", sim.xev_beforeEvent[i], " changed to ", sim.xev[i])
             end
         end
     end
-   
-   # Determine consistent derxev
-    sim.tev = tev
-    sim.eqInfo.lastNorm_r        = 1.0
-    sim.eqInfo.lastrScaledNorm_r = 1.0  
-    for i in eachindex(sim.yNonlinearSolver)
-        sim.yNonlinearSolver[i] = sim.xev[i]
-    end   
- 
-    sim.use_x_fixed = false
-    if ModiaMath.isLogEvents(sim)
-        println("        determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-    end
-      
-    sim.nonlinearEquationsMode = 2
-    ModiaMath.solveNonlinearEquations!(sim.eqInfo, sim.yNonlinearSolver; yScale=sim.yScale, rScale=sim.rScale, FTOL=sim.FTOL) 
-    sim.nonlinearEquationsMode = 0
 end
 
 
 function eventIteration!(model, sim::SimulationState, tev::Float64)
     eh::EventHandler = sim.eventHandler 
-    xevIsConsistent::Bool   = false
 
     # Initialize event iteration
     initEventIteration!(eh, tev)
@@ -387,29 +379,11 @@ function eventIteration!(model, sim::SimulationState, tev::Float64)
             eh.event = false
             break
         end
-   
-        if eh.initial
-            eh.initial = false
-            xevIsConsistent = sim.nc == 0
-   
-            if sim.nc > 0
-                if norm(sim.residues[sim.nd + 1:end], Inf) < 1e-3
-                    xevIsConsistent = true
-                end
-            end
-        else
-            xevIsConsistent = true
-            for i = 1:sim.nx
-                if sim.xev[i] != sim.xev_beforeEvent[i]
-                    xevIsConsistent = false
-                    break
-                end
-            end
-        end
       
-        # Fix event branches and determine new consistent sim.xev_start, sim.derxev_start
-        eh.event = false
-        reinitialize!(model, sim, tev, xevIsConsistent)
+        # Fix event branches and determine new consistent sim.derxev_start (and sim.xev_start during initialization)
+        eh.event   = false
+        eh.initial = false
+        reinitialize!(model, sim, tev)
     end
 end
 
@@ -447,19 +421,11 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
         end
     end
 
-    # Determine meaningful scaling for residue
-    #   sim.time = sim.tev
-    #  Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev, sim.residues, sim.w) 
-    #  for i in eachindex(sim.rScale)
-    #    sim.rScale[i] = abs(sim.residues[i]) > 1.0 ? abs(sim.residues[i]) : 1.0
-    #  end
-    # println("... initialize!: rScale = ", sim.rScale)
-    # println("                 yScale = ", sim.yScale)
-
     # Print initial values   
     if ModiaMath.isLogEvents(sim)
         println("        initial values:")
-        x_table = DataFrames.DataFrame(name=sim.rawResult.names[2:1+sim.nx], start=sim.x_start, fixed=sim.x_fixed, nominal=sim.x_nominal)
+        x_table = DataFrames.DataFrame(name=String[sim.getVariableName(model, Category_X, i)  for i = 1:sim.nx],
+                                       start=sim.x_start, fixed=sim.x_fixed, nominal=sim.x_nominal)
 
         @static if VERSION < v"0.7.0-DEV.2005"
             println(x_table)
@@ -487,12 +453,12 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     eh.afterSimulationStart = true
 
     return InitInfo(sim.xev, sim.derxev;
-                   y_nominal=sim.x_nominal,
-                   y_errorControl=sim.x_errorControl,
-                   maxTime=eh.maxTime,
-                   nextEventTime=eh.nextEventTime,
-                   integrateToEvent=eh.integrateToEvent,
-                   terminate=eh.restart == Terminate)
+                    y_nominal=sim.x_nominal,
+                    y_errorControl=sim.x_errorControl,
+                    maxTime=eh.maxTime,
+                    nextEventTime=eh.nextEventTime,
+                    integrateToEvent=eh.integrateToEvent,
+                    terminate=eh.restart == Terminate)
 end
 
 
