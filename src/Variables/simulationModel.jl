@@ -33,11 +33,12 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         modelName = ModiaMath.componentName(model)
         var = ModelVariables(model)
         x = zeros(var.nx)
-        x_fixed = fill(false,var.nx)
-        ModiaMath.copy_start_to_x!(var,x,x_fixed)
+        x_fixed   = fill(false,var.nx)
+        x_nominal = fill(1.0, var.nx) 
+        ModiaMath.copy_start_to_x!(var,x,x_fixed,x_nominal)
 
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
-                                                    x_fixed = x_fixed, nc = var.nfc,
+                                                    x_fixed = x_fixed, x_nominal=x_nominal, nc = var.nfc,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,
                                                     defaultStartTime = startTime,

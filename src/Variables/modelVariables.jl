@@ -602,25 +602,27 @@ end
 
 
 """
-    copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool})
+    copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool}, x_nominal::Vector{Float64})
 
-Copy `start` and `fixed` values of variables `vars`to `x` and `x_fixed` vectors.
+Copy `start`, `fixed` and `nominal`values of variables `vars` to `x`, `x_fixed`, and `x_nominal` vectors.
 """
-function copy_start_to_x!(m::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool})
+function copy_start_to_x!(m::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool}, x_nominal::Vector{Float64})
     @assert(length(x)       == m.nx)
     @assert(length(x_fixed) == m.nx)
    
     for v in m.x_var
         ibeg = v.ivar
         if isScalar(v)
-            x[ibeg]       = v.start
-            x_fixed[ibeg] = v.fixed
+            x[ibeg]         = v.start
+            x_fixed[ibeg]   = v.fixed
+            x_nominal[ibeg] = v.nominal
         else
             vv = v.start
             for j in 1:length(vv)
                 k = ibeg + j - 1
                 x[ k ]       = vv[j]
-                x_fixed[ k ] = v.fixed 
+                x_fixed[   k ] = v.fixed 
+                x_nominal[ k ] = v.nominal 
             end
         end
     end
