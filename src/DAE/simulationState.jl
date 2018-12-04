@@ -230,6 +230,68 @@ isNearlyEqual(x1::Float64, x2::Float64, x_nominal::Float64, tolerance::Float64) 
 
 
 function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
+    #=
+       DAE:
+           0 = fd(der(x),x,t)            [der(fd,der(x));
+           0 = fc(x,t)                    der(fc,x)]      is regulsr
+
+       Initialization/re-initialization equation:
+           0 = f(y)  ->  solve for y
+
+       Re-Initialization at event:
+           # It is assumed that x might have been changed at the event instant.
+           # For example when an impulse occured: v(after_event) = -eps*v(before_event).
+           # However, it is implicitely assumed (this is not checked) that a Dirac impulse
+           # only occurs in der(x) and not in x. This in turn means that if ni is the highest
+           # occuring derivative of x[i], then at most the n-1-derivative of x[i] is allowed to
+           # be discontinuous and all lower derivatives must be continuous at the event. 
+           #
+           # If dim(fc) = 0, any "x" can be used and der(fd,der(x)) is regular.
+           # Therefore, the right limit of x is fixed and derivatives der(x) could be used
+           # as iteration variables. However, since there is no nominal value for der(x),
+           # instead the following approximation is used where the iteration variables y[i]
+           # are the virtual previous values of x
+                  x[i] = x_ev[i]                  # x_ev the value of x after the event
+             der(x[i]) = (x_ev[i] - y[i]) / hev
+
+           # If dim(fc) > 0, then fc(x,t) might be non-zero (for example, if an impulse occured
+           # and v(after_event) = -eps*v(before_event), then the velocity constraint of a 
+           # closed loop system might be no longer fulfilled.
+           # Therefore, the left limit of x is fixed and the right limit are the iteration variables y
+           # (that are determined, so that fc(x,t) = 0 and fd(der(x),x,t)=0)
+                  x[i] = y[i]                     # the right limit of x
+             der(x[i]) = (y[i] - x_ev[i]) / hev   # the derivative at the right limit of x
+
+        Initialization at t_start:
+           # Similar to re-initialization, but additionally with x_fixed[i] = true it is defined
+           # that x[i] is fixed and should not be changed.
+           if x_fixed[i] or dim(fc) = 0
+              # Right limit of x is fixed, left limit of x are the iteration variables y
+                   x[i] = x_start[i]
+              der(x[i]) = (x_start[i] - y[i]) / hev
+           else
+              # Left limit of x is fixed, right limit of x are the iteration variables y
+                   x[i] = y[i]
+              der(x[i]) = (y[i] - x_start[i]) / hev
+           end
+
+        Explicit solvable derivative (not yet used, but shall be supported in the future)
+           # If a derivative can be explicitely solved, the above procedure can be simplified:
+           #
+           # If (x_fixed[i]=true or dim(fc) = 0) and der(x[i]) can be explicitely computed, then there is no
+           # iteration variable associated with x[i] (so vector y has one element less;
+           # and if all der(x[i]) can be explicitly computed (so ODE), then no equation
+           # must be solved at all):
+             x[i] = x_ev[i]
+             der(x[i]) is explicitely computed
+
+           # If dim(fc) > 0 and der(x[i]) can be explicitely computed, then x[i] might still need 
+           # to be modified, such that fc(x,t) = 0. For this reason, the dimension of the 
+           # reinitialization problem is not changed, just der(x[i]) is analytically computed:
+                  x[i] = y[i]                     # the right limit of x
+             der(x[i]) is explicitely computed
+    =#
+
     model = eqInfo.extraInfo
     sim::SimulationState = model.simulationState
     @assert(length(y) == eqInfo.ny)
@@ -240,9 +302,15 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
     hev      = sim.hev
    
     # Copy unknowns (y) to xev and derxev
-    if sim.initialization
+    if sim.nc == 0
+        # Unknowns are at the left limit
         for i in eachindex(y)
-            if sim.x_fixed[i]
+            sim.xev[i]    = sim.xev_old[i]
+            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
+        end 
+    else # sim.nc > 0
+        for i in eachindex(y)
+            if sim.initialization && sim.x_fixed[i]
                 # Unknowns are at the left limit
                 sim.xev[i]    = sim.xev_old[i]
                 sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev           
@@ -251,18 +319,6 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
                 sim.xev[i]    = y[i]
                 sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev
             end
-        end
-    elseif sim.nc == 0
-        # Unknowns are at the left limit
-        for i in eachindex(y)
-            sim.xev[i]    = sim.xev_old[i]
-            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
-        end
-    else # sim.nc > 0
-        # Unknowns are at the right limit
-        for i in eachindex(y)
-            sim.xev[i]    = y[i]
-            sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev           
         end
     end
    
@@ -298,32 +354,6 @@ end
 
 
 function reinitialize!(model, sim::SimulationState, tev::Float64)
-    #=
-       DAE:
-           0 = f(der(y),y)
-
-       Initial equation:
-           0 = f(z)  ->  solve for z
-
-       Initialization:
-           if x_fixed[i]
-              # Right limit of y is fixed
-                   y[i] = x_start[i]
-              der(y[i]) = (x_start[i] - z[i]) / hev
-           else
-              # Left limit of y is fixed
-                   y[i] = z[i]
-              der(y[i]) = (z[i] - x_start[i]) / hev
-           end
-
-       Re-Initialization at event:
-           # If nc=0, then the DAE is regular with respect to the derivatives and
-           # the right limit of y can be fixed.
-           #
-           # If nc>0, the x-values returned from the event handling, might not fulfill the constraint equation.
-           # Therefore, an implicit Euler step must be made, where the left limit of y is fixed
-    =#
-
     nx = sim.nx   
     nd = sim.nd
     nc = sim.nc
@@ -335,7 +365,11 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
   
     # Determine consistent xev, der(xev)
     if ModiaMath.isLogEvents(sim)
-        println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+        if nc == 0
+            println("        for given x, determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+        else
+            println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+        end
     end
 
     sim.tev = tev
