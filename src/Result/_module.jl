@@ -79,14 +79,17 @@ function __init__()
                     import PyCall       
                 end
 
-                rc = PyCall.PyDict(PyPlot.matplotlib["rcParams"])
-                rc["axes.formatter.limits"] = [-3,4]
-                rc["font.size"]        = 8.0
-                rc["lines.linewidth"]  = 1.0
-                rc["grid.linewidth"]   = 0.5 
-                rc["axes.grid"]        = true
-                rc["axes.titlesize"]   = "medium"
-                rc["figure.titlesize"] = "medium"
+                pyplot_rc = PyCall.PyDict(PyPlot.matplotlib["rcParams"])
+                pyplot_rc["axes.formatter.limits"] = [-3,4]
+                pyplot_rc["font.size"]        = 8.0
+                pyplot_rc["lines.linewidth"]  = 1.0
+                pyplot_rc["grid.linewidth"]   = 0.5 
+                pyplot_rc["axes.grid"]        = true
+                pyplot_rc["axes.titlesize"]   = "medium"
+                pyplot_rc["figure.titlesize"] = "medium"
+
+                # Use separate plot windows (no inline plots)
+                PyPlot.pygui(true)
             end
         end
     end
