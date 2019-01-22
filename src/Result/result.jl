@@ -8,6 +8,22 @@
 #---------------------------- Acessing the time series results (various options)
 appendUnit(name, unit) = unit == "" ? string(name) : string(name, " [", unit, "]")
 
+"""
+    indexOftrailingDot(name::AbstractString)::Int
+
+Return the index of the trailing "." of name. If there is no ".xxx", zero is returned
+"""
+function indexOftrailingDot(name::AbstractString)::Int
+   @static if VERSION >= v"0.7.0-DEV.2005"
+       i = first(something(findlast(".", name), 0:-1))
+   else
+       i = rsearchindex(name, ".")
+   end
+   return i > 0 && i < length(name) ? i : 0
+end
+
+
+
 function getStringDictResult(model, res::RawResult)
     nt     = res.nt
     data   = res.data
@@ -24,9 +40,11 @@ const StringDictAnyResult = Dict{AbstractString,Any}
 resultHeading(result::StringDictAnyResult) = ""
 
 function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
+    hasSignal = false
     if haskey(seriesDict, name)
-        sig     = seriesDict[name]
-        keyName = name
+        sig       = seriesDict[name]
+        keyName   = name
+        hasSignal = true
     else
         if name[end] == ']'
             @static if VERSION >= v"0.7.0-DEV.2005"
@@ -52,29 +70,39 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
                     else
                         warn("ModiaMath.plot: argument name (= $name) does not characterize one array element\nIndex ranges are not yet supported.")
                     end
-                    sig = nothing
+                    return (nothing, keyName, name)
                 end
-
-            else
-                @static if VERSION >= v"0.7.0-DEV.2005"
-                    @warn "ModiaMath.plot: argument name (= $name) is not correct."
-                else
-                    warn("\nModiaMath.plot: argument name (= ", name, ") is not correct.")
-                end
-                sig = nothing
+                hasSignal = true
             end  
     
-        else
-            @static if VERSION >= v"0.7.0-DEV.2005"
-                @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-            else
-                warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        elseif (i = indexOftrailingDot(name)) > 0
+            keyName   = name[1:i-1]
+            fieldName = Symbol(name[i+1:end])
+            if haskey(seriesDict, keyName) 
+                sig3 = seriesDict[keyName]
+                if typeof(sig3) <: AbstractVector && length(sig3) > 0 && isstructtype(typeof(sig3[1])) && 
+                   isdefined(sig3[1], fieldName) && fieldtype(typeof(sig3[1]), fieldName) <: Number
+                    sig = zeros(length(sig3))
+                    for i in 1:length(sig3)
+                        sig[i] = getfield(sig3[i], fieldName)
+                    end
+                    hasSignal = true
+                end
             end
-            sig = nothing
-            keyName = name
         end
     end
-    return (sig, keyName, name)
+
+    if hasSignal
+        return (sig, keyName, name)
+
+    else
+        @static if VERSION >= v"0.7.0-DEV.2005"
+            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
+        else
+            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
+        end
+        return (nothing, name, name)
+    end
 end
 
 

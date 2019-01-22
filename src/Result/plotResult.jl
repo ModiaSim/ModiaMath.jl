@@ -19,9 +19,11 @@ of the variable definition.
 
 # Arguments
 Argument `result` maybe one of the following:
-- A dictionary `Dict{AbstractString,Any}`. Note, before passing data to the plot package,
+- A dictionary `Dict{AbstractString,Any}`. The Dict Value can be Vector{Number}, Matrix{Number},
+  or a vector of structs where the field that shall be plotted is a Number.
+  Note, before passing data to the plot package,
   it is converted to Float64. This allows to, for example, also plot rational numbers,
-  even if not supported by the plot package.
+  even if not supported by the plot package. 
 - An instance of struct [`ModiaMath.Result`](@ref)
 - An object for which function [`ModiaMath.resultTimeSeries`](@ref) is defined.
 
