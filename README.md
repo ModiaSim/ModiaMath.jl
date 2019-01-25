@@ -33,8 +33,8 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 ## Installation
 
 The package is registered in METADATA.jl and can be installed with Pkg.add. The latest
-released version (0.3.1) is the last one with support for Julia 0.6 and 0.7. 
-Trunk and later versions support Julia 1.0 and later. 
+released version (0.3.1) is the last one with support for Julia >= 0.6.
+Trunk and later versions support Julia >=1.0.
 
 ```julia
 # Julia 0.6 and later:
