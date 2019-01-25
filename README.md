@@ -32,13 +32,15 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 ## Installation
 
-The package is registered in METADATA.jl and can be installed with Pkg.add.
+The package is registered in METADATA.jl and can be installed with Pkg.add. The latest
+released version (0.3.1) is the last one with support for Julia 0.6 and 0.7. 
+Trunk and later versions support Julia 1.0 and later. 
 
 ```julia
-# Julia 0.6, 0.7, 1.0:
+# Julia 0.6 and later:
 julia> Pkg.add("ModiaMath")
 
-# alternatively in Julia 0.7 and 1.0:
+# alternatively in Julia >= 0.7:
 julia> ]add ModiaMath
 ```
 
@@ -119,7 +121,7 @@ The package has been tested with Julia `0.6.3` on Windows 7, Kubuntu 18.04, Ubun
 with Julia `0.7.0`, `1.0.0`, `1.0.1` on Windows 7, via the travis CL
 on Linux (x86_64-pc-linux-gnu) and macOS (x86_64-apple-darwin14.5.0), and via the Appveyor CL on Windows.
 
-The ModiaMath version number is 0.3.0 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.3.1 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
