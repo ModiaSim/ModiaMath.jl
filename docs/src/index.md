@@ -30,7 +30,7 @@ The latest released version (0.3.1) is the last one with support for Julia >= 0.
 Trunk and later versions support Julia >=1.0.
 
 ```julia
-# Julia >= 0.6, 0.7, 1.0:
+# Julia >= 0.6:
 julia> Pkg.add("ModiaMath")
 
 # alternatively in Julia >= 0.7:
