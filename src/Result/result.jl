@@ -34,6 +34,7 @@ end
 
 const StringDictAnyResult = Dict{AbstractString,Any}
 resultHeading(result::StringDictAnyResult) = ""
+variablesDependingOnStruct(state::Any) = 0
 
 function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
     hasSignal = false
@@ -42,6 +43,7 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
         keyName   = name
         hasSignal = true
     else
+        # Handle signal arrays, auch as  a.b.c[3]
         if name[end] == ']'
             indexRange = something(findlast("[", name), 0:-1)
             i = indexRange[1]
@@ -64,17 +66,36 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
             end  
     
         elseif (i = indexOftrailingDot(name)) > 0
+            # Handle vector of structs, such as a.b.c and a.b is the key and c is the field in struct a.b[i]
             keyName   = name[1:i-1]
             fieldName = Symbol(name[i+1:end])
             if haskey(seriesDict, keyName) 
                 sig3 = seriesDict[keyName]
-                if typeof(sig3) <: AbstractVector && length(sig3) > 0 && isstructtype(typeof(sig3[1])) && 
-                   isdefined(sig3[1], fieldName) && fieldtype(typeof(sig3[1]), fieldName) <: Number
-                    sig = zeros(length(sig3))
-                    for i in 1:length(sig3)
-                        sig[i] = getfield(sig3[i], fieldName)
+                if typeof(sig3) <: AbstractVector && length(sig3) > 0 && isstructtype(typeof(sig3[1]))
+                    # Signal is a vector of structs and has at least one element
+                    if isdefined(sig3[1], fieldName) && fieldtype(typeof(sig3[1]), fieldName) <: Number
+                        # Struct has fieldName and fieldName is a number
+                        sig = zeros(length(sig3))
+                        for i in 1:length(sig3)
+                           sig[i] = getfield(sig3[i], fieldName)
+                        end
+                        hasSignal = true
+                    else
+                        # Check whether dependent variables are defined
+                        vdict = variablesDependingOnStruct(sig3[1])
+                        key   = name[i+1:end]
+                        if typeof(vdict) != Int
+                            if haskey(vdict, key)
+                                # Dependent variable fieldName is defined
+                                sig = zeros(length(sig3))
+                                fc  = vdict[key]
+                                for i in 1:length(sig3)
+                                    sig[i] = fc(sig3[i])
+                                end
+                                hasSignal = true                                
+                            end
+                        end
                     end
-                    hasSignal = true
                 end
             end
         end

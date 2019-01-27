@@ -19,8 +19,15 @@ of the variable definition.
 
 # Arguments
 Argument `result` maybe one of the following:
-- A dictionary `Dict{AbstractString,Any}`. The Dict Value can be Vector{Number}, Matrix{Number},
-  or a vector of structs where the field that shall be plotted is a Number.
+- A dictionary `Dict{AbstractString,Any}`. The Dict Value can be \\
+  (a) `Vector{Number}`,\\
+  (b) `Matrix{Number}`,\\
+  (c) a vector of structs where the field that shall be plotted is a `Number`, or\\
+  (d) a vector of structs and a function is provided to compute a `Number` from
+  the struct (this function must be stored as value in a dictionary
+  `Dict{AbstractString,Function}` and this dictionary is returned from function
+  `ModiaMath.variablesDependingOnStruct(struct);`
+  see last example below).\\
   Note, before passing data to the plot package,
   it is converted to Float64. This allows to, for example, also plot rational numbers,
   even if not supported by the plot package. 
@@ -81,6 +88,27 @@ ModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)
 # (legend = "Sim 2: phi1 [rad]")
 result[:phi1] = 0.5*result[:phi1]
 ModiaMath.plot(result, :phi1, prefix="Sim 2: ", reuse=true)
+
+# Compute and plot variables that depend on the result vector
+mutable struct MyThermodynamicState
+    p::Float64
+    T::Float64
+end
+specificEnthalpy(state::MyThermodynamicState) = 2.0*state.T
+dynamicViscosity(state::MyThermodynamicState) = 2.0*state.p
+
+const dependentVariables = Dict{AbstractString,Function}("h"   => specificEnthalpy,
+                                                         "eta" => dynamicViscosity)
+
+ModiaMath.variablesDependingOnStruct(state::MyThermodynamicState) = dependentVariables
+
+state = MyThermodynamicState[]
+for i = 1:length(t)
+    push!(state, MyThermodynamicState(i*2.0,i*3.0))
+end
+result = Dict{AbstractString,Any}("time" => t, "state" => state)
+
+ModiaMath.plot(result, ("state.p", "state.T", "state.h", "state.eta"))
 ```
 
 The 5th example above (2 diagrams in form of a vector) give the following plot:

@@ -52,6 +52,8 @@ instead the instructions
 ### Version 0.4.0
 
 - All Julia 0.6 code removed.
+- ModiaMath.plot supports variables that can be computed from a vector of struct result
+  (for details, see docu of plot)
 
 
 ### Version 0.3.1

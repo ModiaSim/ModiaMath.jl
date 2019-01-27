@@ -17,6 +17,15 @@ mutable struct MyThermodynamicState
     T::Float64
 end
 
+specificEnthalpy(state::MyThermodynamicState) = 2.0*state.T
+dynamicViscosity(state::MyThermodynamicState) = 2.0*state.p
+
+const dependentVariables = Dict{AbstractString,Function}("h"   => specificEnthalpy,
+                                                         "eta" => dynamicViscosity)
+
+ModiaMath.variablesDependingOnStruct(state::MyThermodynamicState) = dependentVariables
+
+
 state = MyThermodynamicState[]
 for i = 1:length(t)
     push!(state, MyThermodynamicState(i*2.0,i*3.0))
@@ -25,6 +34,6 @@ end
 result = Dict{AbstractString,Any}("time" => t, "state" => state)
 
 # Plots
-ModiaMath.plot(result, ("state.p", "state.T"), figure=7)
+ModiaMath.plot(result, ("state.p", "state.T", "state.h", "state.eta"), figure=7)
 
 end
