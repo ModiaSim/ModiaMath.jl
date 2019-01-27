@@ -31,13 +31,8 @@ For testing:
 module FreeBodyRotation
 
 import ModiaMath
+using ModiaMath.LinearAlgebra    # should be "using LinearAlgebray", but included via ModiaMath
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using ModiaMath.LinearAlgebra    # should be "using LinearAlgebray", but included via ModiaMath
-    DIAGONAL(m) = Diagonal(m)
-else
-    DIAGONAL(m) = diagm(m)
-end
 
 # Desired:
 #   using StaticArrays
@@ -56,7 +51,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     freqHz::SVector{3,Float64}
     phase::SVector{3,Float64}
 
-    function Model(;m=1.0, I=DIAGONAL([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
+    function Model(;m=1.0, I=Diagonal([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
                   phase=[0,0.5235987755983,1.0471975511966],
                   Q0=[0.1, 0.5, 0.0, 1.0],
                   w0=zeros(3))

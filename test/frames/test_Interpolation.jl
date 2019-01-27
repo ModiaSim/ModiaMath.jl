@@ -8,14 +8,9 @@ import ModiaMath
 #    using Unitful
 #  
 #  In order that these packages need not to be defined in the user environment, they are included via ModiaMath:
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-    using ModiaMath.LinearAlgebra
-end
-
-using  ModiaMath.Unitful
+using ModiaMath.Test
+using ModiaMath.LinearAlgebra
+using ModiaMath.Unitful
 
 
 

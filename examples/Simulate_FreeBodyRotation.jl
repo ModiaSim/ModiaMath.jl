@@ -33,14 +33,9 @@ Reference Modelica model:
 """
 module Simulate_FreeBodyRotation
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
-    DIAGONAL(m) = Diagonal(m)
-else
-    DIAGONAL(m) = diagm(m)
-end
-
+using LinearAlgebra
 using ModiaMath
+
 
 # Desired:
 #   using StaticArrays
@@ -55,7 +50,7 @@ using ModiaMath.StaticArrays
 #                             q0     = [0.1, 0.5, 0.0, 1.0],
 # q0     = [0.08908708063747484, 0.445435403187374, 0.0, 0.8908708063747479],
 
-@component FreeBodyRotation(;I=SMatrix{3,3,Float64,9}(DIAGONAL([1.0,2.0,3.0])),
+@component FreeBodyRotation(;I=SMatrix{3,3,Float64,9}(Diagonal([1.0,2.0,3.0])),
                              A=SVector{3,Float64}([3.0,4.0,5.0]),
                              freqHz=SVector{3,Float64}([0.3,0.2,0.1]),
                              phase=SVector{3,Float64}([0,0.5235987755983,1.0471975511966]),

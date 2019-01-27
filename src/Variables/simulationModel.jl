@@ -49,11 +49,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                                                     scaleConstraintsAtEvents = scaleConstraintsAtEvents)
 
         # model._internal.simulationState = simulationState
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            new(String(modelName), simulationState, var, model)
-        else
-            new(modelName, simulationState, var, model)
-        end
+        new(String(modelName), simulationState, var, model)
     end
 end 
 

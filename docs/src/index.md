@@ -26,12 +26,14 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 ## Installation
 
 ModiMath is registered in METADATA.jl and can be installed with Pkg.add.
+The latest released version (0.3.1) is the last one with support for Julia >= 0.6.
+Trunk and later versions support Julia >=1.0.
 
 ```julia
-# Julia 0.6, 0.7, 1.0:
+# Julia >= 0.6:
 julia> Pkg.add("ModiaMath")
 
-# alternatively in Julia 0.7 and 1.0:
+# alternatively in Julia >= 0.7:
 julia> ]add ModiaMath
 ```
 
@@ -45,6 +47,19 @@ instead the instructions
 
 
 ## Release Notes
+
+
+### Version 0.4.0
+
+- All Julia 0.6 code removed.
+
+
+### Version 0.3.1
+
+- Initialization issue corrected
+- Use PyPlot.pygui(true) when importing ModiaMath in order that separate plots windows are used and no inline plots, independent of the used environment (especially made so that plots in vs-code are not inlined in the vs-code GUI).
+- ModiaMath.plot supports now also Vectors of structs. E.g. Vector{ThermodynamicState} and plot(result, "state.p") is then possible, where state is an instance of the struct and "p" is a fieldname with a scalar Number value.
+
 
 ### Version 0.3.0
 

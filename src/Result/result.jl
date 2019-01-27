@@ -14,11 +14,7 @@ appendUnit(name, unit) = unit == "" ? string(name) : string(name, " [", unit, "]
 Return the index of the trailing "." of name. If there is no ".xxx", zero is returned
 """
 function indexOftrailingDot(name::AbstractString)::Int
-   @static if VERSION >= v"0.7.0-DEV.2005"
-       i = first(something(findlast(".", name), 0:-1))
-   else
-       i = rsearchindex(name, ".")
-   end
+   i = first(something(findlast(".", name), 0:-1))
    return i > 0 && i < length(name) ? i : 0
 end
 
@@ -47,11 +43,7 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
         hasSignal = true
     else
         if name[end] == ']'
-            @static if VERSION >= v"0.7.0-DEV.2005"
-                indexRange = something(findlast("[", name), 0:-1)
-            else
-                indexRange = rsearch(name, "[")
-            end
+            indexRange = something(findlast("[", name), 0:-1)
             i = indexRange[1]
             @assert(i >= 2)
             keyName = name[1:i-1]
@@ -65,11 +57,7 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
                 append!(ex2.args, ex1.args)
                 sig = @eval $ex2
                 if ndims(sig) != 1
-                    @static if VERSION >= v"0.7.0-DEV.2005"
-                        @warn "ModiaMath.plot: argument name (= $name) does not characterize one array element\nIndex ranges are not yet supported."
-                    else
-                        warn("ModiaMath.plot: argument name (= $name) does not characterize one array element\nIndex ranges are not yet supported.")
-                    end
+                    @warn "ModiaMath.plot: argument name (= $name) does not characterize one array element\nIndex ranges are not yet supported."
                     return (nothing, keyName, name)
                 end
                 hasSignal = true
@@ -96,11 +84,7 @@ function getSignal(seriesDict::StringDictAnyResult, name::AbstractString)
         return (sig, keyName, name)
 
     else
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
-        else
-            warn("\nModiaMath.plot: argument name (= ", name, ") is not correct or does not identify a signal in the result.")
-        end
+        @warn "ModiaMath.plot: argument name (= $name) is not correct or does not identify a signal in the result."
         return (nothing, name, name)
     end
 end
@@ -123,11 +107,7 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
     if ndims(xsig) != 1
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector."
-        else
-            warn("\nModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector.")
-        end
+        @warn "ModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector."
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(string(xAxis), string(unit(xsig[1]))) : ""
@@ -153,21 +133,13 @@ function resultTimeSeries(result::StringDictAnyResult, name, xLabel::Bool, xAxis
     elseif ndims(ysig) == 2
         # ysig is a matrix
         nLegend = size(ysig,2)
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            ysigLegend = Array{String}(undef, nLegend)
-        else
-            ysigLegend = Array{String}(nLegend)
-        end
+        ysigLegend = Array{String}(undef, nLegend)
 
         for i = 1:nLegend
             ysigLegend[i] = appendUnit(ykeyName*"["*string(i)*"]", string(unit(ysig[1,i])))
         end
     else
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: Variable $ykeyName is not plotted because variables with more as one dimension not yet supported."
-        else
-            warn("\nModiaMath.plot: Variable $ykeyName is not plotted because variables with more as one dimension not yet supported.")
-        end
+        @warn "ModiaMath.plot: Variable $ykeyName is not plotted because variables with more as one dimension not yet supported."
         return (nothing, nothing, nothing, nothing)
     end
 
@@ -285,11 +257,7 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
         return (nothing, nothing, nothing, nothing)
     end
     if ndims(xsig) != 1
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            @warn "ModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector."
-        else
-            warn("\nModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector.")
-        end
+        @warn "ModiaMath.plot: argument xAxis (= $xAxis) does not characterize a signal vector."
         return (nothing, nothing, nothing, nothing)
     end
     xsigLegend = xLabel ? appendUnit(xName, result.var[Symbol(xkeyName)].unit) : ""
@@ -317,12 +285,7 @@ function resultTimeSeries(result::ResultWithVariables, name, xLabel::Bool, xAxis
 
     else
         # sig has more as one dimension
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            ysigLegend = Array{String}(undef, length(yvar.value))
-        else
-            ysigLegend = Array{String}(length(yvar.value))
-        end
-
+        ysigLegend = Array{String}(undef, length(yvar.value))
         for i in eachindex(yvar.value)
             ysigLegend[i] = appendUnit(ModiaMath.indexToString(symbol_ykeyName, yvar.value, i), yvar.unit)
         end
@@ -348,11 +311,7 @@ end
 
 
 function Base.show(io::IO, result::ResultWithVariables)
-    @static if VERSION >= v"0.7.0-DEV.2005" 
-        show(io, resultTable(result), summary=false, splitcols=true)
-    else
-        show(io, resultTable(result))
-    end
+    show(io, resultTable(result), summary=false, splitcols=true)
 end
 
 

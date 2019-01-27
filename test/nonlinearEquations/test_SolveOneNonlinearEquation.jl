@@ -8,13 +8,8 @@ import ModiaMath
 #    using Unitful
 #  
 #  In order that these packages need not to be defined in the user environment, they are included via ModiaMath:
-@static if VERSION < v"0.7.0-DEV.2005"
-    using Base.Test
-else
-    using ModiaMath.Test
-    @eval using Printf
-end
-
+using ModiaMath.Test
+@eval using Printf
 using ModiaMath: solveOneNonlinearEquation
 
 

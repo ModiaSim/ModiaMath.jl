@@ -14,17 +14,10 @@ module KINSOL
 
 import Sundials
 import ModiaMath
+using LinearAlgebra
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    using LinearAlgebra
-
-    @noinline function old_cfunction(f, r, a)
-        ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
-    end
-
-    const CVOID = Cvoid
-else
-    const CVOID = Void
+@noinline function old_cfunction(f, r, a)
+    ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
 end
 
 
@@ -36,7 +29,7 @@ mutable struct NonlinearEquationsInfo
     y0::Vector{Float64}      # The initial y vector (to print in error messages)
     lastNorm_r::Float64
     lastrScaledNorm_r::Float64
-    kin_mem::Ptr{CVOID}      # KINSOL pointer (to access all KINgetXXX functions)
+    kin_mem::Ptr{Cvoid}      # KINSOL pointer (to access all KINgetXXX functions)
 
     function NonlinearEquationsInfo(name::String, ny::Int, getResidues!::Function; extraInfo=nothing)
         @assert(ny >= 0)

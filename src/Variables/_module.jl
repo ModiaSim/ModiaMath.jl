@@ -203,11 +203,7 @@ import DataFrames
 import ModiaMath
 
 
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const NOTHING = Nothing
-else
-    const NOTHING = Void
-end
+
 
 
 # include code

@@ -6,7 +6,7 @@
 #
 
 # Provide functions to handle time and state events in user models.
-@static if VERSION >= v"0.7.0-DEV.2005" @eval using Printf end
+@eval using Printf
 
 mutable struct EventHandler
    # Input values for the event functions
@@ -45,14 +45,8 @@ mutable struct EventHandler
      
     function EventHandler(;nz::Int=0) 
         @assert(nz >= 0)
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            new(0.0, false, false, false, false, false, floatmax(Float64), floatmax(Float64),
-                true, NoRestart, false, false, nz, ones(nz), fill(false, nz), fill(0, nz))
-        else
-            new(0.0, false, false, false, false, false, realmax(Float64), realmax(Float64),
-                true, NoRestart, false, false, nz, ones(nz), fill(false, nz), fill(0, nz))
-        end
-
+        new(0.0, false, false, false, false, false, floatmax(Float64), floatmax(Float64),
+            true, NoRestart, false, false, nz, ones(nz), fill(false, nz), fill(0, nz))
     end
 end
 
@@ -63,13 +57,8 @@ negativeCrossingAsString(negative::Bool) = negative ? " (became < 0)" : " (becam
 function initEventIteration!(h::EventHandler, t::Float64)
     h.time          = t
     h.restart       = NoRestart
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        h.maxTime       = floatmax(Float64)
-        h.nextEventTime = floatmax(Float64)
-    else
-        h.maxTime       = realmax(Float64)
-        h.nextEventTime = realmax(Float64)
-    end
+    h.maxTime       = floatmax(Float64)
+    h.nextEventTime = floatmax(Float64)
     h.newEventIteration   = false
     h.firstEventIteration = true
 end
