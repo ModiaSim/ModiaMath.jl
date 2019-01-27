@@ -32,7 +32,7 @@ export getStringDictResult, SymbolDictResult, StringDictResult, ResultWithVariab
 export resultHeading, resultTimeSeries, resultTable, plot
 export RawResult, nResults, storeRawResult!
 export closeFigure, closeAllFigures
-
+export variablesDependingOnStruct
 
 
 # using/imports
