@@ -21,11 +21,9 @@ import Sundials
 import ModiaMath
 import ModiaMath.DAE
 using  StaticArrays
+@eval using Printf
+using LinearAlgebra
 
-@static if VERSION >= v"0.7.0-DEV.2005" 
-    @eval using Printf
-    using LinearAlgebra
-end
 
 # include code
 # include("IDA_UserData.jl")  # is included within simulate.jl

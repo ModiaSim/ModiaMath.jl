@@ -9,16 +9,16 @@
 
 mutable struct ComponentInternal <: ModiaMath.AbstractComponentInternal
     name::Symbol                                                     # Name of component
-    within::Union{ModiaMath.AbstractComponentWithVariables,NOTHING}  # Component in which component is present (if within==nothing, object is not within a component)
+    within::Union{ModiaMath.AbstractComponentWithVariables,Nothing}  # Component in which component is present (if within==nothing, object is not within a component)
 
     ComponentInternal(name=NoNameDefined, within=nothing) = new(Symbol(name), within)
 end
 
-isInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) != NOTHING
-isNotInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) == NOTHING
+isInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) != Nothing
+isNotInComponent(internal::ModiaMath.AbstractComponentInternal) = typeof(internal.within) == Nothing
 
-isInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) != NOTHING
-isNotInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) == NOTHING
+isInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) != Nothing
+isNotInComponent(component::ModiaMath.AbstractComponentWithVariables) = typeof(component._internal.within) == Nothing
 
 
 """
@@ -72,37 +72,20 @@ end
 
 
 function Base.show(io::IO, component::ModiaMath.AbstractComponentWithVariables)
-
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        for c in fieldnames(typeof(component))
-            field = getfield(component, c)
-            if typeof(field) <: ModiaMath.AbstractComponentWithVariables
-                println(io, "\n   ", c, " = ", field)
-            elseif typeof(field) <: AbstractVector
-                for i in 1:length(field)
-                    println(io, "   ", c, "[", i, "] = ", field[i])
-                end
-            elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
-                # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
-                println(io, "   ", c, " = ", field)
+    for c in fieldnames(typeof(component))
+        field = getfield(component, c)
+        if typeof(field) <: ModiaMath.AbstractComponentWithVariables
+            println(io, "\n   ", c, " = ", field)
+        elseif typeof(field) <: AbstractVector
+            for i in 1:length(field)
+                println(io, "   ", c, "[", i, "] = ", field[i])
             end
+        elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
+            # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
+            println(io, "   ", c, " = ", field)
         end
-    else
-        for c in fieldnames(component)
-            field = getfield(component, c)
-            if typeof(field) <: ModiaMath.AbstractComponentWithVariables
-                println(io, "\n   ", c, " = ", field)
-            elseif typeof(field) <: AbstractVector
-                for i in 1:length(field)
-                    println(io, "   ", c, "[", i, "] = ", field[i])
-                end
-            elseif !( typeof(field) <: ModiaMath.AbstractComponentInternal )
-                # Print fields, but not "_internal::ModiaMath.AbstractComponentInternal"
-                println(io, "   ", c, " = ", field)
-            end
-        end
-
     end
+
     print(io, "   )")
 end
 

@@ -19,38 +19,20 @@ function get_ModelVariables_aux!(model, modelType, var, dict, analysis::Analysis
     dict[model] = true   # Mark that model is going to be inspected
     #println("... inspect modelType = ", modelType)
 
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        for i = 1:fieldcount(modelType)
-            field = getfield(model, fieldname(modelType, i))
-            ftype = typeof(field)
-            #println("... fieldname = ", fieldname(modelType,i), ", ftype = ", ftype)
-            
-            if ftype <: ModiaMath.AbstractVariable 
-                if isUsedInAnalysis(field, analysis)
-                    # Use field since defined for the desired analysis
-                    push!(var, field)
-                end
-            elseif ftype <: ModiaMath.AbstractComponentWithVariables && !haskey(dict, field)  # Only inspect further, if model/field was not yet inspected
-                get_ModelVariables_aux!(field, ftype, var, dict, analysis)
+    for i = 1:fieldcount(modelType)
+        field = getfield(model, fieldname(modelType, i))
+        ftype = typeof(field)
+        #println("... fieldname = ", fieldname(modelType,i), ", ftype = ", ftype)
+        
+        if ftype <: ModiaMath.AbstractVariable 
+            if isUsedInAnalysis(field, analysis)
+                # Use field since defined for the desired analysis
+                push!(var, field)
             end
-        end
-    else
-        for i = 1:nfields(modelType)
-            field = getfield(model, fieldname(modelType, i))
-            ftype = typeof(field)
-            #println("... fieldname = ", fieldname(modelType,i), ", ftype = ", ftype)
-            
-            if ftype <: ModiaMath.AbstractVariable 
-                if isUsedInAnalysis(field, analysis)
-                    # Use field since defined for the desired analysis
-                    push!(var, field)
-                end
-            elseif ftype <: ModiaMath.AbstractComponentWithVariables && !haskey(dict, field)  # Only inspect further, if model/field was not yet inspected
-                get_ModelVariables_aux!(field, ftype, var, dict, analysis)
-            end
+        elseif ftype <: ModiaMath.AbstractComponentWithVariables && !haskey(dict, field)  # Only inspect further, if model/field was not yet inspected
+            get_ModelVariables_aux!(field, ftype, var, dict, analysis)
         end
     end
-
 end
 
 
@@ -63,11 +45,7 @@ function get_ModelVariables(model::Any, analysis::AnalysisType)
     var = ModiaMath.AbstractVariable[]
     modelType = typeof(model)
 
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        dict = IdDict{Any,Bool}()
-    else
-        dict = ObjectIdDict()
-    end
+    dict = IdDict{Any,Bool}()
     
     if modelType <: ModiaMath.AbstractComponentWithVariables
         get_ModelVariables_aux!(model, modelType, var, dict, analysis)
@@ -108,7 +86,7 @@ function get_variableTable(var::Vector{ModiaMath.AbstractVariable})
             unit        = v.unit
             numericType = v.numericType
             vec         = NumericTypeToVector[Int(v.numericType)]
-            der         = typeof(v.derivative) == NOTHING ? Symbol("") : instanceName(v.derivative)
+            der         = typeof(v.derivative) == Nothing ? Symbol("") : instanceName(v.derivative)
             vmin        = v.min
             vmax        = v.max
             vnominal    = v.nominal
@@ -131,13 +109,8 @@ end
 
 
 function indexToString(name, A, linearIndex)
-    @static if VERSION >= v"0.7.0-DEV.2005"
-        index = CartesianIndices(A)[linearIndex]
-    else
-        index = ind2sub(A, linearIndex)
-    end
-
-    s = string(name, "[")
+    index = CartesianIndices(A)[linearIndex]
+    s     = string(name, "[")
     for i in 1:length(index)
         s = string(s, index[i])
     
@@ -180,7 +153,7 @@ function pushNames!(v::RealVariable, vnumType, xNames, residueNames)
     end
     
     if vnumType == XD_EXP
-        if typeof(v.derivative) == NOTHING
+        if typeof(v.derivative) == Nothing
             error(instanceName(v), " is defined as XD_EXP, but no variable is defined as its derivative.")
         end
         push!(residueNames, string(instanceName(v.derivative)) * " - derx[.]")
@@ -267,13 +240,9 @@ mutable struct ModelVariables
             dummy_x    = RealScalar("_dummy_x"   ; fixed=true, numericType=XD_EXP)
             dummy_derx = RealScalar("_dummy_derx";             numericType=DER_XD_EXP, integral=dummy_x)
             
-            @static if VERSION >= v"0.7.0-DEV.2005" 
-                pushfirst!(var, dummy_derx)
-                pushfirst!(var, dummy_x) 
-            else 
-                unshift!(var, dummy_derx)
-                unshift!(var, dummy_x) 
-            end
+            pushfirst!(var, dummy_derx)
+            pushfirst!(var, dummy_x) 
+
             nx        = 1
             nx_exp    = 1
             nderx_exp = 1
@@ -283,12 +252,8 @@ mutable struct ModelVariables
             dummyDifferentialEquation = false
         end
         time = RealScalar("time"; unit="s", causality=Independent, numericType=TIME)
+        pushfirst!(var, time) 
 
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            pushfirst!(var, time) 
-        else
-            unshift!(var, time) 
-        end
         # println("\n... v_table = ", get_variableTable(var))
 
         # Check dimensions
@@ -307,12 +272,7 @@ mutable struct ModelVariables
         end
 
         # Allocate variable/index vectors to copy x-, derx-values to variables and variables to residues
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            x_var        = Array{ModiaMath.AbstractRealVariable}(undef, nx_exp_var + nx_imp_var + nx_alg_var)   # = [x_exp_var, x_imp_var, x_alg_var]
-        else
-            x_var        = Array{ModiaMath.AbstractRealVariable}(nx_exp_var + nx_imp_var + nx_alg_var)   # = [x_exp_var, x_imp_var, x_alg_var]
-        end
-        
+        x_var     = Array{ModiaMath.AbstractRealVariable}(undef, nx_exp_var + nx_imp_var + nx_alg_var)   # = [x_exp_var, x_imp_var, x_alg_var]
         ix_exp    = 1
         ix_imp    = nx_exp    + 1
         ix_alg    = ix_imp    + nx_imp
@@ -324,11 +284,7 @@ mutable struct ModelVariables
         ix_lambda_var = ix_alg_var    + nx_alg_var
         ix_mue_var    = ix_lambda_var + nx_lambda_var
                    
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            derx_var     = Array{ModiaMath.AbstractRealVariable}(undef, nx_imp_var + nx_lambda_var + nx_mue_var)  # = [der(x_imp_var), lambda_var, mue_var]
-        else
-            derx_var     = Array{ModiaMath.AbstractRealVariable}(nx_imp_var + nx_lambda_var + nx_mue_var)  # = [der(x_imp_var), lambda_var, mue_var]
-        end
+        derx_var     = Array{ModiaMath.AbstractRealVariable}(undef, nx_imp_var + nx_lambda_var + nx_mue_var)  # = [der(x_imp_var), lambda_var, mue_var]
         iderx_imp    = 1
         iderx_lambda = nx_imp + 1
         iderx_mue    = nx_imp + nx_lambda + 1
@@ -336,32 +292,20 @@ mutable struct ModelVariables
         iderx_lambda_var = nx_imp_var + 1
         iderx_mue_var    = nx_imp_var + nx_lambda_var + 1
                    
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            residue_var  = Array{ModiaMath.AbstractRealVariable}(undef, nfd_imp_var + nfc_var)   # = [fd_imp_var, fc_var]
-        else
-            residue_var  = Array{ModiaMath.AbstractRealVariable}(nfd_imp_var + nfc_var)   # = [fd_imp_var, fc_var]
-        end
+        residue_var  = Array{ModiaMath.AbstractRealVariable}(undef, nfd_imp_var + nfc_var)   # = [fd_imp_var, fc_var]
         ifd_imp = 1
         ifc     = nfd_imp + 1 
         ifd_imp_var = 1
         ifc_var     = nfd_imp_var + 1
                    
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            result_var   = Array{ModiaMath.AbstractVariable}(undef, 1 + length(x_var) + nderx_exp_var + length(derx_var) + nwr_var + nwc_var - (dummyDifferentialEquation ? 2 : 0))    # [time, x_var, derx_var, wr_var, wc_var]
-            result_names = Array{String}(undef, 1 + nx_exp + nx_imp + nx_alg + nderx_exp + nx_imp + nx_lambda + nx_mue + nwr + nwc - (dummyDifferentialEquation ? 2 : 0))
-        else
-            result_var   = Array{ModiaMath.AbstractVariable}(1 + length(x_var) + nderx_exp_var + length(derx_var) + nwr_var + nwc_var - (dummyDifferentialEquation ? 2 : 0))    # [time, x_var, derx_var, wr_var, wc_var]
-            result_names = Array{String}(1 + nx_exp + nx_imp + nx_alg + nderx_exp + nx_imp + nx_lambda + nx_mue + nwr + nwc - (dummyDifferentialEquation ? 2 : 0))
-        end
+        result_var   = Array{ModiaMath.AbstractVariable}(undef, 1 + length(x_var) + nderx_exp_var + length(derx_var) + nwr_var + nwc_var - (dummyDifferentialEquation ? 2 : 0))    # [time, x_var, derx_var, wr_var, wc_var]
+        result_names = Array{String}(undef, 1 + nx_exp + nx_imp + nx_alg + nderx_exp + nx_imp + nx_lambda + nx_mue + nwr + nwc - (dummyDifferentialEquation ? 2 : 0))
         result_names[1] = "time"
         iresult     = 1
         iresult_var = 1
 
-        @static if VERSION >= v"0.7.0-DEV.2005"
-            x_names      = Array{String}(undef, nx)
-        else
-            x_names      = Array{String}(nx)
-        end
+        x_names      = Array{String}(undef, nx)
+
         #println("... length(result_var) = ", length(result_var), ", length(result_names) = ", length(result_names), ", nx_exp = ", nx_exp)
 
         for i in eachindex(var)
@@ -540,20 +484,12 @@ function print_ModelVariables(m::ModelVariables)
     copyToResidueTable = ModiaMath.get_copyToResidueTable(m)
     copyToResultTable = ModiaMath.get_copyToResultTable(m)
 
-    @static if VERSION < v"0.7.0-DEV.2005"
-        println("\n\nvariables: ", variabletable)
-        println("\n\nx vector: ", x_table)
-        println("\n\ncopy to variables: ", copyToVariableTable)
-        println("\n\ncopy to residue vector: ", copyToResidueTable)
-        println("\n\ncopy to results: ", copyToResultTable)
-    else
-        print("\n\nvariables: ");                show(variabletable      , splitcols=true, summary=false)
-        print("\n\n\nx vector: ");               show(x_table            , splitcols=true, summary=false)
-        print("\n\n\ncopy to variables: ");      show(copyToVariableTable, splitcols=true, summary=false)
-        print("\n\n\ncopy to residue vector: "); show(copyToResidueTable , splitcols=true, summary=false)
-        print("\n\n\ncopy to results: ");        show(copyToResultTable  , splitcols=true, summary=false)
-        print("\n")
-    end
+    print("\n\nvariables: ");                show(variabletable      , splitcols=true, summary=false)
+    print("\n\n\nx vector: ");               show(x_table            , splitcols=true, summary=false)
+    print("\n\n\ncopy to variables: ");      show(copyToVariableTable, splitcols=true, summary=false)
+    print("\n\n\ncopy to residue vector: "); show(copyToResidueTable , splitcols=true, summary=false)
+    print("\n\n\ncopy to results: ");        show(copyToResultTable  , splitcols=true, summary=false)
+    print("\n")
 end
 
 

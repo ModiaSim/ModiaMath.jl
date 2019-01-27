@@ -51,8 +51,8 @@ Types WC are additional variables that are computed only at communication points
 Type TIME is just used to mark which variable is the independent time variable.
 =#
 
-isNothing(T) = typeof(T) == NOTHING
-hasValue(T)  = typeof(T) != NOTHING
+isNothing(T) = typeof(T) == Nothing
+hasValue(T)  = typeof(T) != Nothing
 
 
 #------------------------------ Generic Real Variable ----------------------------------------
@@ -79,8 +79,8 @@ mutable struct RealVariable{ValueType,ElementType} <: ModiaMath.AbstractRealVari
     nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
     flow::Bool
     numericType::NumericType                                          # how the variable is used in the equations
-    integral::Union{NOTHING,RealVariable{ValueType,ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{NOTHING, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-    derivative::Union{NOTHING,RealVariable{ValueType,ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    integral::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    derivative::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
     unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
 
     # How the variable is stored in vectors
@@ -93,7 +93,7 @@ mutable struct RealVariable{ValueType,ElementType} <: ModiaMath.AbstractRealVari
         variable = new(ComponentInternal(name, within), deepcopy(start), info, causality, variability, 
                      start, fixed, analysis, min, max, nominal, flow, numericType, integral, nothing, unit, 0, 0) 
 
-        if typeof(within) != NOTHING
+        if typeof(within) != Nothing
             setfield!(within, Symbol(name), variable)
         end
 

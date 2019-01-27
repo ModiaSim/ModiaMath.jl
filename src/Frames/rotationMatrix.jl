@@ -5,7 +5,8 @@
 #   ModiaMath.Frames (ModiaMath/Frames/_module.jl)
 #
 
-@static if VERSION >= v"0.7.0-DEV.2005" @eval using LinearAlgebra end
+@eval using LinearAlgebra
+
 
 """
     const ModiaMath.RotationMatrix = SMatrix{3,3,Float64,9}
@@ -32,19 +33,10 @@ const RotationMatrix = SMatrix{3,3,Float64,9}
 
 
 """
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const ModiaMath.NullRotation = ModiaMath.RotationMatrix(Matrix(1.0I, 3, 3))
-else
-    const ModiaMath.NullRotation = ModiaMath.RotationMatrix(eye(3))
-end
-
 Constant RotationMatrix that defines no rotation from frame 1 to frame 2.
 """
-@static if VERSION >= v"0.7.0-DEV.2005"
-    const NullRotation = SMatrix{3,3,Float64,9}(Matrix(1.0I, 3, 3))
-else
-    const NullRotation = SMatrix{3,3,Float64,9}(eye(3))
-end
+const NullRotation = SMatrix{3,3,Float64,9}(Matrix(1.0I, 3, 3))
+
 
 
 """
@@ -255,12 +247,7 @@ isapprox(angle1, angle2)
 ```
 """
 @inline function planarRotationAngle(e::AbstractVector, v1::AbstractVector, v2::AbstractVector; angle_guess::Number=0.0)::Number
-   @static if VERSION >= v"0.7.0-DEV.2005"
-      angle1 = atan( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
-   else
-      angle1 = atan2( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
-   end
-
+   angle1 = atan( dot(-cross(e,v1), v2), dot(v1,v2) - dot(e,v1)*dot(e,v2) )
    pi2    = 2*pi
    return angle1 + pi2*round(Int, (pi+angle_guess-angle1)/(pi2), RoundDown)
 end
