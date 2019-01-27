@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add.# Julia 0.6, 0.7, 1.0:\r\njulia> Pkg.add(\"ModiaMath\")\r\n\r\n# alternatively in Julia 0.7 and 1.0:\r\njulia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
+    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add. The latest released version (0.3.1) is the last one with support for Julia >= 0.6. Trunk and later versions support Julia >=1.0.# Julia >= 0.6, 0.7, 1.0:\r\njulia> Pkg.add(\"ModiaMath\")\r\n\r\n# alternatively in Julia >= 0.7:\r\njulia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
 },
 
 {
@@ -33,11 +33,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "index.html#Version-0.2.6-dev-1",
+    "location": "index.html#Version-0.4.0-1",
     "page": "Home",
-    "title": "Version 0.2.6-dev",
+    "title": "Version 0.4.0",
     "category": "section",
-    "text": "ModiaMath initialization and simulation improved:\nIssue with defaultInterval fixed: Previously: defaultInterval = (defaultStopTime - defaultStartTime)/500.0. However, if stopTime was set to 10e5, then the defaultInterval was much too small. This was changed so that defaultInterval is either explicitly given, or it is computed from the actual values of StopTime and StartTime.\nx_nominal introduced in constructor of simulation state (DAE.SimulationState) and of Modia interface (ModiaToModiaMath.ModiaSimulationModel): If x_nominal is explicitly provided in these constructor calls, it is used. Otherwise x_nominal[i] is set to max(abs(x_start[i]), 1e-7).\nx_nominal is newly used in KINSOL to scale the unknowns and is used to compute the absolute tolerance for Sundials IDA.\nA bug was corrected in the initialization function, where rScale was reported to KINSOL, but was also used for scaling of the residue (although this is performed in KINSOL).New function ModiaMath.solveOneNonlinearEquation: Determines the solution of one non-linear algebraic equation y=f(u) in one unknown u in a reliable and efficient way (using Brents algorithm)."
+    "text": "All Julia 0.6 code removed."
+},
+
+{
+    "location": "index.html#Version-0.3.1-1",
+    "page": "Home",
+    "title": "Version 0.3.1",
+    "category": "section",
+    "text": "Initialization issue corrected\nUse PyPlot.pygui(true) when importing ModiaMath in order that separate plots windows are used and no inline plots, independent of the used environment (especially made so that plots in vs-code are not inlined in the vs-code GUI).\nModiaMath.plot supports now also Vectors of structs. E.g. Vector{ThermodynamicState} and plot(result, \"state.p\") is then possible, where state is an instance of the struct and \"p\" is a fieldname with a scalar Number value."
+},
+
+{
+    "location": "index.html#Version-0.3.0-1",
+    "page": "Home",
+    "title": "Version 0.3.0",
+    "category": "section",
+    "text": "ModiaMath initialization and re-initialization improved:\nInitialization and re-initialization considerably changed (now only one nonlinear equation is solved and no longer two nonlinear equations).\nBy this change, several issues in the initialization were fixed.\nx_nominal also supported for ModiaMath.Variables."
+},
+
+{
+    "location": "index.html#Version-0.2.6-1",
+    "page": "Home",
+    "title": "Version 0.2.6",
+    "category": "section",
+    "text": "ModiaMath initialization and simulation improved:\nIssue with defaultInterval fixed: Previously: defaultInterval = (defaultStopTime - defaultStartTime)/500.0. However, if stopTime was set to 10e5, then the defaultInterval was much too small. This was changed so that defaultInterval is either explicitly given, or it is computed from the actual values of StopTime and StartTime.\nx_nominal introduced in constructor of simulation state (DAE.SimulationState) and of Modia interface (ModiaToModiaMath.ModiaSimulationModel): If x_nominal is explicitly provided in these constructor calls, it is used. Otherwise x_nominal[i] is set to max(abs(x_start[i]), 1e-7).\nx_nominal is newly used in KINSOL to scale the unknowns and is used to compute the absolute tolerance for Sundials IDA.\nA bug was corrected in the initialization function, where rScale was reported to KINSOL, but was also used for scaling of the residue (although this is performed in KINSOL).\nIf log=true, name-, start-, fixed-, nominal-values of the x-vector are printed before initialization starts.New function ModiaMath.solveOneNonlinearEquation: Determines the solution of one non-linear algebraic equation y=f(u) in one unknown u in a reliable and efficient way (using Brents algorithm)."
 },
 
 {
@@ -253,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.plot",
     "category": "method",
-    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, \n               figure=1, prefix=\"\", reuse=false, maxLegend=10)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{AbstractString,Any}. Note, before passing data to the plot package, it is converted to Float64. This allows to, for example, also plot rational numbers, even if not supported by the plot package.\nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or AbstractString).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\nprefix::AbstractString: String that is appended in front of every legend label (useful especially if reuse=true)\nreuse::Bool: If figure already exists and reuse=false, clear the figure before adding the plot.\nmaxLegend::Int: If the number of legend entries in one plot command > maxLegend, the legend is suppressed. All curves have still their names as labels. The curves can be inspected by their names by clicking in the toolbar of the plot on button Edit axis, curve .. and then on Curves.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{AbstractString,Any}(\n            \"time\" => t*u\"s\", \"phi1\" => sin.(t)u\"rad\"  , \"phi2\" => 0.5*sin.(t),\n                              \"w1\"   => cos.(t)u\"rad/s\", \"w2\"   => 0.6*cos.(t))\n\n# 1 signal in one diagram\n#   (legend = \"phi1 [rad]\")\nModiaMath.plot(result, :phi1)   \n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (\"phi1\", :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    \n\n# Append signal of the next simulation run to figure=1\n# (legend = \"Sim 2: phi1 [rad]\")\nresult[:phi1] = 0.5*result[:phi1]\nModiaMath.plot(result, :phi1, prefix=\"Sim 2: \", reuse=true)\n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
+    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, \n               figure=1, prefix=\"\", reuse=false, maxLegend=10)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{AbstractString,Any}. The Dict Value can be Vector{Number}, Matrix{Number}, or a vector of structs where the field that shall be plotted is a Number. Note, before passing data to the plot package, it is converted to Float64. This allows to, for example, also plot rational numbers, even if not supported by the plot package. \nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or AbstractString).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\nprefix::AbstractString: String that is appended in front of every legend label (useful especially if reuse=true)\nreuse::Bool: If figure already exists and reuse=false, clear the figure before adding the plot.\nmaxLegend::Int: If the number of legend entries in one plot command > maxLegend, the legend is suppressed. All curves have still their names as labels. The curves can be inspected by their names by clicking in the toolbar of the plot on button Edit axis, curve .. and then on Curves.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{AbstractString,Any}(\n            \"time\" => t*u\"s\", \"phi1\" => sin.(t)u\"rad\"  , \"phi2\" => 0.5*sin.(t),\n                              \"w1\"   => cos.(t)u\"rad/s\", \"w2\"   => 0.6*cos.(t))\n\n# 1 signal in one diagram\n#   (legend = \"phi1 [rad]\")\nModiaMath.plot(result, :phi1)   \n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (\"phi1\", :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    \n\n# Append signal of the next simulation run to figure=1\n# (legend = \"Sim 2: phi1 [rad]\")\nresult[:phi1] = 0.5*result[:phi1]\nModiaMath.plot(result, :phi1, prefix=\"Sim 2: \", reuse=true)\n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
 },
 
 {
@@ -593,11 +617,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "lib/Variables.html#ModiaMath.Variables.copy_start_to_x!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Bool,1}}",
+    "location": "lib/Variables.html#ModiaMath.Variables.copy_start_to_x!-Tuple{ModiaMath.Variables.ModelVariables,Array{Float64,1},Array{Bool,1},Array{Float64,1}}",
     "page": "Variables",
     "title": "ModiaMath.Variables.copy_start_to_x!",
     "category": "method",
-    "text": "copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool})\n\nCopy start and fixed values of variables varsto x and x_fixed vectors.\n\n\n\n\n\n"
+    "text": "copy_start_to_x!(vars::ModelVariables, x::Vector{Float64}, x_fixed::Vector{Bool}, x_nominal::Vector{Float64})\n\nCopy start, fixed and nominalvalues of variables vars to x, x_fixed, and x_nominal vectors.\n\n\n\n\n\n"
 },
 
 {
@@ -829,7 +853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Frames",
     "title": "ModiaMath.Frames.NullRotation",
     "category": "constant",
-    "text": "@static if VERSION >= v\"0.7.0-DEV.2005\"     const ModiaMath.NullRotation = ModiaMath.RotationMatrix(Matrix(1.0I, 3, 3)) else     const ModiaMath.NullRotation = ModiaMath.RotationMatrix(eye(3)) end\n\nConstant RotationMatrix that defines no rotation from frame 1 to frame 2.\n\n\n\n\n\n"
+    "text": "Constant RotationMatrix that defines no rotation from frame 1 to frame 2.\n\n\n\n\n\n"
 },
 
 {
