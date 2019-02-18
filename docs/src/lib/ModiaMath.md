@@ -1,28 +1,23 @@
-# ModiaMath Constants and Types
+# Constants and Types
 
-The following **constants** are defined in ModiaMath:
+The following **constants** are defined in ModiaMath (all these
+definitions are not exported and therefore need to be prefixed with ModiaMath):
 
 - `const path`\
   Absolute path of ModiaMath package directory. This allows for example to run ModiaMath examples
   as `include("$(ModiaMath.path)/examples/Simulate_Pendulum.jl")`.
 
+- `const Version`\
+  Version of ModiaMath
+
+- `const Date`\
+  Version Date of ModiaMath
+
 
 The following **abstract types** are defined and used in ModiaMath:
 
-- `ModiaMath.AbstractSimulationModel`\
-  Struct that is used as simulation model (has field 
-  `simulationState::ModiaMath.SimulationState`). An instance of this
-  type can be directly used in a [`ModiaMath.simulate!`](@ref)`(...)` call.
-
-- `ModiaMath.AbstractComponentWithVariables`\
-   Struct that contains ModiaMath.AbstractVariables as field or as field
-   in a sub-struct. 
-
-- `ModiaMath.AbstractVariable <: ModiMath.AbstractComponentWithVariables`\
-   A Variable used as element of the DAE model.
-
-- `ModiaMath.AbstractRealVariable <: AbstractVariable`\
-   A real `ModiaMath.AbstractVariable` (either scalar or array).
-
-
+```@autodocs
+Modules = [ModiaMath]
+Order = [:type]
+```
 

@@ -42,7 +42,129 @@ function getResultNames(model::Any)
 end
 
 
+"""
+    simulationState = SimulationState(
+          name, getModelResidues!, x_start, 
+          getVariableName=ModiaMath.defaultVariableName;
+          nc=0, nz=0, nw=0,
+          zDir                     = fill(0, nz),                   
+          x_fixed                  = fill(false, length(x_start)),   
+          x_nominal                = fill(NaN, length(x_start)),   
+          x_errorControl           = fill(true, length(x_start)),
+          w_start                  = fill(NaN,nw),
+          w_fixed                  = fill(false,nw),
+          w_nominal                = fill(NaN, length(w_start)),   
+          jac                      = nothing, 
+          maxSparsity              = 0.1,
+          hev                      = 1e-8,
+          scaleConstraintsAtEvents = true,               
+          getResultNames::Function = ModiaMath.getResultNames, 
+          storeResult!::Function   = ModiaMath.storeRawResult!,
+          getResult::Function      = ModiaMath.getStringDictResult,
+          defaultTolerance         = 1e-4, 
+          defaultStartTime         = 0.0,
+          defaultStopTime          = 1.0, 
+          defaultInterval          = NaN)
+                     
+Return a `simulationState` object. A `model` that shall be simulated with function
+[`ModiaMath.simulate!`](@ref)`(model, ...)` is required to be defined as:
 
+```julia
+mutable struct ModelName <: ModiaMath.AbstractSimulationModel
+    simulationState::ModiaMath.SimulationState
+
+    # other definitions (e.g. parameters of model)
+end
+```
+
+
+# Required arguments
+
+- `name::Union{AbstractString,Symbol}`: Name of model
+
+- `getModelResidues!::Function`: Function with arguments `(model,t,x,derx,r,w)` to
+  compute the residues `r` and auxiliary variables `w` from time `t`, vector `x` and
+  its time derivative `derx`.
+ 
+- `x_start::Vector{Float64}`: Start values of `x`.
+
+- `getVariableName::Function=ModiaMath.defaultVariableName`: Function that returns the
+  name of a variable, given its type and its index.
+
+
+# Optional (keyword) arguments:
+
+- `nc::Int`: Number of constraints functions (= length(fc))
+
+- `nz::Int`: Number of event indicators
+
+- `nw::Int`: Number of auxiliary variables (Float64 variables that are additionally computed
+             and stored at communication points, and where start values can be provided
+             for initialization)
+
+- `zDir::Vector{Int}`: Interpretation of event indictors:
+   zDir[i] = 0: Root is reported for both crossing directions,
+           = 1: Root is reported when crossing from negative to positive direction
+           = -1: Root is reported when crossing from positive to negative direction
+   
+- `x_fixed::Vector{Bool}`: = true, `x_start[i]` is fixed during initialization.
+  = false, `x_start[i]` might be changed, e.g., due to an initial impulse.
+
+- `x_nominal::Vector{Float64}`: Nominal values of `x`. if `x_nominal[i]=NaN` no nominal value
+  is defined for `x[i]` and a nominal value is computed
+  (`x_nominal[i] = abs(x_start[i]) > 1e-7 ? abs(x_start[i]) : 1.0`).
+
+- `x_errorControl::Vector{Bool}`: = true, the absolute error tolerance is set to
+  `0.1 * relativeTolerance * x_nominal[i]`. = false, the absolute error tolerance is
+  switched off (is set to a large value). This is recommended for variables that are
+  basically not limited (for example the angle of a shaft that is permantently rotating
+  in the same direction and therefore becomes larger and larger).
+
+- `w_start::Vector{Float64}`: Start values for auxiliary variables `w`.
+  If `w_start[i] = NaN`, then no start value for `w[i]` is defined and
+  `w[i]` is ignored during initialization.
+  If `w_start[i] != NaN`, an initial equation `w[i] = w_start[i]` is utilized
+  during initialization.
+
+- `w_fixed::Vector{Bool}`: = true (and `w_start[i] != NaN`), `w_start[i]` is fixed 
+  during initialization. = false (and `w_start[i] != NaN`, `w_start[i]`
+  might be changed, e.g., due to an initial impulse.
+
+- `w_nominal::Vector{Float64}`: Nominal values of `w`. if `w_nominal[i]=NaN` no nominal value
+  is defined for `w[i]` and a nominal value is computed
+  (`w_nominal[i] = abs(w_start[i]) > 1e-7 ? abs(w_start[i]) : 1.0`).
+
+- `hev::Float64`: Stepsize used during initialization and at event restart.
+
+- `scaleConstraintsAtEvents::Bool`: = true, constraint equations are scaled during 
+  initialization and at event restart (currently, this setting is ignored).
+
+- `jac`: Sparse Jacobian datastructure (currently not supported).
+
+- `maxSparsity::Float64`: A sparse Jacobian is only used during simulation if
+  sparseness of jac < maxSparsity (currently not supported)
+
+- `getResultNames::Function`: Function that returns the names of the variables to be
+  stored in the result data structure.
+
+- `storeResult!::Function`: Function that stores the raw results.
+
+- `getResult::Function`: Function that resturns the result data structure after the simulation.
+
+- `defaultTolerance::Float64`: Model specific default relative tolerance, if not redefined in the call to
+  [`ModiaMath.simulate!`](@ref).
+
+- `defaultStartTime::Float64`: Model specific default start time in [s], if not redefined in the call to
+  [`ModiaMath.simulate!`](@ref).
+
+- `defaultStopTime::Float64`: Model specific default stop time in [s], if not redefined in the call to
+  [`ModiaMath.simulate!`](@ref).
+
+- `defaultInterval::Float64`: Model specific default interval in [s], if not redefined in the call to
+  [`ModiaMath.simulate!`](@ref). Result data is stored every `defaultInterval` seconds.
+  If `defaultInterval=NaN`, the default interval is computed as
+  `interval = (stopTime - startTime)/500.0`. 
+"""
 mutable struct SimulationState
     name::Symbol                      # Name of model
     model::Any                        # Model
@@ -93,6 +215,11 @@ mutable struct SimulationState
     x_errorControl::Vector{Bool}     
 
     w::Vector{Float64}  # length(w) = nw
+    w_start::Vector{Float64}
+    w_fixed::Vector{Bool}
+    w_nominal::Vector{Float64}
+    w_start_used::Vector{Int}                # The indices of w_start, where w_start[i] != NaN.
+                                             # Only these w_start values are used for initialization
         
     # Auxiliary storage needed during initialization and at events
     eqInfo::ModiaMath.NonlinearEquationsInfo
@@ -115,7 +242,7 @@ mutable struct SimulationState
     rawResult::ModiaMath.RawResult
     result::Any
    
-    function SimulationState(name,
+    function SimulationState(name::Union{AbstractString,Symbol},
                             getModelResidues!::Function, 
                             x_start::Vector{Float64},
                             getVariableName::Function=defaultVariableName;
@@ -126,6 +253,9 @@ mutable struct SimulationState
                             x_fixed::Vector{Bool}=fill(false, length(x_start)),   
                             x_nominal::Vector{Float64}=fill(NaN, length(x_start)),                                                   
                             x_errorControl::Vector{Bool}=fill(true, length(x_start)),
+                            w_start::Vector{Float64}=fill(NaN,nw),
+                            w_fixed::Vector{Bool}=fill(false,nw),
+                            w_nominal::Vector{Float64}=fill(NaN, length(w_start)),
                             hev=1e-8,
                             scaleConstraintsAtEvents::Bool=true,               
                             jac=nothing, 
@@ -176,6 +306,25 @@ mutable struct SimulationState
             yScale[i] = 1/x_nominal2[i]
         end
 
+        w_nominal2 = ones(nw)
+        for i in 1:nw
+            if isnan( w_nominal[i] )
+                if abs(w_start[i]) > 1e-7
+                    w_nominal2[i] = abs(w_start[i])
+                end
+            else
+                w_nominal2[i] = w_nominal[i]
+            end
+        end
+
+        # Compute w_start values that are used during initialization
+        w_start_used = Float64[]
+        for i in eachindex(w_start)
+            if !isnan(w_start[i])
+                push!(w_start_used, i)
+            end
+        end
+
         # Compute utility elements
         nd = nx - nc
         eventHandler = EventHandler(nz=nz)
@@ -200,6 +349,7 @@ mutable struct SimulationState
             ModiaMath.SimulationStatistics(nx, sparse, sparse ? cg.ngroups : 0),
             NaN, NaN, NaN, NaN,
             x_start, x_fixed, x_nominal2, x_errorControl, zeros(nw),  
+            w_start, w_fixed, w_nominal2, w_start_used,
             eqInfo, zeros(nx), zeros(nx), zeros(nx),
             zeros(nx), zeros(nx), zeros(nx), yScale, ones(nx), 0.0, hev, 0.0, 
             scaleConstraintsAtEvents, false, false)
@@ -219,8 +369,10 @@ isNearlyEqual(x1::Float64, x2::Float64, x_nominal::Float64, tolerance::Float64) 
 function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
     #=
        DAE:
-           0 = fd(der(x),x,t)            [der(fd,der(x));
-           0 = fc(x,t)                    der(fc,x)]      is regulsr
+           w = fw(der(x),x,t)             
+           0 = fd(der(x),x,t,w)          [der(fd,der(x));
+           0 = fc(x,t,w)                  der(fc,x)]      is regular (under the assumption that w is inlined and
+                                                                      w[i] used in fc(...) do not depend on der(x))
 
        Initialization/re-initialization equation:
            0 = f(y)  ->  solve for y
@@ -232,51 +384,82 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
            # only occurs in der(x) and not in x. This in turn means that if ni is the highest
            # occuring derivative of x[i], then at most the n-1-derivative of x[i] is allowed to
            # be discontinuous and all lower derivatives must be continuous at the event. 
-           #
-           # If dim(fc) = 0, any "x" can be used and der(fd,der(x)) is regular.
-           # Therefore, the right limit of x is fixed and derivatives der(x) could be used
-           # as iteration variables. However, since there is no nominal value for der(x),
-           # instead the following approximation is used where the iteration variables y[i]
-           # are the virtual previous values of x
-                  x[i] = x_ev[i]                  # x_ev the value of x after the event
-             der(x[i]) = (x_ev[i] - y[i]) / hev
+           #     If this requirement is fulfilled, it can be guaranteed that integrating over
+           # the discontinuity will yield a mathematically well-defined solution.
+           # If this requirement is not fulfilled, it is unclear whether a mathematically
+           # well-defined solution exists and most likely a somewhat arbitrary value is computed.
+           
+           dim(fc) = 0:
+               # Any "x" can be used (note, it is assumed that der(fd,der(x)) is regular).
+               # Therefore, the right limit of x is fixed and derivatives der(x) could be used
+               # as iteration variables. However, since there is no nominal value for der(x),
+               # instead the following approximation is used where the iteration variables y[i]
+               # are the virtual previous values of x
+                        x[i] = x_ev[i]                     # x_ev the value of x after the event
+                   der(x[i]) = (x_ev[i] - y[i]) / hev
 
-           # If dim(fc) > 0, then fc(x,t) might be non-zero (for example, if an impulse occured
-           # and v(after_event) = -eps*v(before_event), then the velocity constraint of a 
-           # closed loop system might be no longer fulfilled.
-           # Therefore, the left limit of x is fixed and the right limit are the iteration variables y
-           # (that are determined, so that fc(x,t) = 0 and fd(der(x),x,t)=0)
-                  x[i] = y[i]                     # the right limit of x
-             der(x[i]) = (y[i] - x_ev[i]) / hev   # the derivative at the right limit of x
+               # If der(x[i]) can be explicitely computed, then there is no iteration variable
+               # associated with der(x[i]) or the virtual previous value of x. So vector y has one 
+               # element less (If all der(x[i]) can be explicitly computed (so ODE), then no equation
+               # must be solved at all):
+                   x[i] = x_ev[i]
+                   der(x[i]) is explicitely computed
+ 
+               # If fd is linear in der(x), which seems to be always the case for physical systems,
+               # no nonlinear equation must be solved. Instead, the Jacobian with respect to der(x) 
+               # is computed and then a linear equation is solved to compute der(x)
+               # (this is not yet done):
+                   0 = Jd(x,t)*der(x) + hd(x,t)  -> der(x) = solve(Jd, -hd)
+               
+                   # Determination of Jd and hd:
+                       -      hd = fd(der(x)=0  , x, t)
+                       - Jd[:,i] = fd(der(x)=e_i, x, t) - hd(x,t)  
+
+               # If fd is linear in der(x) and some der(x[i]) can be explicitely computed, then the
+               # linear equation system to be solved for is smaller. Furthermore, the Jacobian could
+               # also be sparse. There are several options, such as:
+               #   (a) Only support sparse der(x)-Jacobians. In this case explicitely solvable
+               #       derivatives are included as a special case. The model must provide the structure 
+               #       of the Jacobian.
+               #   (b) The generated code solves already explicitely for the derivatives at an event,
+               #       so from the outside, all derivatives are explicitely computed.
+           
+           dim(fc) > 0:
+               # fc(x,t) might be non-zero at an event (for example, if an impulse occured
+               # and v(after_event) = -eps*v(before_event), then the velocity constraint of a 
+               # closed loop system might be no longer fulfilled.
+               # Therefore, the left limit of x is fixed and the right limit are the iteration variables y
+               # (that are determined, so that fc(x,t) = 0 and fd(der(x),x,t)=0)
+                        x[i] = y[i]                     # the right limit of x
+                   der(x[i]) = (y[i] - x_ev[i]) / hev   # the derivative at the right limit of x
+
+               # If der(x[i]) can be explicitely computed, then x[i] might still need 
+               # to be modified, such that fc(x,t) = 0. For this reason, the dimension of the 
+               # reinitialization problem is not changed, just der(x[i]) is analytically computed
+               # and the residue is computed as the difference to the numerically computed derivative.
+               # Therefore, no essential simplification occurs when utilizing this feature, just
+               # the residue computation is more robust.
+
+               # If fd is linear in der(x), still the nonlinear equation fc(x,t)=0 must be solved.
+               # Again no simplification for the re-initialization algorithm seems to be possible,
+               # if it is known that fd is linear in the derivative.
+
 
         Initialization at t_start:
            # Similar to re-initialization, but additionally with x_fixed[i] = true it is defined
            # that x[i] is fixed and should not be changed.
+           # Furthermore, w_fixed[i] 
            if x_fixed[i] or dim(fc) = 0
               # Right limit of x is fixed, left limit of x are the iteration variables y
                    x[i] = x_start[i]
               der(x[i]) = (x_start[i] - y[i]) / hev
+
+              # If dim(fc) = 0, a linear equation can be solved to compute der(x)
            else
               # Left limit of x is fixed, right limit of x are the iteration variables y
                    x[i] = y[i]
               der(x[i]) = (y[i] - x_start[i]) / hev
            end
-
-        Explicit solvable derivative (not yet used, but shall be supported in the future)
-           # If a derivative can be explicitely solved, the above procedure can be simplified:
-           #
-           # If (x_fixed[i]=true or dim(fc) = 0) and der(x[i]) can be explicitely computed, then there is no
-           # iteration variable associated with x[i] (so vector y has one element less;
-           # and if all der(x[i]) can be explicitly computed (so ODE), then no equation
-           # must be solved at all):
-             x[i] = x_ev[i]
-             der(x[i]) is explicitely computed
-
-           # If dim(fc) > 0 and der(x[i]) can be explicitely computed, then x[i] might still need 
-           # to be modified, such that fc(x,t) = 0. For this reason, the dimension of the 
-           # reinitialization problem is not changed, just der(x[i]) is analytically computed:
-                  x[i] = y[i]                     # the right limit of x
-             der(x[i]) is explicitely computed
     =#
 
     model = eqInfo.extraInfo
@@ -544,3 +727,53 @@ function getEventIndicators!(model, sim::SimulationState, t::Float64, y::Vector{
     end
     return nothing
 end
+
+
+
+
+const small = sqrt( eps(Float64) )
+
+
+"""
+    computeFullJacobian!(model, sim, t, y, yp, residues, cj, ewt)
+
+Compute full Jacobian
+ 
+```julia
+jac = der(f,y) + cj*der(f,yp).
+```
+
+numerically by finite differences
+"""
+function computeJacobian!(model, sim::SimulationState, t::Float64, y::Vector{Float64}, yp::Vector{Float64}, r::Vector{Float64}, 
+                          fulljac::Matrix{Float64}, hcur::Float64, cj::Float64, ewt::Vector{Float64})
+    # Compute one column of the Jacobian once at a time
+    inc::Float64 = 0.0
+    yj::Float64  = 0.0
+    ypj::Float64 = 0.0
+    for j = 1:sim.nx
+        # Determine increment for column j
+        yj  = y[j]
+        ypj = yp[j]
+        inc = max( small*max( abs(yj), abs(hcur*ypj) ), 1.0/ewt[j] )
+        if hcur*ypj < 0.0
+            inc = -inc
+        end
+        inc = (yj + inc) - yj
+        y[j]  += inc
+        yp[j] += cj*inc
+
+        # Compute residues
+        Base.invokelatest(sim.getModelResidues!, model, t, y, yp, sim.residues, sim.w) 
+
+        # Compute finite differences and store them in the j column of the Jacobian
+        for i = 1:sim.nx
+            fulljac[i,j] = sim.residues[i]/inc - r[j]/inc
+        end
+
+        # Reset y and yp
+        y[j]  = yj
+        yp[j] = ypj
+    end
+end
+
