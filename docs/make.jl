@@ -2,10 +2,9 @@ using Documenter, ModiaMath
 
 makedocs(
   modules  = [ModiaMath],
-  format   = :html,
   sitename = "ModiaMath",
   authors  = "Martin Otter (DLR-SR)",
-  html_prettyurls = false,
+  format = Documenter.HTML(prettyurls = false),
   pages    = [
      "Home"   => "index.md",
      "Manual" => [

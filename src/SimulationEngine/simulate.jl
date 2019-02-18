@@ -27,6 +27,7 @@ mutable struct IntegratorData
 
     y::Vector{Sundials.realtype}    # Julia vector of y wrapping y_N_Vector vector
     yp::Vector{Sundials.realtype}   # Julia vector of yp wrapping yp_N_Vector vector
+    fulljac::Union{Matrix{Sundials.realtype}, Nothing}  # Julia matrix of fulljac wrapping fulljac_N_xxx
 
     function IntegratorData(model::ModiaMath.AbstractSimulationModel, simulationState::ModiaMath.SimulationState)
         ny = simulationState.nx
@@ -132,7 +133,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                    stopTime=NaN,
                    interval=NaN,
                    log::Bool=false, 
-                   KLUorderingChoice::Int=1)     
+                   KLUorderingChoice::Int=1)
+
+    use_fulljac = false     
 
     sim           = model.simulationState
     sim.model     = model
@@ -152,9 +155,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     logger              = sim.logger
     ModiaMath.setLog!(logger, log)
    
-    #if ModiaMath.isLogInfos(logger)
-    println("... ModiaMath.simulate! (version ", ModiaMath.Version, ") to simulate model: ", sim.name)
-    #end
+    if ModiaMath.isLogInfos(logger)
+        println("... ModiaMath.simulate! (version ", ModiaMath.Version, " ", ModiaMath.Date, ") to simulate model: ", sim.name)
+    end
 
     # Start timing measure
     cpuStart::UInt64 = time_ns()
@@ -211,6 +214,12 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     yp = copy(init.yp0)
     simModel.y  = y
     simModel.yp = yp 
+    if use_fulljac
+        fulljac = zeros(sim.nx, sim.nx)
+        simModel.fulljac = fulljac
+    else
+        simModel.fulljac = nothing
+    end
 
     eventInfo = DAE.EventInfo()
     tret    = [0.0]
@@ -230,6 +239,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     y_N_Vector  = Sundials.N_VMake_Serial(ny, pointer(y))
     yp_N_Vector = Sundials.N_VMake_Serial(ny, pointer(yp))
 
+
     # Run IDA
     try
         # Set error handler function
@@ -237,6 +247,11 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
 
         # Initialize IDA
         Sundials.IDAInit(mem, old_cfunction(idasol_f, Cint, Tuple{Sundials.realtype,Sundials.N_Vector,Sundials.N_Vector,Sundials.N_Vector,Ref{typeof(IntegratorData)}}), t0, y_N_Vector, yp_N_Vector)
+        if use_fulljac
+            # IDADlsJacFn
+            Sundials.IDADlsSetJacFn(mem, old_cfunction(idasol_fulljac, Cint, Tuple{Sundials.realtype,Sundials.realtype,Sundials.N_Vector,Sundials.N_Vector,
+                                                       Sundials.N_Vector,Sundials.SUNMatrix, Ref{typeof(IntegratorData)},Sundials.N_Vector,Sundials.N_Vector,Sundials.N_Vector}))
+        end
 
         #IDASStolerances(mem, tolerance, 0.1*tolerance)
         tolAbs = 0.1 * tolerance * init.y_nominal

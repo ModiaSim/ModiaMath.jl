@@ -3,7 +3,7 @@
 
 
 """
-ModiaMath - Mathematical Utilities for Modia and Modia3D
+    ModiaMath - Mathematical Utilities for Modia and Modia3D
 
 To define a model use Modia or Modia3D. You can define a model
 natively in ModiaMath in the following way:
@@ -66,9 +66,10 @@ Absolute path of package directory of ModiaMath
 """
 const path = dirname(dirname(@__FILE__))   # Absolute path of package directory
 const Time = Float64   # Prepare for later Integer type of time
-const Version = "0.4.0-dev from 2019-01-27 11:35"
+const Version = "0.4.0-dev"
+const Date = "2019-02-17"
 
-println(" \nImporting ModiaMath version ", Version)
+println(" \nImporting ModiaMath Version $Version ($Date)")
 
 
 
@@ -100,7 +101,7 @@ abstract type AbstractComponentInternal end
 
 
 """
-    type ModiaMath.AbstractVariable <: ModiMath.AbstractComponentWithVariables
+    type ModiaMath.AbstractVariable <: ModiaMath.AbstractComponentWithVariables
 
 A Variable used as element of the DAE model description and is
 included in the result (if no residue)

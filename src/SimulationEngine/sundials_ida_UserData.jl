@@ -113,6 +113,48 @@ function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vec
 end
 
 
+#------- full jacobian
+function idasol_fulljac(t::Sundials.realtype, cj::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_Vector, _r::Sundials.N_Vector,
+                        _fulljac::Sundials.SUNMatrix, simModel::IntegratorData, 
+                        tmp1::Sundials.N_Vector, tmp2::Sundials.N_Vector, tmp3::Sundials.N_Vector)
+    # Compute full Jacobian
+    sim      = simModel.simulationState
+    sim.time = t
+    Sundials.IDAGetCurrentStep(simModel.ida_mem, simModel.hcur)
+    IDAGetErrWeights(simModel.ida_mem, simModel.eweight)
+       
+
+    # Check that simModel.y is still identical to _y
+    if pointer(simModel.y) === Sundials.__N_VGetArrayPointer_Serial(_y)
+       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
+        y  = simModel.y
+    else
+        y  = Sundials.asarray(_y)
+        println("\n!!! Info message from ModiaMath.simulate:\n",      
+                 "    idasol_fulljac assumption SimModel.y === _y is not valid; using asarray(_y).")
+    end
+
+    if pointer(simModel.yp) === Sundials.__N_VGetArrayPointer_Serial(_yp)
+       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
+        yp = simModel.yp
+    else
+        yp = Sundials.asarray(_yp) 
+        println("\n!!! Info message from ModiaMath.simulate:\n",      
+                 "    idasol_fulljac assumption SimModel.yp === _yp is not valid; using asarray(_yp).")
+    end
+
+    r = Sundials.asarray(_r)
+    ModiaMath.DAE.computeJacobian!(simModel.model, sim, t, y, yp, r, simModel.fulljac, simModel.hcur[1], cj, simModel.eweight)
+    simModel.statistics += sim.nx
+   
+    # Copy simModel.fulljac to fulljac   
+    unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_fulljac), pointer(simModel.fulljac), sim.nx)
+    return Cint(0)   # indicates normal return
+end
+
+
+
+
 #=
 #-------- Jacobian
 function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, r::Sundials.N_Vector,

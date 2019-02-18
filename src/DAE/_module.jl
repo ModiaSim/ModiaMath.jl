@@ -5,6 +5,18 @@
     module ModiaMath.DAE 
 
 Interface between the [`ModiaMath.SimulationEngine`](@ref) and the index 1 DAE model.
+A DAE model is a `struct` derived from [`ModiaMath.AbstractSimulationModel`](@ref) 
+that has a required field `simulationState::`[`ModiaMath.SimulationState`](@ref)
+in which the main properties of the DAE model are reported to the simulation engine:
+
+```julia
+# DAE model ModelName
+mutable struct ModelName <: ModiaMath.AbstractSimulationModel
+    simulationState::ModiaMath.SimulationState
+
+    # other definitions (e.g. parameters of model)
+end
+```
 
 The following functions can be called in the DAE model to inquire
 **information about the simulation state**:
