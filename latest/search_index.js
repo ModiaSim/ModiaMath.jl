@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add. The latest released version (0.3.1) is the last one with support for Julia >= 0.6. Trunk and later versions support Julia >=1.0.# Julia >= 0.6, 0.7, 1.0:\r\njulia> Pkg.add(\"ModiaMath\")\r\n\r\n# alternatively in Julia >= 0.7:\r\njulia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
+    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add. The latest released version (0.3.1) is the last one with support for Julia >= 0.6. Trunk and later versions support Julia >=1.0.# Julia >= 0.6:\r\njulia> Pkg.add(\"ModiaMath\")\r\n\r\n# alternatively in Julia >= 0.7:\r\njulia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
 },
 
 {
@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Version 0.4.0",
     "category": "section",
-    "text": "All Julia 0.6 code removed."
+    "text": "All Julia 0.6 code removed.\nModiaMath.plot supports variables that can be computed from a vector of struct result (for details, see docu of plot)"
 },
 
 {
@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Result",
     "title": "ModiaMath.Result.plot",
     "category": "method",
-    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, \n               figure=1, prefix=\"\", reuse=false, maxLegend=10)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{AbstractString,Any}. The Dict Value can be Vector{Number}, Matrix{Number}, or a vector of structs where the field that shall be plotted is a Number. Note, before passing data to the plot package, it is converted to Float64. This allows to, for example, also plot rational numbers, even if not supported by the plot package. \nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or AbstractString).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\nprefix::AbstractString: String that is appended in front of every legend label (useful especially if reuse=true)\nreuse::Bool: If figure already exists and reuse=false, clear the figure before adding the plot.\nmaxLegend::Int: If the number of legend entries in one plot command > maxLegend, the legend is suppressed. All curves have still their names as labels. The curves can be inspected by their names by clicking in the toolbar of the plot on button Edit axis, curve .. and then on Curves.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{AbstractString,Any}(\n            \"time\" => t*u\"s\", \"phi1\" => sin.(t)u\"rad\"  , \"phi2\" => 0.5*sin.(t),\n                              \"w1\"   => cos.(t)u\"rad/s\", \"w2\"   => 0.6*cos.(t))\n\n# 1 signal in one diagram\n#   (legend = \"phi1 [rad]\")\nModiaMath.plot(result, :phi1)   \n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (\"phi1\", :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    \n\n# Append signal of the next simulation run to figure=1\n# (legend = \"Sim 2: phi1 [rad]\")\nresult[:phi1] = 0.5*result[:phi1]\nModiaMath.plot(result, :phi1, prefix=\"Sim 2: \", reuse=true)\n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
+    "text": "ModiaMath.plot(result, names; heading=\"\", grid=true, xAxis= :time, \n               figure=1, prefix=\"\", reuse=false, maxLegend=10)\n\nPlot time series of the result defined by the names keys (Symbol or String). The keys (and their units, if available in the result) are automatically used as legend. Units can be either added by using package Unitful if result is just a dictionary, or it can be added by using package ModiaMath.Result, where units are defined as elements of the variable definition. \n\nArguments\n\nArgument result maybe one of the following:\n\nA dictionary Dict{AbstractString,Any}. The Dict Value can be \n(a) Vector{Number},\n(b) Matrix{Number},\n(c) a vector of structs where the field that shall be plotted is a Number, or\n(d) a vector of structs and a function is provided to compute a Number from the struct (this function must be stored as value in a dictionary Dict{AbstractString,Function} and this dictionary is returned from function ModiaMath.variablesDependingOnStruct(struct); see last example below).\nNote, before passing data to the plot package, it is converted to Float64. This allows to, for example, also plot rational numbers, even if not supported by the plot package. \nAn instance of struct ModiaMath.Result\nAn object for which function ModiaMath.resultTimeSeries is defined.\n\nArgument names defines the diagrams to be drawn and the time series to be included in the respective diagram: \n\nIf names is a Symbol or String, generate one diagram with one time series.\nIf names is a Tuple of Symbols/Strings, generate one diagram with the time series of the given keys\nIf names is a Vector or Matrix of Symbols/Strings/Tuples, generate a vector or matrix of diagrams.\n\nRemaining arguments:\n\nheading::AbstractString: Optional heading above the diagram.\ngrid::Bool: Optional grid.\nxAxis: Name of x-axis (Symbol or AbstractString).\nfigure::Int: Integer identifier of the window in which the diagrams shall be drawn.\nprefix::AbstractString: String that is appended in front of every legend label (useful especially if reuse=true)\nreuse::Bool: If figure already exists and reuse=false, clear the figure before adding the plot.\nmaxLegend::Int: If the number of legend entries in one plot command > maxLegend, the legend is suppressed. All curves have still their names as labels. The curves can be inspected by their names by clicking in the toolbar of the plot on button Edit axis, curve .. and then on Curves.\n\nExamples\n\nimport ModiaMath\nusing Unitful\n\nt = linspace(0.0, 10.0, 100)\nresult = Dict{AbstractString,Any}(\n            \"time\" => t*u\"s\", \"phi1\" => sin.(t)u\"rad\"  , \"phi2\" => 0.5*sin.(t),\n                              \"w1\"   => cos.(t)u\"rad/s\", \"w2\"   => 0.6*cos.(t))\n\n# 1 signal in one diagram\n#   (legend = \"phi1 [rad]\")\nModiaMath.plot(result, :phi1)   \n\n# 3 signals in one diagram                                 \nModiaMath.plot(result, (\"phi1\", :phi2, :w1), figure=2)\n\n# 3 diagrams in form of a vector (every diagram has one signal)                 \nModiaMath.plot(result, [:phi1, :phi2, :w1], figure=3)     \n\n# 4 diagrams in form of a matrix (every diagram has one signal)          \nModiaMath.plot(result, [\"phi1\" \"phi2\";\n                        \"w1\"   \"w2\"   ], figure=4)     \n\n# 2 diagrams in form of a vector           \nModiaMath.plot(result, [ (:phi1,:phi2), (:w1) ], figure=5)           \n\n# 4 diagrams in form of a matrix\nModiaMath.plot(result, [ (:phi1,)           (:phi2,:w1);\n                         (:phi1,:phi2,:w1)  (:w2,)     ],figure=6)  \n\n# Plot w1=f(phi1) in one diagram \nModiaMath.plot(result, :w1, xAxis=:phi1, figure=7)    \n\n# Append signal of the next simulation run to figure=1\n# (legend = \"Sim 2: phi1 [rad]\")\nresult[:phi1] = 0.5*result[:phi1]\nModiaMath.plot(result, :phi1, prefix=\"Sim 2: \", reuse=true)\n\n# Compute and plot variables that depend on the result vector\nmutable struct MyThermodynamicState\n    p::Float64\n    T::Float64\nend\nspecificEnthalpy(state::MyThermodynamicState) = 2.0*state.T\ndynamicViscosity(state::MyThermodynamicState) = 2.0*state.p\n\nconst dependentVariables = Dict{AbstractString,Function}(\"h\"   => specificEnthalpy,\n                                                         \"eta\" => dynamicViscosity)\n\nModiaMath.variablesDependingOnStruct(state::MyThermodynamicState) = dependentVariables\n\nstate = MyThermodynamicState[]\nfor i = 1:length(t)\n    push!(state, MyThermodynamicState(i*2.0,i*3.0))\nend\nresult = Dict{AbstractString,Any}(\"time\" => t, \"state\" => state)\n\nModiaMath.plot(result, (\"state.p\", \"state.T\", \"state.h\", \"state.eta\"))\n\nThe 5th example above (2 diagrams in form of a vector) give the following plot:\n\n(Image: Figure 5)\n\n\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE",
     "category": "module",
-    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model.\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
+    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model. A DAE model is a struct derived from ModiaMath.AbstractSimulationModel  that has a required field simulationState::ModiaMath.SimulationState in which the main properties of the DAE model are reported to the simulation engine:\n\n# DAE model ModelName\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -326,6 +326,14 @@ var documenterSearchIndex = {"docs": [
     "title": "ModiaMath.DAE.EventRestart",
     "category": "type",
     "text": "@enum EventRestart NoRestart Restart FullRestart Terminate\n\nDefine how to continue or restart integration after an event. Usually, Restart should be used. Only in special cases, the other flags are useful.\n\nNoRestart, continue integration without restarting the integrator\nRestart, restart integrator\nFullRestart, restart integrator and optionally exchange simulationState (so dimensions may change)\nTerminate, terminate integration\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/DAE.html#ModiaMath.DAE.SimulationState",
+    "page": "DAE",
+    "title": "ModiaMath.DAE.SimulationState",
+    "category": "type",
+    "text": "simulationState = SimulationState(\n      name, getModelResidues!, x_start, \n      getVariableName=ModiaMath.defaultVariableName;\n      nc=0, nz=0, nw=0,\n      zDir                     = fill(0, nz),                   \n      x_fixed                  = fill(false, length(x_start)),   \n      x_nominal                = fill(NaN, length(x_start)),   \n      x_errorControl           = fill(true, length(x_start)),\n      w_start                  = fill(NaN,nw),\n      w_fixed                  = fill(false,nw),\n      jac                      = nothing, \n      maxSparsity              = 0.1,\n      hev                      = 1e-8,\n      scaleConstraintsAtEvents = true,               \n      getResultNames::Function = ModiaMath.getResultNames, \n      storeResult!::Function   = ModiaMath.storeRawResult!,\n      getResult::Function      = ModiaMath.getStringDictResult,\n      defaultTolerance         = 1e-4, \n      defaultStartTime         = 0.0,\n      defaultStopTime          = 1.0, \n      defaultInterval          = NaN)\n\nReturn a simulationState object. A model that shall be simulated with function ModiaMath.simulate!(model, ...) is required to be defined as:\n\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nRequired arguments\n\nname::Union{AbstractString,Symbol}: Name of model\ngetModelResidues!::Function: Function with arguments (model,t,x,derx,r,w) to compute the residues r and auxiliary variables w from time t, vector x and its time derivative derx.\n\nx_start::Vector{Float64}: Start values of x.\ngetVariableName::Function=ModiaMath.defaultVariableName: Function that returns the name of a variable, given its type and its index.\n\nOptional (keyword) arguments:\n\nnc::Int: Number of constraints functions (= length(fc))\nnz::Int: Number of event indicators\nnw::Int: Number of auxiliary variables (Float64 variables that are additionally computed            and stored at communication points, and where start values can be provided            for initialization)\nzDir::Vector{Int}: Interpretation of event indictors:  zDir[i] = 0: Root is reported for both crossing directions,          = 1: Root is reported when crossing from negative to positive direction          = -1: Root is reported when crossing from positive to negative direction\nx_fixed::Vector{Bool}: = true, x_start[i] is fixed during initialization. = false, x_start[i] might be changed, e.g., due to an initial impulse.\nx_nominal::Vector{Float64}: Nominal values of x. if x_nominal[i]=NaN no nominal value is defined for x[i] and a nominal value is computed (x_nominal[i] = abs(x_start[i]) > 1e-7 ? abs(x_start[i]) : 1.0).\nx_errorControl::Vector{Bool}: = true, the absolute error tolerance is set to 0.1 * relativeTolerance * x_nominal[i]. = false, the absolute error tolerance is switched off (is set to a large value). This is recommended for variables that are basically not limited (for example the angle of a shaft that is permantently rotating in the same direction and therefore becomes larger and larger).\nw_start::Vector{Float64}: Start values for auxiliary variables w. If w_start[i] = NaN, then no start value for w[i] is defined and w[i] is ignored during initialization. If w_start[i] != NaN, an initial equation w[i] = w_start[i] is utilized during initialization.\nw_fixed::Vector{Bool}: = true (and w_start[i] != NaN), w_start[i] is fixed  during initialization. = false (and w_start[i] != NaN, w_start[i] might be changed, e.g., due to an initial impulse.\nhev::Float64: Stepsize used during initialization and at event restart.\nscaleConstraintsAtEvents::Bool: = true, constraint equations are scaled during  initialization and at event restart (currently, this setting is ignored).\njac: Sparse Jacobian datastructure (currently not supported).\nmaxSparsity::Float64: A sparse Jacobian is only used during simulation if sparseness of jac < maxSparsity (currently not supported)\ngetResultNames::Function: Function that returns the names of the variables to be stored in the result data structure.\nstoreResult!::Function: Function that stores the raw results.\ngetResult::Function: Function that resturns the result data structure after the simulation.\ndefaultTolerance::Float64: Model specific default relative tolerance, if not redefined in the call to ModiaMath.simulate!.\ndefaultStartTime::Float64: Model specific default start time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultStopTime::Float64: Model specific default stop time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultInterval::Float64: Model specific default interval in [s], if not redefined in the call to ModiaMath.simulate!. Result data is stored every defaultInterval seconds. If defaultInterval=NaN, the default interval is computed as interval = (stopTime - startTime)/500.0. \n\n\n\n\n\n"
 },
 
 {
@@ -1154,18 +1162,58 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "lib/ModiaMath.html#",
-    "page": "ModiaMath Constants and Types",
-    "title": "ModiaMath Constants and Types",
+    "page": "Constants and Types",
+    "title": "Constants and Types",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "lib/ModiaMath.html#ModiaMath-Constants-and-Types-1",
-    "page": "ModiaMath Constants and Types",
-    "title": "ModiaMath Constants and Types",
+    "location": "lib/ModiaMath.html#ModiaMath.AbstractComponentInternal",
+    "page": "Constants and Types",
+    "title": "ModiaMath.AbstractComponentInternal",
+    "category": "type",
+    "text": "The internal part of a component (has at least fields \"name\" and \"within\") \n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/ModiaMath.html#ModiaMath.AbstractComponentWithVariables",
+    "page": "Constants and Types",
+    "title": "ModiaMath.AbstractComponentWithVariables",
+    "category": "type",
+    "text": "type ModiaMath.AbstractComponentWithVariables\n\nStruct that contains ModiaMath.AbstractVariables as field or as field in a sub-struct.\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/ModiaMath.html#ModiaMath.AbstractRealVariable",
+    "page": "Constants and Types",
+    "title": "ModiaMath.AbstractRealVariable",
+    "category": "type",
+    "text": "ModiaMath.AbstractRealVariable <: ModiaMath.AbstractVariable\n\nA real ModiaMath.AbstractVariable (either scalar or array)\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/ModiaMath.html#ModiaMath.AbstractSimulationModel",
+    "page": "Constants and Types",
+    "title": "ModiaMath.AbstractSimulationModel",
+    "category": "type",
+    "text": "type ModiaMath.AbstractSimulationModel\n\nStruct that is used as simulation model (has field: simulationState)\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/ModiaMath.html#ModiaMath.AbstractVariable",
+    "page": "Constants and Types",
+    "title": "ModiaMath.AbstractVariable",
+    "category": "type",
+    "text": "type ModiaMath.AbstractVariable <: ModiaMath.AbstractComponentWithVariables\n\nA Variable used as element of the DAE model description and is included in the result (if no residue)\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/ModiaMath.html#Constants-and-Types-1",
+    "page": "Constants and Types",
+    "title": "Constants and Types",
     "category": "section",
-    "text": "The following constants are defined in ModiaMath:const path\nAbsolute path of ModiaMath package directory. This allows for example to run ModiaMath examples as include(\"$(ModiaMath.path)/examples/Simulate_Pendulum.jl\").The following abstract types are defined and used in ModiaMath:ModiaMath.AbstractSimulationModel\nStruct that is used as simulation model (has field  simulationState::ModiaMath.SimulationState). An instance of this type can be directly used in a ModiaMath.simulate!(...) call.ModiaMath.AbstractComponentWithVariables\n Struct that contains ModiaMath.AbstractVariables as field or as field  in a sub-struct. ModiaMath.AbstractVariable <: ModiMath.AbstractComponentWithVariables\n A Variable used as element of the DAE model.ModiaMath.AbstractRealVariable <: AbstractVariable\n A real ModiaMath.AbstractVariable (either scalar or array)."
+    "text": "The following constants are defined in ModiaMath (all these definitions are not exported and therefore need to be prefixed with ModiaMath):const path\nAbsolute path of ModiaMath package directory. This allows for example to run ModiaMath examples as include(\"$(ModiaMath.path)/examples/Simulate_Pendulum.jl\").const Version\nVersion of ModiaMathconst Date\nVersion Date of ModiaMathThe following abstract types are defined and used in ModiaMath:Modules = [ModiaMath]\r\nOrder = [:type]"
 },
 
 ]}
