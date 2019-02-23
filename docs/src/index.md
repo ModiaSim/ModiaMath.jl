@@ -25,15 +25,10 @@ and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 ## Installation
 
-ModiMath is registered in METADATA.jl and can be installed with Pkg.add.
-The latest released version (0.3.1) is the last one with support for Julia >= 0.6.
-Trunk and later versions support Julia >=1.0.
+The package is registered in METADATA.jl and can be installed
+in the following way (Julia >= 1.0 is required):
 
 ```julia
-# Julia >= 0.6:
-julia> Pkg.add("ModiaMath")
-
-# alternatively in Julia >= 0.7:
 julia> ]add ModiaMath
 ```
 
@@ -51,9 +46,25 @@ instead the instructions
 
 ### Version 0.4.0
 
-- All Julia 0.6 code removed.
+- The first version that requires Julia >= 1.0 (all Julia 0.6 and 0.7 code was removed).
+
+- ModiaMath.SimulationState has a new keyword argument `structureOfDAE`.
+  It is now possible to define that the DAE is linear in all derivatives or all derivatives
+  are explicitely solved (= ODE). If one of the new structures is selected, 
+  initialization and re-initialization is more robust and more efficient
+  (in particular no implicit Euler step is used).
+
 - ModiaMath.plot supports variables that can be computed from a vector of struct result
-  (for details, see docu of plot)
+  (for details, see docu of plot).
+
+- Using newest versions of all used packages (since issues with Sundials).
+
+- Docu of SimulationState and of StructureOfDAE introduced.
+
+- Version information adapted to Modia style (Version/Date constants).
+
+- Info message of simulation start only printed if log=true.
+
 
 
 ### Version 0.3.1

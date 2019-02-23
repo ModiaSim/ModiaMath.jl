@@ -38,6 +38,11 @@ end
 
 nResults(res::RawResult) = res.nt
 
+"""
+    storeRawResult!(res, v::Vector{Float64})
+
+Store vector `v` in result data structure `res`.
+"""
 function storeRawResult!(res::RawResult, v::Vector{Float64})
     res.nt += 1
     i = res.nt

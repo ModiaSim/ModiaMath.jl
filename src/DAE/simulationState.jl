@@ -6,6 +6,11 @@
 #
 
 # Utility functions used below
+"""
+    defaultVariableName(model, vcat, vindex)
+
+Return default names for the variables (e.g. `x[1]`)
+"""
 defaultVariableName(model::Any, vcat::VariableCategory, vindex::Int) = vcat == Category_X ? "x[" * string(vindex) * "]" :
                                                                       (vcat == Category_W ? "w[" * string(vindex) * "]" :
                                                                                         "der(x[" * string(vindex) * "])" )
@@ -16,7 +21,15 @@ defaultVariableName(model::Any, vcat::VariableCategory, vindex::Int) = vcat == C
 nameVector(name, nNames::Int) = [string(name, "[", i, "]") for i = 1:nNames]                                                                            
 fcNameVector(fc, names::AbstractVector) = [ string(fc, "(", names[i], ")") for i in eachindex(names)]
 
-                                                                    
+""" 
+    getVariableName(model, vcat, vindex, nx=0; 
+                    xNames   =nameVector("x", nx),
+                    derxNames=fcNameVector("der", xNames),
+                    wNames   =String[])
+
+Given category `vcat` and index `vindex`of category, 
+return the full path name of the respective variable.
+"""                                                                    
 function getVariableName(model::Any, vcat::VariableCategory, vindex::Int, nx=0;
                          xNames::Vector{String}=nameVector("x", nx), 
                          derxNames::Vector{String}=fcNameVector("der", xNames),
@@ -32,7 +45,11 @@ function getVariableName(model::Any, vcat::VariableCategory, vindex::Int, nx=0;
     end
 end 
 
+"""
+   getResultNames(model)
 
+Return a vector of result names.
+"""
 function getResultNames(model::Any) 
     sim::SimulationState = model.simulationState
     resultNames = ["time"; String[sim.getVariableName(model, Category_X, i)  for i = 1:sim.nx];
@@ -43,30 +60,91 @@ end
 
 
 """
-    simulationState = SimulationState(
-          name, getModelResidues!, x_start, 
-          getVariableName=ModiaMath.defaultVariableName;
-          nc=0, nz=0, nw=0,
-          zDir                     = fill(0, nz),                   
-          x_fixed                  = fill(false, length(x_start)),   
-          x_nominal                = fill(NaN, length(x_start)),   
-          x_errorControl           = fill(true, length(x_start)),
-          w_start                  = fill(NaN,nw),
-          w_fixed                  = fill(false,nw),
-          w_nominal                = fill(NaN, length(w_start)),   
-          jac                      = nothing, 
-          maxSparsity              = 0.1,
-          hev                      = 1e-8,
-          scaleConstraintsAtEvents = true,               
-          getResultNames::Function = ModiaMath.getResultNames, 
-          storeResult!::Function   = ModiaMath.storeRawResult!,
-          getResult::Function      = ModiaMath.getStringDictResult,
-          defaultTolerance         = 1e-4, 
-          defaultStartTime         = 0.0,
-          defaultStopTime          = 1.0, 
-          defaultInterval          = NaN)
-                     
-Return a `simulationState` object. A `model` that shall be simulated with function
+    @enum StructureOfDAE
+          ImplicitIndexOneDAE
+          LinearDerivativesWithConstraints
+          ExplicitDerivativesWithoutConstraints 
+
+Enumeration defining the structure of the DAE of the simulation model. 
+The following DAE structures are supported 
+(function `getModelResidues!(model, t, x, derx, r, w)` returns the residues `r`):
+
+# ModiaMath.ImplicitIndexOneDAE
+
+```math
+\\begin{align}
+     z &= f_z(x,t) \\\\
+ 0 = r &= \\left[ \\begin{array}{l}
+                    f_d(\\dot{x},x,t,z_i>0) \\\\
+                    f_c(x,t,z_i>0)
+                  \\end{array} \\right] \\\\
+     J &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};  
+                  \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular (matrix is invertible)}
+\\end{align}
+```
+
+Initialization and re-initialization is performed by using an implicit Euler step.
+When appropriately scaling `r`, using a step size that tends to zero and under further
+assumptions, then this solution can be interpreted as analytically integrating over
+the time instant. This might mean to integrate over
+Dirac impulses (in case `x` is discontinuous at this time instant).
+Since the selected step size is not close to zero, the implicit Euler step
+will give a very rough approximation of the analytical integral.
+A much better approximation is achieved with option 
+`LinearDerivativesWithConstraints` below where a step size of zero is used.
+
+
+# ModiaMath.LinearDerivativesWithConstraints
+
+```math
+\\begin{align}
+     z &= f_z(x,t) \\\\
+ 0 = r &= \\left[ \\begin{array}{l}
+                    M_d(x,t,z_i>0) \\cdot \\dot{x} + b_d(x,t,z_i>0)\\\\
+                    f_c(x,t,z_i>0)
+                  \\end{array} \\right] \\\\
+     J &= \\left[ M_d;  
+                  \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular (matrix is invertible)}
+\\end{align}
+```
+
+When instantiating a [`SimulationState`](@ref), the dimension `nc = length(fc)` must be provided
+(`nc = 0` is included as a special case).
+
+Initialization and re-initialization is performed by analytically integrating
+over the initial time or the event time. This might mean to integrate over
+Dirac impulses (in case `x` is discontinuous at this time instant).
+Under certain assumptions a numerical approximation of
+the mathematically unique solution is computed.
+
+
+# ModiaMath.ExplicitDerivativesWithoutConstraints
+
+```math
+\\begin{align}
+     z &= f_z(x, t) \\\\
+ 0 = r &= f(x, t, z_i > 0) - \\dot{x}
+\\end{align}
+```
+
+Initialization and re-initialization is trivial:
+
+```julia
+     x = x_start 
+der(x) = r         # getModelResidues!(model, t, x, zeros(nx), r, w)
+```
+"""
+@enum StructureOfDAE ImplicitIndexOneDAE ExplicitDerivativesWithoutConstraints LinearDerivativesWithConstraints
+
+
+"""
+    simulationState = SimulationState(name, getModelResidues!, x_start, 
+                                      getVariableName; kwargs...)
+
+Return a `simulationState` object that is described by a DAE
+with one of the supported structures defined with enumeration [`StructureOfDAE`](@ref).
+
+A `model` that shall be simulated with function
 [`ModiaMath.simulate!`](@ref)`(model, ...)` is required to be defined as:
 
 ```julia
@@ -77,6 +155,28 @@ mutable struct ModelName <: ModiaMath.AbstractSimulationModel
 end
 ```
 
+| Keyword arguments           | defaults                                           |
+|:----------------------------|:---------------------------------------------------|
+| structureOfDAE              | ImplicitIndexOneDAE (see [`StructureOfDAE`](@ref)) |
+| nc                          | 0                                                  |
+| nz                          | 0                                                  |
+| nw                          | 0                                                  |
+| zDir                        | fill(0, nz)                                        |
+| x_fixed                     | fill(false, length(x_start))                       |
+| x_nominal                   | fill(NaN, length(x_start))                         |
+| x_errorControl              | fill(true, length(x_start))                        |
+| jac                         | nothing                                            |
+| maxSparsity                 | 0.1                                                |
+| hev                         | 1e-8                                               |
+| scaleConstraintsAtEvents    | true,                                              |
+| getResultNames              | [`ModiaMath.getResultNames`](@ref)                 |
+| storeResult!                | [`ModiaMath.storeRawResult!`](@ref)                |
+| getResult                   | [`ModiaMath.getStringDictResult`](@ref)            |
+| defaultTolerance            | 1e-4                                               |
+| defaultStartTime            | 0.0                                                |
+| defaultStopTime             | 1.0                                                |
+| defaultInterval             | NaN                                                |
+
 
 # Required arguments
 
@@ -84,17 +184,28 @@ end
 
 - `getModelResidues!::Function`: Function with arguments `(model,t,x,derx,r,w)` to
   compute the residues `r` and auxiliary variables `w` from time `t`, vector `x` and
-  its time derivative `derx`.
+  its time derivative `derx`. 
  
 - `x_start::Vector{Float64}`: Start values of `x`.
 
-- `getVariableName::Function=ModiaMath.defaultVariableName`: Function that returns the
+- `getVariableName::Function=`[`ModiaMath.defaultVariableName`](@ref): Function that returns the
   name of a variable, given its type and its index.
 
 
 # Optional (keyword) arguments:
 
-- `nc::Int`: Number of constraints functions (= length(fc))
+- `structureOfDAE::`[`StructureOfDAE`](@ref): Structure of DAE.
+  Try to not use the default `ImplicitIndexOneDAE` because this is numerically the 
+  less robust for initialization and re-initialization.
+
+- `nc::Int`: Number of constraint equations (= length(fc)).\\
+   If `structureOfDAE = ImplicitIndexOneDAE`, then
+   `nc > 0` signals that constraint equations are present (but they need not to be 
+   at the end of the residue vector).\\
+   If `structureOfDAE = LinearDerivativesWithConstraints`, then
+   `nc` defines the number of constraint equations and these equations must be
+   at the end of the residue vector.\\
+   If `structureOfDAE = ExplicitDerivativesWithoutConstraints`, `nc = 0` required.
 
 - `nz::Int`: Number of event indicators
 
@@ -120,24 +231,12 @@ end
   basically not limited (for example the angle of a shaft that is permantently rotating
   in the same direction and therefore becomes larger and larger).
 
-- `w_start::Vector{Float64}`: Start values for auxiliary variables `w`.
-  If `w_start[i] = NaN`, then no start value for `w[i]` is defined and
-  `w[i]` is ignored during initialization.
-  If `w_start[i] != NaN`, an initial equation `w[i] = w_start[i]` is utilized
-  during initialization.
+- `hev::Float64`: Stepsize used during initialization and at event restart
+  if `structureOfDAE = ModiaMath.ImplicitIndexOneDAE`.
+  Otherwise `hev` is ignored.
 
-- `w_fixed::Vector{Bool}`: = true (and `w_start[i] != NaN`), `w_start[i]` is fixed 
-  during initialization. = false (and `w_start[i] != NaN`, `w_start[i]`
-  might be changed, e.g., due to an initial impulse.
-
-- `w_nominal::Vector{Float64}`: Nominal values of `w`. if `w_nominal[i]=NaN` no nominal value
-  is defined for `w[i]` and a nominal value is computed
-  (`w_nominal[i] = abs(w_start[i]) > 1e-7 ? abs(w_start[i]) : 1.0`).
-
-- `hev::Float64`: Stepsize used during initialization and at event restart.
-
-- `scaleConstraintsAtEvents::Bool`: = true, constraint equations are scaled during 
-  initialization and at event restart (currently, this setting is ignored).
+- `scaleConstraintsAtEvents::Bool`: only kept for backwards compatibility
+  (option is ignored).
 
 - `jac`: Sparse Jacobian datastructure (currently not supported).
 
@@ -175,6 +274,7 @@ mutable struct SimulationState
     storeResult!::Function
     getResult::Function
     eventHandler::EventHandler
+    structureOfDAE::StructureOfDAE
 
     nx::Int   # Length of x-vector
     nd::Int   # fd(der(x),x,t) = 0; nd = length(fd)
@@ -215,11 +315,6 @@ mutable struct SimulationState
     x_errorControl::Vector{Bool}     
 
     w::Vector{Float64}  # length(w) = nw
-    w_start::Vector{Float64}
-    w_fixed::Vector{Bool}
-    w_nominal::Vector{Float64}
-    w_start_used::Vector{Int}                # The indices of w_start, where w_start[i] != NaN.
-                                             # Only these w_start values are used for initialization
         
     # Auxiliary storage needed during initialization and at events
     eqInfo::ModiaMath.NonlinearEquationsInfo
@@ -229,6 +324,9 @@ mutable struct SimulationState
     yNonlinearSolver::Vector{Float64}
     derxev::Vector{Float64}
     residues::Vector{Float64}
+    residues2::Vector{Float64}
+    derx_zero::Vector{Float64}
+    jac2::Union{Matrix{Float64}, Nothing}
     yScale::Vector{Float64}
     rScale::Vector{Float64}
     tev::Float64
@@ -243,34 +341,35 @@ mutable struct SimulationState
     result::Any
    
     function SimulationState(name::Union{AbstractString,Symbol},
-                            getModelResidues!::Function, 
-                            x_start::Vector{Float64},
-                            getVariableName::Function=defaultVariableName;
-                            nc=0,
-                            nz=0,
-                            nw=0,
-                            zDir::Vector{Int}=fill(0, nz),                   
-                            x_fixed::Vector{Bool}=fill(false, length(x_start)),   
-                            x_nominal::Vector{Float64}=fill(NaN, length(x_start)),                                                   
-                            x_errorControl::Vector{Bool}=fill(true, length(x_start)),
-                            w_start::Vector{Float64}=fill(NaN,nw),
-                            w_fixed::Vector{Bool}=fill(false,nw),
-                            w_nominal::Vector{Float64}=fill(NaN, length(w_start)),
-                            hev=1e-8,
-                            scaleConstraintsAtEvents::Bool=true,               
-                            jac=nothing, 
-                            maxSparsity::Float64=0.1,
-                            getResultNames::Function=ModiaMath.getResultNames, 
-                            storeResult!::Function=ModiaMath.storeRawResult!,
-                            getResult::Function=ModiaMath.getStringDictResult,
-                            defaultTolerance=1e-4, 
-                            defaultStartTime=0.0,
-                            defaultStopTime=1.0, 
-                            defaultInterval=NaN)
+                             getModelResidues!::Function, 
+                             x_start::Vector{Float64},
+                             getVariableName::Function=defaultVariableName;
+                             structureOfDAE::StructureOfDAE = ImplicitIndexOneDAE,
+                             nc=0,
+                             nz=0,
+                             nw=0,
+                             zDir::Vector{Int}=fill(0, nz),                   
+                             x_fixed::Vector{Bool}=fill(false, length(x_start)),   
+                             x_nominal::Vector{Float64}=fill(NaN, length(x_start)),                                                   
+                             x_errorControl::Vector{Bool}=fill(true, length(x_start)),
+                             hev=1e-8,
+                             scaleConstraintsAtEvents::Bool=true,               
+                             jac=nothing, 
+                             maxSparsity::Float64=0.1,
+                             getResultNames::Function=ModiaMath.getResultNames, 
+                             storeResult!::Function=ModiaMath.storeRawResult!,
+                             getResult::Function=ModiaMath.getStringDictResult,
+                             defaultTolerance=1e-4, 
+                             defaultStartTime=0.0,
+                             defaultStopTime=1.0, 
+                             defaultInterval=NaN)
   
         # Check input arguments                                        
         @assert(nc >= 0)
         @assert(nc <= length(x_start))
+        if structureOfDAE == ExplicitDerivativesWithoutConstraints
+            @assert(nc == 0)
+        end
         @assert(nz >= 0)
         @assert(nw >= 0)
         @assert(length(x_fixed) == length(x_start))
@@ -306,30 +405,18 @@ mutable struct SimulationState
             yScale[i] = 1/x_nominal2[i]
         end
 
-        w_nominal2 = ones(nw)
-        for i in 1:nw
-            if isnan( w_nominal[i] )
-                if abs(w_start[i]) > 1e-7
-                    w_nominal2[i] = abs(w_start[i])
-                end
-            else
-                w_nominal2[i] = w_nominal[i]
-            end
-        end
-
-        # Compute w_start values that are used during initialization
-        w_start_used = Float64[]
-        for i in eachindex(w_start)
-            if !isnan(w_start[i])
-                push!(w_start_used, i)
-            end
-        end
-
         # Compute utility elements
         nd = nx - nc
         eventHandler = EventHandler(nz=nz)
-            
-        eqInfo = ModiaMath.NonlinearEquationsInfo("???", nx, getEventResidues!)
+
+        if structureOfDAE == LinearDerivativesWithConstraints
+            eqInfo = ModiaMath.NonlinearEquationsInfo("???", nx, getEventResidues_LinearDerivativesWithConstraints!)
+            jac2   = zeros(nx,nx)
+        else     
+            eqInfo = ModiaMath.NonlinearEquationsInfo("???", nx, getEventResidues_ImplicitIndexOneDAE!)
+            jac2   = nothing
+        end
+
 
         # If jac is provided and sparse enough, use sparse methods
         #sparse = typeof(jac) == Void ? false : nnz(jac)/(nx*nx) < maxSparsity
@@ -343,15 +430,15 @@ mutable struct SimulationState
         cg = nothing
 
         new(Symbol(name), nothing, getModelResidues!, getVariableName, getResultNames, 
-            storeResult!, getResult, eventHandler, nx, nd, nc, nw, nz, zDir,
+            storeResult!, getResult, eventHandler, structureOfDAE, nx, nd, nc, nw, nz, zDir,
             sparse, jac, cg, defaultTolerance, defaultStartTime, defaultStopTime,
             defaultInterval, NaN, ModiaMath.Logger(),
-            ModiaMath.SimulationStatistics(nx, sparse, sparse ? cg.ngroups : 0),
+            ModiaMath.SimulationStatistics(structureOfDAE, nx, nc, sparse, sparse ? cg.ngroups : 0),
             NaN, NaN, NaN, NaN,
             x_start, x_fixed, x_nominal2, x_errorControl, zeros(nw),  
-            w_start, w_fixed, w_nominal2, w_start_used,
             eqInfo, zeros(nx), zeros(nx), zeros(nx),
-            zeros(nx), zeros(nx), zeros(nx), yScale, ones(nx), 0.0, hev, 0.0, 
+            zeros(nx), zeros(nx), zeros(nx), zeros(nx), zeros(nx), jac2,
+            yScale, ones(nx), 0.0, hev, 0.0, 
             scaleConstraintsAtEvents, false, false)
     end
 end
@@ -366,101 +453,7 @@ isNearlyEqual(x1::Float64, x2::Float64, x_nominal::Float64, tolerance::Float64) 
 
 
 
-function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
-    #=
-       DAE:
-           w = fw(der(x),x,t)             
-           0 = fd(der(x),x,t,w)          [der(fd,der(x));
-           0 = fc(x,t,w)                  der(fc,x)]      is regular (under the assumption that w is inlined and
-                                                                      w[i] used in fc(...) do not depend on der(x))
-
-       Initialization/re-initialization equation:
-           0 = f(y)  ->  solve for y
-
-       Re-Initialization at event:
-           # It is assumed that x might have been changed at the event instant.
-           # For example when an impulse occured: v(after_event) = -eps*v(before_event).
-           # However, it is implicitely assumed (this is not checked) that a Dirac impulse
-           # only occurs in der(x) and not in x. This in turn means that if ni is the highest
-           # occuring derivative of x[i], then at most the n-1-derivative of x[i] is allowed to
-           # be discontinuous and all lower derivatives must be continuous at the event. 
-           #     If this requirement is fulfilled, it can be guaranteed that integrating over
-           # the discontinuity will yield a mathematically well-defined solution.
-           # If this requirement is not fulfilled, it is unclear whether a mathematically
-           # well-defined solution exists and most likely a somewhat arbitrary value is computed.
-           
-           dim(fc) = 0:
-               # Any "x" can be used (note, it is assumed that der(fd,der(x)) is regular).
-               # Therefore, the right limit of x is fixed and derivatives der(x) could be used
-               # as iteration variables. However, since there is no nominal value for der(x),
-               # instead the following approximation is used where the iteration variables y[i]
-               # are the virtual previous values of x
-                        x[i] = x_ev[i]                     # x_ev the value of x after the event
-                   der(x[i]) = (x_ev[i] - y[i]) / hev
-
-               # If der(x[i]) can be explicitely computed, then there is no iteration variable
-               # associated with der(x[i]) or the virtual previous value of x. So vector y has one 
-               # element less (If all der(x[i]) can be explicitly computed (so ODE), then no equation
-               # must be solved at all):
-                   x[i] = x_ev[i]
-                   der(x[i]) is explicitely computed
- 
-               # If fd is linear in der(x), which seems to be always the case for physical systems,
-               # no nonlinear equation must be solved. Instead, the Jacobian with respect to der(x) 
-               # is computed and then a linear equation is solved to compute der(x)
-               # (this is not yet done):
-                   0 = Jd(x,t)*der(x) + hd(x,t)  -> der(x) = solve(Jd, -hd)
-               
-                   # Determination of Jd and hd:
-                       -      hd = fd(der(x)=0  , x, t)
-                       - Jd[:,i] = fd(der(x)=e_i, x, t) - hd(x,t)  
-
-               # If fd is linear in der(x) and some der(x[i]) can be explicitely computed, then the
-               # linear equation system to be solved for is smaller. Furthermore, the Jacobian could
-               # also be sparse. There are several options, such as:
-               #   (a) Only support sparse der(x)-Jacobians. In this case explicitely solvable
-               #       derivatives are included as a special case. The model must provide the structure 
-               #       of the Jacobian.
-               #   (b) The generated code solves already explicitely for the derivatives at an event,
-               #       so from the outside, all derivatives are explicitely computed.
-           
-           dim(fc) > 0:
-               # fc(x,t) might be non-zero at an event (for example, if an impulse occured
-               # and v(after_event) = -eps*v(before_event), then the velocity constraint of a 
-               # closed loop system might be no longer fulfilled.
-               # Therefore, the left limit of x is fixed and the right limit are the iteration variables y
-               # (that are determined, so that fc(x,t) = 0 and fd(der(x),x,t)=0)
-                        x[i] = y[i]                     # the right limit of x
-                   der(x[i]) = (y[i] - x_ev[i]) / hev   # the derivative at the right limit of x
-
-               # If der(x[i]) can be explicitely computed, then x[i] might still need 
-               # to be modified, such that fc(x,t) = 0. For this reason, the dimension of the 
-               # reinitialization problem is not changed, just der(x[i]) is analytically computed
-               # and the residue is computed as the difference to the numerically computed derivative.
-               # Therefore, no essential simplification occurs when utilizing this feature, just
-               # the residue computation is more robust.
-
-               # If fd is linear in der(x), still the nonlinear equation fc(x,t)=0 must be solved.
-               # Again no simplification for the re-initialization algorithm seems to be possible,
-               # if it is known that fd is linear in the derivative.
-
-
-        Initialization at t_start:
-           # Similar to re-initialization, but additionally with x_fixed[i] = true it is defined
-           # that x[i] is fixed and should not be changed.
-           # Furthermore, w_fixed[i] 
-           if x_fixed[i] or dim(fc) = 0
-              # Right limit of x is fixed, left limit of x are the iteration variables y
-                   x[i] = x_start[i]
-              der(x[i]) = (x_start[i] - y[i]) / hev
-
-              # If dim(fc) = 0, a linear equation can be solved to compute der(x)
-           else
-              # Left limit of x is fixed, right limit of x are the iteration variables y
-                   x[i] = y[i]
-              der(x[i]) = (y[i] - x_start[i]) / hev
-           end
-    =#
+function getEventResidues_ImplicitIndexOneDAE!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
 
     model = eqInfo.extraInfo
     sim::SimulationState = model.simulationState
@@ -523,6 +516,62 @@ function getEventResidues!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{F
 end
 
 
+function getEventResidues_LinearDerivativesWithConstraints!(eqInfo::ModiaMath.NonlinearEquationsInfo, y::Vector{Float64}, r::Vector{Float64})
+
+    model = eqInfo.extraInfo
+    sim::SimulationState = model.simulationState
+    @assert(length(y) == eqInfo.ny)
+    @assert(length(r) == eqInfo.ny)
+    @assert(length(y) == sim.nx)
+   
+    residues  = sim.residues
+    residues2 = sim.residues2
+   
+    # Copy unknowns (y) to xev and derxev
+    if sim.nc == 0
+        # Unknowns are at the left limit
+        for i in eachindex(y)
+            sim.xev[i]    = sim.xev_old[i]
+            sim.derxev[i] = sim.xev_old[i] - y[i]            
+        end 
+    else # sim.nc > 0
+        for i in eachindex(y)
+            if sim.initialization && sim.x_fixed[i]
+                # Unknowns are at the left limit
+                sim.xev[i]    = sim.xev_old[i]
+                sim.derxev[i] = sim.xev_old[i] - y[i]           
+            else
+                # Unknowns are at the right limit
+                sim.xev[i]    = y[i]
+                sim.derxev[i] = y[i] - sim.xev_old[i]
+            end
+        end
+    end
+   
+    # Compute residues
+    sim.time = sim.tev
+    Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, residues , sim.w)  
+    Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev   , residues2, sim.w)  
+
+    for i = 1:sim.nd
+        r[i] = residues[i] - residues2[i]
+    end
+    for i = sim.nd+1:sim.nx 
+        r[i] = residues[i]
+    end
+
+    eqInfo.lastNorm_r        = norm(r, Inf)
+    eqInfo.lastrScaledNorm_r = norm(sim.rScale .* r, Inf)
+   
+    # println("maxabs(r) = ", maxabs(r))
+    # println("residue = "),display(r)
+   
+    return nothing
+end
+
+const small = sqrt( eps(Float64) )
+
+
 function reinitialize!(model, sim::SimulationState, tev::Float64)
     nx = sim.nx   
     nd = sim.nd
@@ -535,10 +584,22 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
   
     # Determine consistent xev, der(xev)
     if ModiaMath.isLogEvents(sim)
-        if nc == 0
-            println("        for given x, determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-        else
-            println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+        if sim.structureOfDAE == ImplicitIndexOneDAE
+            if nc == 0
+                println("        for given x, determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+            else
+                println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
+            end
+        elseif sim.structureOfDAE == LinearDerivativesWithConstraints
+            if nc == 0
+                println("        for given x, determine consistent DAE variables der(x) (solving a linear equation system)")
+            else
+                println("        determine consistent DAE variables x,der(x) (with analytical integral over time instant)")
+            end
+        elseif sim.structureOfDAE == ExplicitDerivativesWithoutConstraints
+            println("        for given x, compute der(x)")
+        else 
+            error("... Cannot occur. Variable structureOfDAE = ", sim.structureOfDAE, " is wrong.")
         end
     end
 
@@ -554,15 +615,63 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
 
     # Print log message
     if ModiaMath.isLogInfos(sim)
-        for i = 1:nx
-            if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i], sim.x_nominal[i], sim.tolerance)
-                xname = sim.getVariableName(model, Category_X, i)
-                println("            ", xname, " = ", sim.xev_beforeEvent[i], " changed to ", sim.xev[i])
+        if sim.structureOfDAE != ExplicitDerivativesWithoutConstraints
+            for i = 1:nx
+                if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i], sim.x_nominal[i], sim.tolerance)
+                    xname = sim.getVariableName(model, Category_X, i)
+                    println("            ", xname, " = ", sim.xev_beforeEvent[i], " changed to ", sim.xev[i])
+                end
             end
         end
     end
-end
 
+
+    # Compute consistent derivatives 
+    if sim.structureOfDAE == ExplicitDerivativesWithoutConstraints
+        Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.derxev, sim.w)
+
+    elseif sim.structureOfDAE == LinearDerivativesWithConstraints
+        # Determine linear factors
+        jac2 = sim.jac2
+        Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues, sim.w)
+
+        # Determine der(fd, der(x)) using the fact that fd is linear in der(x)
+        for j = 1:nx
+            sim.derx_zero[j] = 1.0
+            Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
+            for i = 1:nd
+                jac2[i,j] = sim.residues2[i] - sim.residues[i]
+            end
+            sim.derx_zero[j] = 0.0 
+        end 
+
+        # Determine der(fc, x) with forward difference
+        if nc > 0
+            inc::Float64 = 0.0
+            xinc = sim.yNonlinearSolver
+            for j = 1:nx
+                xinc[j] = 0.0
+            end
+            for j = 1:nx
+                xj  = sim.xev[j]
+                inc = small*max( abs(xj), sim.x_nominal[j] )
+                inc = (xj + inc) - xj
+                sim.xev[j] += inc 
+                Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
+                for i = nd+1:nx
+                    jac2[i,j] = sim.residues2[i]/inc - sim.residues[i]/inc 
+                end
+                sim.xev[j] = xj
+            end
+        end
+
+        # Solve linear system of equation: jac2*derxev = -residue
+        for j = 1:nx
+            sim.derxev[j] = -sim.residues[j]
+        end
+        ldiv!(lu!(jac2),sim.derxev)
+    end
+end
 
 function eventIteration!(model, sim::SimulationState, tev::Float64)
     eh::EventHandler = sim.eventHandler 
@@ -730,10 +839,7 @@ end
 
 
 
-
-const small = sqrt( eps(Float64) )
-
-
+#=
 """
     computeFullJacobian!(model, sim, t, y, yp, residues, cj, ewt)
 
@@ -776,4 +882,4 @@ function computeJacobian!(model, sim::SimulationState, t::Float64, y::Vector{Flo
         yp[j] = ypj
     end
 end
-
+=#

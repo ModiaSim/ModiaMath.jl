@@ -19,7 +19,11 @@ function indexOftrailingDot(name::AbstractString)::Int
 end
 
 
+"""
+    getStringDictResult(model, res)
 
+Return dictionary of result, from raw result data structure `raw`.
+"""
 function getStringDictResult(model, res::RawResult)
     nt     = res.nt
     data   = res.data

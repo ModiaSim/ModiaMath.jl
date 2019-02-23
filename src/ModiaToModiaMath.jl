@@ -16,6 +16,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
     store    # extra storage
    
     function ModiaSimulationModel(name::Symbol, f!::Function, x0::Vector{Float64}, der_x0::Vector{Float64}, jac=nothing;
+                                structureOfDAE = ModiaMath.ImplicitIndexOneDAE,
                                 xNames::Vector{String}=ModiaMath.DAE.nameVector("x", length(x0)),
                                 derxNames::Vector{String}=ModiaMath.DAE.fcNameVector("der", xNames),
                                 wNames::Vector{String}=fill("", 0),
@@ -27,6 +28,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                                 interval=(stopTime - startTime) / 500.0)                
 
         simulationState = ModiaMath.SimulationState(string(name), getModelResidues!, x0;
+                                structureOfDAE = structureOfDAE,
                                 nc=nc == 0 ? 1 : nc,
                                 nz=nz,
                                 jac=jac,
@@ -43,7 +45,8 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
     function ModiaSimulationModel(name::String, 
                             getModelResidues!::Function,
                             x_start::Vector{Float64},
-                            getVariableName::Function=ModiaMath.DAE.defaultVariableName;                   
+                            getVariableName::Function=ModiaMath.DAE.defaultVariableName; 
+                            structureOfDAE = ModiaMath.ImplicitIndexOneDAE,                  
                             nc::Int=1,
                             nz::Int=0,                   
                             nw::Int=0,
@@ -58,6 +61,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                             interval=(stopTime - startTime) / 500.0)
       
         simulationState = ModiaMath.SimulationState(name, getModelResidues!, x_start, getVariableName;
+                            structureOfDAE = structureOfDAE,
                             nc=nc,
                             nz=nz,
                             nw=nw,

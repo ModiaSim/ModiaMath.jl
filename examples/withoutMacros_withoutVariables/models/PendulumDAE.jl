@@ -44,14 +44,15 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     m::Float64
     g::Float64
 
-    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false)   #y0=-sqrt(L*L - x0*x0))
+    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false, linearDerivatives=false)   #y0=-sqrt(L*L - x0*x0))
         @assert(L > 0.0)
         @assert(m > 0.0)
         @assert(-L <= x0 <= L)
         @assert(-L <= y0 <= L)      
         simulationState = ModiaMath.SimulationState("PendulumDAE", getModelResidues!, [x0,y0,1.0,1.0,0.0,0.0], getVariableName;
                                 x_fixed=[x_fixed, false, x_fixed, false, false, false],
-                                nc=2)
+                                nc=2, structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
+                                                                           ModiaMath.ImplicitIndexOneDAE)
         new(simulationState, L, m, g)
     end
 end 

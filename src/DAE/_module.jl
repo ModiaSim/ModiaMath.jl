@@ -5,8 +5,8 @@
     module ModiaMath.DAE 
 
 Interface between the [`ModiaMath.SimulationEngine`](@ref) and the index 1 DAE model.
-A DAE model is a `struct` derived from [`ModiaMath.AbstractSimulationModel`](@ref) 
-that has a required field `simulationState::`[`ModiaMath.SimulationState`](@ref)
+A DAE model is a `struct` that has a required field 
+`simulationState::`[`ModiaMath.SimulationState`](@ref)
 in which the main properties of the DAE model are reported to the simulation engine:
 
 ```julia
@@ -62,7 +62,7 @@ or they can be called on a simulation model
 module DAE
 
 export EventRestart, NoRestart, Restart, FullRestart, Terminate
-export getVariableName, getResultNames
+export getVariableName, getResultNames, defaultVariableName
 
 export getTime, getStartTime, getStopTime, getTolerance
 export isInitial, isTerminal, isEvent, isZeroCrossing, isAfterSimulationStart, isStoreResult, setNominal!
@@ -70,6 +70,8 @@ export setNextEvent!, positive!, negative!, change!, edge!
 export getSimulationResult
 
 export SimulationState
+export StructureOfDAE, ImplicitIndexOneDAE, ExplicitDerivativesWithoutConstraints, LinearDerivativesWithConstraints
+
 
 # export InitInfo, EventInfo, reset!
 # export EventHandler

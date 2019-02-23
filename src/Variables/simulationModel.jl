@@ -28,6 +28,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                              stopTime  = 1.0,
                              tolerance = 1e-4,
                              interval  = (stopTime-startTime)/500.0,
+                             structureOfDAE = ModiaMath.ImplicitIndexOneDAE,
                              hev = 1e-8,
                              scaleConstraintsAtEvents::Bool = true)
         modelName = ModiaMath.componentName(model)
@@ -38,6 +39,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         ModiaMath.copy_start_to_x!(var,x,x_fixed,x_nominal)
 
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
+                                                    structureOfDAE = structureOfDAE,
                                                     x_fixed = x_fixed, x_nominal=x_nominal, nc = var.nfc,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,

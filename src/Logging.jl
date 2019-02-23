@@ -165,6 +165,7 @@ isLogEvents(logger::Logger)     = logger.log && logger.events
 
 The following data is stored in this structure:
 
+- `structureOfDAE`: Structure of DAE
 - `cpuTimeInitialization`: CPU-time for initialization
 - `cpuTimeIntegration`: CPU-time for integration
 - `startTime`: start time of the integration
@@ -172,6 +173,7 @@ The following data is stored in this structure:
 - `interval`: communication interval of the integration
 - `tolerance`: relative tolerance used for the integration
 - `nEquations`: number of equations (length of y and of yp)
+- `nConstraints`: number of constraint equations
 - `nResults`: number of time points stored in result data structure
 - `nSteps`: number of (successful) steps
 - `nResidues`: number of calls to compute residues (includes residue calls for Jacobian)
@@ -191,6 +193,7 @@ The following data is stored in this structure:
   taking the sparseness structure into account).
 """
 mutable struct SimulationStatistics
+    structureOfDAE::Any
     cpuTimeInitialization::Float64
     cpuTimeIntegration::Float64
     startTime::Float64
@@ -198,6 +201,7 @@ mutable struct SimulationStatistics
     interval::Float64
     tolerance::Float64
     nEquations::Int
+    nConstraints::Int
     nResults::Int
     nSteps::Int
     nResidues::Int
@@ -214,8 +218,8 @@ mutable struct SimulationStatistics
     sparseSolver::Bool
     nGroups::Int
 
-    SimulationStatistics(nEquations::Int, sparseSolver::Bool, nGroups::Int) =
-    new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, 0, 0, 0, 0, 0, 0, 0, 0, 0, floatmax(Float64),
+    SimulationStatistics(structureOfDAE, nEquations::Int, nConstraints::Int, sparseSolver::Bool, nGroups::Int) =
+    new(structureOfDAE, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, nConstraints, 0, 0, 0, 0, 0, 0, 0, 0, 0, floatmax(Float64),
         floatmax(Float64), 0.0, 0, sparseSolver, nGroups)
 end
 
@@ -247,14 +251,15 @@ import Base.show
 Base.print(io::IO, stat::SimulationStatistics) = show(io, stat)
 
 function Base.show(io::IO, stat::SimulationStatistics)
-    @printf(io,"        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n", 
+    println(io, "        structureOfDAE = ", stat.structureOfDAE)
+    @printf(io, "        cpuTime        = %.2g s (init: %.2g s, integration: %.2g s)\n", 
                                            stat.cpuTimeInitialization + stat.cpuTimeIntegration, 
                                            stat.cpuTimeInitialization, stat.cpuTimeIntegration)
     println(io, "        startTime      = ", stat.startTime, " s")
     println(io, "        stopTime       = ", stat.stopTime, " s")
     println(io, "        interval       = ", stat.interval, " s")
     println(io, "        tolerance      = ", stat.tolerance)
-    println(io, "        nEquations     = ", stat.nEquations)
+    println(io, "        nEquations     = ", stat.nEquations, " (includes ", stat.nConstraints, " constraints)")
     println(io, "        nResults       = ", stat.nResults)
     println(io, "        nSteps         = ", stat.nSteps)
     println(io, "        nResidues      = ", stat.nResidues, " (includes residue calls for Jacobian)")

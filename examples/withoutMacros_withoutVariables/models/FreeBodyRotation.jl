@@ -54,7 +54,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     function Model(;m=1.0, I=Diagonal([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
                   phase=[0,0.5235987755983,1.0471975511966],
                   Q0=[0.1, 0.5, 0.0, 1.0],
-                  w0=zeros(3))
+                  w0=zeros(3), linearDerivatives=false)
         @assert(m > 0.0)
         @assert(size(I) == (3, 3))
         @assert(isposdef(I))
@@ -65,7 +65,9 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(length(Q0) == 4)
         @assert(length(w0) == 3)
 
-        simulationState = ModiaMath.SimulationState("FreeBodyRotation", getModelResidues!, Vector{Float64}([Q0;w0]), getVariableName;  nc=1) 
+        simulationState = ModiaMath.SimulationState("FreeBodyRotation", getModelResidues!, Vector{Float64}([Q0;w0]), getVariableName; nc=1,  
+                                                    structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
+                                                                                         ModiaMath.ImplicitIndexOneDAE) 
         new(simulationState, m, SMatrix{3,3,Float64,9}(I), SVector{3,Float64}(A),
                                                        SVector{3,Float64}(freqHz),
                                                        SVector{3,Float64}(phase))
