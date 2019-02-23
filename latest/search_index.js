@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Installation",
     "category": "section",
-    "text": "ModiMath is registered in METADATA.jl and can be installed with Pkg.add. The latest released version (0.3.1) is the last one with support for Julia >= 0.6. Trunk and later versions support Julia >=1.0.# Julia >= 0.6:\r\njulia> Pkg.add(\"ModiaMath\")\r\n\r\n# alternatively in Julia >= 0.7:\r\njulia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
+    "text": "The package is registered in METADATA.jl and can be installed in the following way (Julia >= 1.0 is required):julia> ]add ModiaMathModiaMath uses PyPlot for plotting. If PyPlot is not available in your current Julia environment an information message is printed and all ModiaMath.plot(..) calls are ignored. In order that plot windows are displayed, you need to add PyPlot to your current environment via Pkg.add(\"PyPlot\"). Often this automatic installation fails and it is recommended to follow instead the instructions Installing PyPlot in a robust way."
 },
 
 {
@@ -37,7 +37,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Home",
     "title": "Version 0.4.0",
     "category": "section",
-    "text": "All Julia 0.6 code removed.\nModiaMath.plot supports variables that can be computed from a vector of struct result (for details, see docu of plot)"
+    "text": "The first version that requires Julia >= 1.0 (all Julia 0.6 and 0.7 code was removed).ModiaMath.SimulationState has a new keyword argument structureOfDAE. It is now possible to define that the DAE is linear in all derivatives or all derivatives are explicitely solved (= ODE). If one of the new structures is selected,  initialization and re-initialization is more robust and more efficient (in particular no implicit Euler step is used).ModiaMath.plot supports variables that can be computed from a vector of struct result (for details, see docu of plot).Using newest versions of all used packages (since issues with Sundials).Docu of SimulationState and of StructureOfDAE introduced.Version information adapted to Modia style (Version/Date constants).Info message of simulation start only printed if log=true."
 },
 
 {
@@ -273,6 +273,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "lib/Result.html#ModiaMath.Result.getStringDictResult-Tuple{Any,ModiaMath.Result.RawResult}",
+    "page": "Result",
+    "title": "ModiaMath.Result.getStringDictResult",
+    "category": "method",
+    "text": "getStringDictResult(model, res)\n\nReturn dictionary of result, from raw result data structure raw.\n\n\n\n\n\n"
+},
+
+{
     "location": "lib/Result.html#ModiaMath.Result.plot-Tuple{Any,Symbol}",
     "page": "Result",
     "title": "ModiaMath.Result.plot",
@@ -297,6 +305,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "lib/Result.html#ModiaMath.Result.storeRawResult!-Tuple{ModiaMath.Result.RawResult,Array{Float64,1}}",
+    "page": "Result",
+    "title": "ModiaMath.Result.storeRawResult!",
+    "category": "method",
+    "text": "storeRawResult!(res, v::Vector{Float64})\n\nStore vector v in result data structure res.\n\n\n\n\n\n"
+},
+
+{
     "location": "lib/Result.html#Result-1",
     "page": "Result",
     "title": "Result",
@@ -317,7 +333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE",
     "category": "module",
-    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model. A DAE model is a struct derived from ModiaMath.AbstractSimulationModel  that has a required field simulationState::ModiaMath.SimulationState in which the main properties of the DAE model are reported to the simulation engine:\n\n# DAE model ModelName\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
+    "text": "module ModiaMath.DAE\n\nInterface between the ModiaMath.SimulationEngine and the index 1 DAE model. A DAE model is a struct that has a required field  simulationState::ModiaMath.SimulationState in which the main properties of the DAE model are reported to the simulation engine:\n\n# DAE model ModelName\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nThe following functions can be called in the DAE model to inquire information about the simulation state:\n\nModiaMath.getTime\nModiaMath.getStartTime\nModiaMath.getStopTime\nModiaMath.getTolerance\nModiaMath.isInitial\nModiaMath.isTerminal\nModiaMath.isEvent\nModiaMath.isZeroCrossing\nModiaMath.isAfterSimulationStart\nModiaMath.isStoreResult\nModiaMath.isLogInfos\nModiaMath.isLogWarnings\nModiaMath.isLogEvents\n\nThe following functions can be called in the DAE model to set properties in the simulation engine:\n\nModiaMath.setNominal!\nModiaMath.setNextEvent!\nModiaMath.positive!\nModiaMath.negative!\nModiaMath.change!\nModiaMath.edge!\n\nThe following functions can be either called in the DAE model or they can be called on a simulation model (before or after ModiaMath.simulate!(simulationModel, ...) is called).\n\nModiaMath.logOn!\nModiaMath.logOff!\nModiaMath.setLogCategories!\n\nMain developer\n\nMartin Otter,  DLR - Institute of System Dynamics and Control\n\n\n\n\n\n"
 },
 
 {
@@ -333,7 +349,15 @@ var documenterSearchIndex = {"docs": [
     "page": "DAE",
     "title": "ModiaMath.DAE.SimulationState",
     "category": "type",
-    "text": "simulationState = SimulationState(\n      name, getModelResidues!, x_start, \n      getVariableName=ModiaMath.defaultVariableName;\n      nc=0, nz=0, nw=0,\n      zDir                     = fill(0, nz),                   \n      x_fixed                  = fill(false, length(x_start)),   \n      x_nominal                = fill(NaN, length(x_start)),   \n      x_errorControl           = fill(true, length(x_start)),\n      w_start                  = fill(NaN,nw),\n      w_fixed                  = fill(false,nw),\n      jac                      = nothing, \n      maxSparsity              = 0.1,\n      hev                      = 1e-8,\n      scaleConstraintsAtEvents = true,               \n      getResultNames::Function = ModiaMath.getResultNames, \n      storeResult!::Function   = ModiaMath.storeRawResult!,\n      getResult::Function      = ModiaMath.getStringDictResult,\n      defaultTolerance         = 1e-4, \n      defaultStartTime         = 0.0,\n      defaultStopTime          = 1.0, \n      defaultInterval          = NaN)\n\nReturn a simulationState object. A model that shall be simulated with function ModiaMath.simulate!(model, ...) is required to be defined as:\n\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nRequired arguments\n\nname::Union{AbstractString,Symbol}: Name of model\ngetModelResidues!::Function: Function with arguments (model,t,x,derx,r,w) to compute the residues r and auxiliary variables w from time t, vector x and its time derivative derx.\n\nx_start::Vector{Float64}: Start values of x.\ngetVariableName::Function=ModiaMath.defaultVariableName: Function that returns the name of a variable, given its type and its index.\n\nOptional (keyword) arguments:\n\nnc::Int: Number of constraints functions (= length(fc))\nnz::Int: Number of event indicators\nnw::Int: Number of auxiliary variables (Float64 variables that are additionally computed            and stored at communication points, and where start values can be provided            for initialization)\nzDir::Vector{Int}: Interpretation of event indictors:  zDir[i] = 0: Root is reported for both crossing directions,          = 1: Root is reported when crossing from negative to positive direction          = -1: Root is reported when crossing from positive to negative direction\nx_fixed::Vector{Bool}: = true, x_start[i] is fixed during initialization. = false, x_start[i] might be changed, e.g., due to an initial impulse.\nx_nominal::Vector{Float64}: Nominal values of x. if x_nominal[i]=NaN no nominal value is defined for x[i] and a nominal value is computed (x_nominal[i] = abs(x_start[i]) > 1e-7 ? abs(x_start[i]) : 1.0).\nx_errorControl::Vector{Bool}: = true, the absolute error tolerance is set to 0.1 * relativeTolerance * x_nominal[i]. = false, the absolute error tolerance is switched off (is set to a large value). This is recommended for variables that are basically not limited (for example the angle of a shaft that is permantently rotating in the same direction and therefore becomes larger and larger).\nw_start::Vector{Float64}: Start values for auxiliary variables w. If w_start[i] = NaN, then no start value for w[i] is defined and w[i] is ignored during initialization. If w_start[i] != NaN, an initial equation w[i] = w_start[i] is utilized during initialization.\nw_fixed::Vector{Bool}: = true (and w_start[i] != NaN), w_start[i] is fixed  during initialization. = false (and w_start[i] != NaN, w_start[i] might be changed, e.g., due to an initial impulse.\nhev::Float64: Stepsize used during initialization and at event restart.\nscaleConstraintsAtEvents::Bool: = true, constraint equations are scaled during  initialization and at event restart (currently, this setting is ignored).\njac: Sparse Jacobian datastructure (currently not supported).\nmaxSparsity::Float64: A sparse Jacobian is only used during simulation if sparseness of jac < maxSparsity (currently not supported)\ngetResultNames::Function: Function that returns the names of the variables to be stored in the result data structure.\nstoreResult!::Function: Function that stores the raw results.\ngetResult::Function: Function that resturns the result data structure after the simulation.\ndefaultTolerance::Float64: Model specific default relative tolerance, if not redefined in the call to ModiaMath.simulate!.\ndefaultStartTime::Float64: Model specific default start time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultStopTime::Float64: Model specific default stop time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultInterval::Float64: Model specific default interval in [s], if not redefined in the call to ModiaMath.simulate!. Result data is stored every defaultInterval seconds. If defaultInterval=NaN, the default interval is computed as interval = (stopTime - startTime)/500.0. \n\n\n\n\n\n"
+    "text": "simulationState = SimulationState(name, getModelResidues!, x_start, \n                                  getVariableName; kwargs...)\n\nReturn a simulationState object that is described by a DAE with one of the supported structures defined with enumeration StructureOfDAE.\n\nA model that shall be simulated with function ModiaMath.simulate!(model, ...) is required to be defined as:\n\nmutable struct ModelName <: ModiaMath.AbstractSimulationModel\n    simulationState::ModiaMath.SimulationState\n\n    # other definitions (e.g. parameters of model)\nend\n\nKeyword arguments defaults\nstructureOfDAE ImplicitIndexOneDAE (see StructureOfDAE)\nnc 0\nnz 0\nnw 0\nzDir fill(0, nz)\nx_fixed fill(false, length(x_start))\nx_nominal fill(NaN, length(x_start))\nx_errorControl fill(true, length(x_start))\njac nothing\nmaxSparsity 0.1\nhev 1e-8\nscaleConstraintsAtEvents true,\ngetResultNames ModiaMath.getResultNames\nstoreResult! ModiaMath.storeRawResult!\ngetResult ModiaMath.getStringDictResult\ndefaultTolerance 1e-4\ndefaultStartTime 0.0\ndefaultStopTime 1.0\ndefaultInterval NaN\n\nRequired arguments\n\nname::Union{AbstractString,Symbol}: Name of model\ngetModelResidues!::Function: Function with arguments (model,t,x,derx,r,w) to compute the residues r and auxiliary variables w from time t, vector x and its time derivative derx. \n\nx_start::Vector{Float64}: Start values of x.\ngetVariableName::Function=ModiaMath.defaultVariableName: Function that returns the name of a variable, given its type and its index.\n\nOptional (keyword) arguments:\n\nstructureOfDAE::StructureOfDAE: Structure of DAE. Try to not use the default ImplicitIndexOneDAE because this is numerically the  less robust for initialization and re-initialization.\nnc::Int: Number of constraint equations (= length(fc)).\n If structureOfDAE = ImplicitIndexOneDAE, then  nc > 0 signals that constraint equations are present (but they need not to be   at the end of the residue vector).\n If structureOfDAE = LinearDerivativesWithConstraints, then  nc defines the number of constraint equations and these equations must be  at the end of the residue vector.\n If structureOfDAE = ExplicitDerivativesWithoutConstraints, nc = 0 required.\nnz::Int: Number of event indicators\nnw::Int: Number of auxiliary variables (Float64 variables that are additionally computed            and stored at communication points, and where start values can be provided            for initialization)\nzDir::Vector{Int}: Interpretation of event indictors:  zDir[i] = 0: Root is reported for both crossing directions,          = 1: Root is reported when crossing from negative to positive direction          = -1: Root is reported when crossing from positive to negative direction\nx_fixed::Vector{Bool}: = true, x_start[i] is fixed during initialization. = false, x_start[i] might be changed, e.g., due to an initial impulse.\nx_nominal::Vector{Float64}: Nominal values of x. if x_nominal[i]=NaN no nominal value is defined for x[i] and a nominal value is computed (x_nominal[i] = abs(x_start[i]) > 1e-7 ? abs(x_start[i]) : 1.0).\nx_errorControl::Vector{Bool}: = true, the absolute error tolerance is set to 0.1 * relativeTolerance * x_nominal[i]. = false, the absolute error tolerance is switched off (is set to a large value). This is recommended for variables that are basically not limited (for example the angle of a shaft that is permantently rotating in the same direction and therefore becomes larger and larger).\nhev::Float64: Stepsize used during initialization and at event restart if structureOfDAE = ModiaMath.ImplicitIndexOneDAE. Otherwise hev is ignored.\nscaleConstraintsAtEvents::Bool: only kept for backwards compatibility (option is ignored).\njac: Sparse Jacobian datastructure (currently not supported).\nmaxSparsity::Float64: A sparse Jacobian is only used during simulation if sparseness of jac < maxSparsity (currently not supported)\ngetResultNames::Function: Function that returns the names of the variables to be stored in the result data structure.\nstoreResult!::Function: Function that stores the raw results.\ngetResult::Function: Function that resturns the result data structure after the simulation.\ndefaultTolerance::Float64: Model specific default relative tolerance, if not redefined in the call to ModiaMath.simulate!.\ndefaultStartTime::Float64: Model specific default start time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultStopTime::Float64: Model specific default stop time in [s], if not redefined in the call to ModiaMath.simulate!.\ndefaultInterval::Float64: Model specific default interval in [s], if not redefined in the call to ModiaMath.simulate!. Result data is stored every defaultInterval seconds. If defaultInterval=NaN, the default interval is computed as interval = (stopTime - startTime)/500.0. \n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/DAE.html#ModiaMath.DAE.StructureOfDAE",
+    "page": "DAE",
+    "title": "ModiaMath.DAE.StructureOfDAE",
+    "category": "type",
+    "text": "@enum StructureOfDAE\n      ImplicitIndexOneDAE\n      LinearDerivativesWithConstraints\n      ExplicitDerivativesWithoutConstraints\n\nEnumeration defining the structure of the DAE of the simulation model.  The following DAE structures are supported  (function getModelResidues!(model, t, x, derx, r, w) returns the residues r):\n\nModiaMath.ImplicitIndexOneDAE\n\nbeginalign\n     z = f_z(xt) \n 0 = r = left beginarrayl\n                    f_d(dotxxtz_i0) \n                    f_c(xtz_i0)\n                  endarray right \n     J = left fracpartial f_dpartial dotx  \n                  fracpartial f_cpartial x right  textis regular (matrix is invertible)\nendalign\n\nInitialization and re-initialization is performed by using an implicit Euler step. When appropriately scaling r, using a step size that tends to zero and under further assumptions, then this solution can be interpreted as analytically integrating over the time instant. This might mean to integrate over Dirac impulses (in case x is discontinuous at this time instant). Since the selected step size is not close to zero, the implicit Euler step will give a very rough approximation of the analytical integral. A much better approximation is achieved with option  LinearDerivativesWithConstraints below where a step size of zero is used.\n\nModiaMath.LinearDerivativesWithConstraints\n\nbeginalign\n     z = f_z(xt) \n 0 = r = left beginarrayl\n                    M_d(xtz_i0) cdot dotx + b_d(xtz_i0)\n                    f_c(xtz_i0)\n                  endarray right \n     J = left M_d  \n                  fracpartial f_cpartial x right  textis regular (matrix is invertible)\nendalign\n\nWhen instantiating a SimulationState, the dimension nc = length(fc) must be provided (nc = 0 is included as a special case).\n\nInitialization and re-initialization is performed by analytically integrating over the initial time or the event time. This might mean to integrate over Dirac impulses (in case x is discontinuous at this time instant). Under certain assumptions a numerical approximation of the mathematically unique solution is computed.\n\nModiaMath.ExplicitDerivativesWithoutConstraints\n\nbeginalign\n     z = f_z(x t) \n 0 = r = f(x t z_i  0) - dotx\nendalign\n\nInitialization and re-initialization is trivial:\n\n     x = x_start \nder(x) = r         # getModelResidues!(model, t, x, zeros(nx), r, w)\n\n\n\n\n\n"
 },
 
 {
@@ -345,11 +369,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "lib/DAE.html#ModiaMath.DAE.defaultVariableName-Tuple{Any,ModiaMath.DAE.VariableCategory,Int64}",
+    "page": "DAE",
+    "title": "ModiaMath.DAE.defaultVariableName",
+    "category": "method",
+    "text": "defaultVariableName(model, vcat, vindex)\n\nReturn default names for the variables (e.g. x[1])\n\n\n\n\n\n"
+},
+
+{
     "location": "lib/DAE.html#ModiaMath.DAE.edge!-Tuple{ModiaMath.DAE.SimulationState,Int64,Float64,String}",
     "page": "DAE",
     "title": "ModiaMath.DAE.edge!",
     "category": "method",
     "text": "ModiaMath.edge!(sim, nr, crossing, crossingAsString; restart = ModiaMath.Restart)\n\nTrigger an event, whenever crossing > 0 switches from false to true. The function returns always false.\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/DAE.html#ModiaMath.DAE.getResultNames-Tuple{Any}",
+    "page": "DAE",
+    "title": "ModiaMath.DAE.getResultNames",
+    "category": "method",
+    "text": "getResultNames(model)\n\nReturn a vector of result names.\n\n\n\n\n\n"
 },
 
 {
@@ -382,6 +422,14 @@ var documenterSearchIndex = {"docs": [
     "title": "ModiaMath.DAE.getTolerance",
     "category": "method",
     "text": "ModiaMath.getTolerance(m::ModiaMath.[AbstractSimulationModel|SimulationState])\n\nReturn (relative) tolerance of the actual simulation run.\n\n\n\n\n\n"
+},
+
+{
+    "location": "lib/DAE.html#ModiaMath.DAE.getVariableName",
+    "page": "DAE",
+    "title": "ModiaMath.DAE.getVariableName",
+    "category": "function",
+    "text": "getVariableName(model, vcat, vindex, nx=0; \n                xNames   =nameVector(\"x\", nx),\n                derxNames=fcNameVector(\"der\", xNames),\n                wNames   =String[])\n\nGiven category vcat and index vindexof category,  return the full path name of the respective variable.\n\n\n\n\n\n"
 },
 
 {
@@ -757,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Logging",
     "title": "ModiaMath.Logging.SimulationStatistics",
     "category": "type",
-    "text": "mutable struct SimulationStatistics - Collect statistics of the last simulation run.\n\nThe following data is stored in this structure:\n\ncpuTimeInitialization: CPU-time for initialization\ncpuTimeIntegration: CPU-time for integration\nstartTime: start time of the integration\nstopTime: stop time of the integration\ninterval: communication interval of the integration\ntolerance: relative tolerance used for the integration\nnEquations: number of equations (length of y and of yp)\nnResults: number of time points stored in result data structure\nnSteps: number of (successful) steps\nnResidues: number of calls to compute residues (includes residue calls for Jacobian)\nnZeroCrossing: number of calls to compute zero crossings\nnJac: number of calls to compute Jacobian\nnTimeEvents: number of time events\nnRestartEvents: number of events with integrator restart\nnErrTestFails: number of fails of error tests\nh0: stepsize used at the first step\nhMin: minimum integration stepsize\nhMax: maximum integration stepsize\norderMax: maximum integration order\nsparseSolver = true: if sparse solver used, otherwise dense solver\nnGroups: if sparseSolver, number of column groups to compute Jacobian (e.g. if nEquations=100, nGroups=5, then 5+1=6 model evaluations are needed to compute the Jacobian numerically, instead of 101 model evaluations without taking the sparseness structure into account).\n\n\n\n\n\n"
+    "text": "mutable struct SimulationStatistics - Collect statistics of the last simulation run.\n\nThe following data is stored in this structure:\n\nstructureOfDAE: Structure of DAE\ncpuTimeInitialization: CPU-time for initialization\ncpuTimeIntegration: CPU-time for integration\nstartTime: start time of the integration\nstopTime: stop time of the integration\ninterval: communication interval of the integration\ntolerance: relative tolerance used for the integration\nnEquations: number of equations (length of y and of yp)\nnConstraints: number of constraint equations\nnResults: number of time points stored in result data structure\nnSteps: number of (successful) steps\nnResidues: number of calls to compute residues (includes residue calls for Jacobian)\nnZeroCrossing: number of calls to compute zero crossings\nnJac: number of calls to compute Jacobian\nnTimeEvents: number of time events\nnRestartEvents: number of events with integrator restart\nnErrTestFails: number of fails of error tests\nh0: stepsize used at the first step\nhMin: minimum integration stepsize\nhMax: maximum integration stepsize\norderMax: maximum integration order\nsparseSolver = true: if sparse solver used, otherwise dense solver\nnGroups: if sparseSolver, number of column groups to compute Jacobian (e.g. if nEquations=100, nGroups=5, then 5+1=6 model evaluations are needed to compute the Jacobian numerically, instead of 101 model evaluations without taking the sparseness structure into account).\n\n\n\n\n\n"
 },
 
 {
