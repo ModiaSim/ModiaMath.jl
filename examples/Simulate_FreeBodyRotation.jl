@@ -33,8 +33,9 @@ Reference Modelica model:
 """
 module Simulate_FreeBodyRotation
 
-using LinearAlgebra
 using ModiaMath
+using ModiaMath.LinearAlgebra   # included via ModiaMath, to avoid requirement to add it in the standard environment
+
 
 
 # Desired:

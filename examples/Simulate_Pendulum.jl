@@ -10,12 +10,7 @@ with ModiaMath.
 module Simulate_Pendulum
 
 using ModiaMath
-
-# Desired:
-#   using StaticArrays
-#
-# In order that StaticArrays need not to be defined in the user environment, it is included via ModiaMath:
-using ModiaMath.StaticArrays
+using ModiaMath.StaticArrays   # included via ModiaMath, to avoid requirement to add it in the standard environment
 
 
 @component Pendulum(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90.0) begin

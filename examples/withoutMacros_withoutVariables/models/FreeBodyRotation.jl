@@ -31,7 +31,7 @@ For testing:
 module FreeBodyRotation
 
 import ModiaMath
-using ModiaMath.LinearAlgebra    # should be "using LinearAlgebray", but included via ModiaMath
+using  ModiaMath.LinearAlgebra    # included via ModiaMath, to avoid requirement to add it in the standard environment
 
 
 # Desired:
