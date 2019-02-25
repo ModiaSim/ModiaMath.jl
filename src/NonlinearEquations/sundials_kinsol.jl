@@ -73,34 +73,36 @@ function kinsol_ErrHandlerFn(error_code::Cint, KINmodule::Cstring, KINfunction::
             simState = simulationModel.simulationState
             x_names     = String[simState.getVariableName(simState.model, ModiaMath.DAE.Category_X, i)  for i = 1:simState.nx]
 
-            str2 = string(simState.name) * ": time = " * string(simState.time) *
-                 ", stepsize of implicit Euler step = " * string(simState.hev) *
-                 ", scaleConstraintsAtEvents = " * string(simState.scaleConstraintsAtEvents) *
-                 "\nx_names     = " * string(x_names) *
-                 "\nx_start     = " * string(eqInfo.y0) *
-                 "\nx_fixed     = " * string(simState.x_fixed) *
-                 "\nx_nominal   = " * string(simState.x_nominal) *
-                 "\nx_yScale    = " * string(simState.yScale) *
-                 "\nx_rScale    = " * string(simState.rScale) *
-                 "\nx           = " * string(simState.xev) *
-                 "\nderx        = " * string(simState.derxev) *
-                 "\nresidues    = " * string(simState.residues) *
-                 "\nnx          = " * string(simState.nx) *
-                 "\nnd          = " * string(simState.nd) *
-                 "\nnc          = " * string(simState.nc) *
-                 "\nnw          = " * string(simState.nw) *
-                 "\nnz          = " * string(simState.nz) *
-                 "\ntolerance   = " * string(simState.tolerance) *
-                 "\nFTOL        = " * string(simState.FTOL)
+            error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
+                  "(...) returned with a [", unsafe_string(KINmodule), "] error:\n    ",
+                  unsafe_string(message), "\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
+                  ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".", str1,
+                  string(simState.name), ": time = " , string(simState.time) ,
+                 ", stepsize of implicit Euler step = " , string(simState.hev) ,
+                 ", scaleConstraintsAtEvents = " , string(simState.scaleConstraintsAtEvents) ,
+                 "\nx_names     = " , string(x_names) ,
+                 "\nx_start     = " , string(eqInfo.y0) ,
+                 "\nx_fixed     = " , string(simState.x_fixed) ,
+                 "\nx_nominal   = " , string(simState.x_nominal) ,
+                 "\nx_yScale    = " , string(simState.yScale) ,
+                 "\nx_rScale    = " , string(simState.rScale) ,
+                 "\nx           = " , string(simState.xev) ,
+                 "\nderx        = " , string(simState.derxev) ,
+                 "\nresidues    = " , string(simState.residues) ,
+                 "\nnx          = " , string(simState.nx) ,
+                 "\nnd          = " , string(simState.nd) ,
+                 "\nnc          = " , string(simState.nc) ,
+                 "\nnw          = " , string(simState.nw) ,
+                 "\nnz          = " , string(simState.nz) ,
+                 "\ntolerance   = " , string(simState.tolerance) ,
+                 "\nFTOL        = " , string(simState.FTOL))
 
         else
-            str2 = ""
+            error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
+                  "(...) returned with a [", unsafe_string(KINmodule), "] error:\n    ",
+                  unsafe_string(message), "\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
+                  ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".", str1)
         end
-
-        error("\n\n!!! Error from ModiaMath.NonlinearEquations.KINSOL: ", unsafe_string(KINfunction),
-             "(...) returned with a [", unsafe_string(KINmodule), "] error:\n    ",
-             unsafe_string(message), "\nModiaMath info:\nlastNorm(r) = ", eqInfo.lastNorm_r,
-             ", lastNorm(rScaled*r) = ", eqInfo.lastrScaledNorm_r, ".", str1, str2)
     end
     return nothing
 end
