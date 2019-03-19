@@ -96,8 +96,8 @@ function ModiaMath.computeVariables!(b::FreeBodyRotation, sim::ModiaMath.Simulat
     return nothing
 end
 
-#simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)
-simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
+simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)
+#simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
 result          = ModiaMath.simulate!(simulationModel, log=true)
 ModiaMath.plot(result, [:q, :w, :derw, :tau])
 

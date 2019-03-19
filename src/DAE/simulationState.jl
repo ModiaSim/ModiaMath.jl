@@ -744,10 +744,10 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
             sim.derxev[j] = -sim.residues[j]
         end
         ldiv!(lu!(jac2),sim.derxev)
-
-        # println("\n... der(x)(t0) = ", sim.derxev)
-    
     end
+	
+	println("... sim.xev    = ", sim.xev)
+	println("... sim.derxev = ", sim.derxev)	
 end
 
 function eventIteration!(model, sim::SimulationState, tev::Float64)
