@@ -921,6 +921,104 @@ package ModelicaReferenceModels
       annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
             coordinateSystem(preserveAspectRatio=false)));
     end fvParameterization2;
+
+    model IdealClutch_LNCS
+      Modelica.Electrical.Analog.Basic.Resistor R(R=10)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      Modelica.Electrical.Analog.Basic.Capacitor capacitor(C=2) annotation (
+          Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-30,30})));
+      Modelica.Electrical.Analog.Basic.EMF emf(k=0.25)
+        annotation (Placement(transformation(extent={{-10,20},{10,40}})));
+      Modelica.Electrical.Analog.Sources.ConstantVoltage constantVoltage(V=10)
+        annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-70,30})));
+      Modelica.Electrical.Analog.Basic.Ground ground
+        annotation (Placement(transformation(extent={{-80,-12},{-60,8}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia1(J=0.1)
+        annotation (Placement(transformation(extent={{18,20},{38,40}})));
+      Modelica.Mechanics.Rotational.Components.Clutch clutch(fn_max=1000)
+        annotation (Placement(transformation(extent={{48,20},{68,40}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia2(J=0.4, w(start=
+              10))
+        annotation (Placement(transformation(extent={{76,20},{96,40}})));
+      Modelica.Blocks.Sources.BooleanExpression engaged(y=time < 100 or time
+             >= 300)
+        annotation (Placement(transformation(extent={{-20,60},{20,80}})));
+      Modelica.Blocks.Math.BooleanToReal booleanToReal
+        annotation (Placement(transformation(extent={{32,64},{44,76}})));
+    equation
+      connect(R.n, capacitor.p) annotation (Line(points={{-40,50},{-30,50},{-30,
+              40}}, color={0,0,255}));
+      connect(R.n, emf.p)
+        annotation (Line(points={{-40,50},{0,50},{0,40}}, color={0,0,255}));
+      connect(constantVoltage.p, R.p) annotation (Line(points={{-70,40},{-70,50},
+              {-60,50}}, color={0,0,255}));
+      connect(constantVoltage.n, capacitor.n) annotation (Line(points={{-70,20},
+              {-70,14},{-30,14},{-30,20}}, color={0,0,255}));
+      connect(capacitor.n, emf.n) annotation (Line(points={{-30,20},{-30,14},{0,
+              14},{0,20}}, color={0,0,255}));
+      connect(ground.p, constantVoltage.n)
+        annotation (Line(points={{-70,8},{-70,20}}, color={0,0,255}));
+      connect(emf.flange, inertia1.flange_a)
+        annotation (Line(points={{10,30},{18,30}}, color={0,0,0}));
+      connect(inertia1.flange_b, clutch.flange_a)
+        annotation (Line(points={{38,30},{48,30}}, color={0,0,0}));
+      connect(clutch.flange_b, inertia2.flange_a)
+        annotation (Line(points={{68,30},{76,30}}, color={0,0,0}));
+      connect(booleanToReal.u, engaged.y)
+        annotation (Line(points={{30.8,70},{22,70}}, color={255,0,255}));
+      connect(booleanToReal.y, clutch.f_normalized)
+        annotation (Line(points={{44.6,70},{58,70},{58,41}}, color={0,0,127}));
+      annotation (
+        Icon(coordinateSystem(preserveAspectRatio=false)),
+        Diagram(coordinateSystem(preserveAspectRatio=false)),
+        experiment(StopTime=500));
+    end IdealClutch_LNCS;
+
+    model IdealClutch_LNCS2
+      Modelica.Electrical.Analog.Basic.Resistor R(R=10)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      Modelica.Electrical.Analog.Basic.Capacitor capacitor(C=2) annotation (
+          Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-30,30})));
+      Modelica.Electrical.Analog.Basic.EMF emf(k=0.25)
+        annotation (Placement(transformation(extent={{-10,20},{10,40}})));
+      Modelica.Electrical.Analog.Sources.ConstantVoltage constantVoltage(V=10)
+        annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-70,30})));
+      Modelica.Electrical.Analog.Basic.Ground ground
+        annotation (Placement(transformation(extent={{-80,-12},{-60,8}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia1(J=0.1)
+        annotation (Placement(transformation(extent={{18,20},{38,40}})));
+    equation
+      connect(R.n, capacitor.p) annotation (Line(points={{-40,50},{-30,50},{-30,
+              40}}, color={0,0,255}));
+      connect(R.n, emf.p)
+        annotation (Line(points={{-40,50},{0,50},{0,40}}, color={0,0,255}));
+      connect(constantVoltage.p, R.p) annotation (Line(points={{-70,40},{-70,50},
+              {-60,50}}, color={0,0,255}));
+      connect(constantVoltage.n, capacitor.n) annotation (Line(points={{-70,20},
+              {-70,14},{-30,14},{-30,20}}, color={0,0,255}));
+      connect(capacitor.n, emf.n) annotation (Line(points={{-30,20},{-30,14},{0,
+              14},{0,20}}, color={0,0,255}));
+      connect(ground.p, constantVoltage.n)
+        annotation (Line(points={{-70,8},{-70,20}}, color={0,0,255}));
+      connect(emf.flange, inertia1.flange_a)
+        annotation (Line(points={{10,30},{18,30}}, color={0,0,0}));
+      annotation (
+        Icon(coordinateSystem(preserveAspectRatio=false)),
+        Diagram(coordinateSystem(preserveAspectRatio=false)),
+        experiment(StopTime=500));
+    end IdealClutch_LNCS2;
   end Friction;
 
   package ODAEs

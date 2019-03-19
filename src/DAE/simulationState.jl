@@ -63,11 +63,11 @@ end
     @enum StructureOfDAE
           ImplicitIndexOneDAE
           LinearDerivativesWithConstraints
-          ExplicitDerivativesWithoutConstraints 
+          ExplicitDerivatives 
 
 Enumeration defining the structure of the DAE of the simulation model. 
 The following DAE structures are supported 
-(function `getModelResidues!(model, t, x, derx, r, w)` returns the residues `r`):
+(function `getModelResidues!(model, t, x, derx, r, w; simulation=true)` returns the residues `r`):
 
 # ModiaMath.ImplicitIndexOneDAE
 
@@ -93,6 +93,9 @@ will give a very rough approximation of the analytical integral.
 A much better approximation is achieved with option 
 `LinearDerivativesWithConstraints` below where a step size of zero is used.
 
+Since an implicit Euler step size is used, the information about the constraint equations
+is not utilized (even if it is provided).
+
 
 # ModiaMath.LinearDerivativesWithConstraints
 
@@ -108,17 +111,23 @@ A much better approximation is achieved with option
 \\end{align}
 ```
 
-When instantiating a [`SimulationState`](@ref), the dimension `nc = length(fc)` must be provided
-(`nc = 0` is included as a special case).
+The constraint equations ``f_c`` can be at any position of the residue vector `r` and at an event
+instant they can change. When instantiating a [`SimulationState`](@ref), the initial definition
+of the constraint equations is provided with vector argument `is_fc`. 
 
 Initialization and re-initialization is performed by analytically integrating
 over the initial time or the event time. This might mean to integrate over
 Dirac impulses (in case `x` is discontinuous at this time instant).
 Under certain assumptions a numerical approximation of
-the mathematically unique solution is computed.
+the mathematical (exact) solution is computed.
+
+The derivative of one or more constraint equations ``f_c`` can be provided at
+event restart. In this case a linear, instead of a nonlinear, equation system is solved
+to compute ``\\dot{x}``. For details, see vector argument `is_der_fc_for_reinit`
+and function [`ModiaMath.compute_der_fc`](@ref).
 
 
-# ModiaMath.ExplicitDerivativesWithoutConstraints
+# ModiaMath.ExplicitDerivatives
 
 ```math
 \\begin{align}
@@ -134,7 +143,7 @@ Initialization and re-initialization is trivial:
 der(x) = r         # getModelResidues!(model, t, x, zeros(nx), r, w)
 ```
 """
-@enum StructureOfDAE ImplicitIndexOneDAE ExplicitDerivativesWithoutConstraints LinearDerivativesWithConstraints
+@enum StructureOfDAE ImplicitIndexOneDAE LinearDerivativesWithConstraints ExplicitDerivatives 
 
 
 """
@@ -158,6 +167,8 @@ end
 | Keyword arguments           | defaults                                           |
 |:----------------------------|:---------------------------------------------------|
 | structureOfDAE              | ImplicitIndexOneDAE (see [`StructureOfDAE`](@ref)) |
+| is_fc                       | fill(false, length(x_start))                       |
+| is_der_fc_for_reinit        | fill(false, length(x_start))                       |
 | nc                          | 0                                                  |
 | nz                          | 0                                                  |
 | nw                          | 0                                                  |
@@ -198,14 +209,17 @@ end
   Try to not use the default `ImplicitIndexOneDAE` because this is numerically the 
   less robust for initialization and re-initialization.
 
-- `nc::Int`: Number of constraint equations (= length(fc)).\\
-   If `structureOfDAE = ImplicitIndexOneDAE`, then
-   `nc > 0` signals that constraint equations are present (but they need not to be 
-   at the end of the residue vector).\\
-   If `structureOfDAE = LinearDerivativesWithConstraints`, then
-   `nc` defines the number of constraint equations and these equations must be
-   at the end of the residue vector.\\
-   If `structureOfDAE = ExplicitDerivativesWithoutConstraints`, `nc = 0` required.
+- `is_fc::Vector{Bool}`: = true, `residue[i]` is a constraint equation `fc` or its derivative.
+                         = false, `residue[i]` is not a constraint equation.
+                         (is only used for `structureOfDAE = LinearDerivativesWithConstraints`)
+
+- `is_der_fc_for_reinit::Vector{Bool}`: if [`ModiaMath.compute_der_fc`](@ref)` returns true
+                        and `is_fc[i] = true`:
+                         = true , `residue[i]` is the derivative of an `fc` equation
+                         = false, `residue[i]` is an `fc` equation
+                        (is only used for `structureOfDAE = LinearDerivativesWithConstraints`)
+
+- `nc::Int`: Dummy argument. Only provided for backwards compatibility (is no longer used in ModiaMath).
 
 - `nz::Int`: Number of event indicators
 
@@ -275,10 +289,12 @@ mutable struct SimulationState
     getResult::Function
     eventHandler::EventHandler
     structureOfDAE::StructureOfDAE
+    is_fc::Vector{Bool}
+    is_der_fc_for_reinit::Vector{Bool}
 
     nx::Int   # Length of x-vector
-    nd::Int   # fd(der(x),x,t) = 0; nd = length(fd)
-    nc::Int   #        fc(x,t) = 0; nc = length(fc)
+    nd::Int   # fd(der(x),x,t) = 0; nd = nx - nc
+    nc::Int   #        fc(x,t) = 0; nc = count(is_fc)
     nw::Int   # Number of auxiliary variables
 
     # Other model information
@@ -335,7 +351,8 @@ mutable struct SimulationState
     scaleConstraintsAtEvents::Bool
     initialization::Bool
       
-    # Information updated during simulation   
+    # Information updated during simulation
+    compute_der_fc::Bool          # = true, if derivative of constraint equations has to be returned in the residue 
     storeResult::Bool             # = true, if DAE is called to store results of variables
     rawResult::ModiaMath.RawResult
     result::Any
@@ -345,7 +362,8 @@ mutable struct SimulationState
                              x_start::Vector{Float64},
                              getVariableName::Function=defaultVariableName;
                              structureOfDAE::StructureOfDAE = ImplicitIndexOneDAE,
-                             nc=0,
+                             is_fc::Vector{Bool} = fill(false, length(x_start)),
+                             is_der_fc_for_reinit::Vector{Bool} = fill(false, length(x_start)),
                              nz=0,
                              nw=0,
                              zDir::Vector{Int}=fill(0, nz),                   
@@ -364,12 +382,9 @@ mutable struct SimulationState
                              defaultStopTime=1.0, 
                              defaultInterval=NaN)
   
-        # Check input arguments                                        
-        @assert(nc >= 0)
-        @assert(nc <= length(x_start))
-        if structureOfDAE == ExplicitDerivativesWithoutConstraints
-            @assert(nc == 0)
-        end
+        # Check input arguments
+        @assert(length(is_fc) == length(x_start))
+        @assert(length(is_der_fc_for_reinit) == length(x_start))
         @assert(nz >= 0)
         @assert(nw >= 0)
         @assert(length(x_fixed) == length(x_start))
@@ -406,15 +421,18 @@ mutable struct SimulationState
         end
 
         # Compute utility elements
-        nd = nx - nc
+        nc2 = count(is_fc)
+        nd  = nx - nc2
         eventHandler = EventHandler(nz=nz)
 
         if structureOfDAE == LinearDerivativesWithConstraints
             eqInfo = ModiaMath.NonlinearEquationsInfo("???", nx, getEventResidues_LinearDerivativesWithConstraints!)
             jac2   = zeros(nx,nx)
+            nc3    = nc2
         else     
             eqInfo = ModiaMath.NonlinearEquationsInfo("???", nx, getEventResidues_ImplicitIndexOneDAE!)
             jac2   = nothing
+            nc3    = missing
         end
 
 
@@ -430,16 +448,17 @@ mutable struct SimulationState
         cg = nothing
 
         new(Symbol(name), nothing, getModelResidues!, getVariableName, getResultNames, 
-            storeResult!, getResult, eventHandler, structureOfDAE, nx, nd, nc, nw, nz, zDir,
+            storeResult!, getResult, eventHandler, structureOfDAE, is_fc,
+            is_der_fc_for_reinit, nx, nd, nc2, nw, nz, zDir,
             sparse, jac, cg, defaultTolerance, defaultStartTime, defaultStopTime,
             defaultInterval, NaN, ModiaMath.Logger(),
-            ModiaMath.SimulationStatistics(structureOfDAE, nx, nc, sparse, sparse ? cg.ngroups : 0),
+            ModiaMath.SimulationStatistics(structureOfDAE, nx, nc3, sparse, sparse ? cg.ngroups : 0),
             NaN, NaN, NaN, NaN,
             x_start, x_fixed, x_nominal2, x_errorControl, zeros(nw),  
             eqInfo, zeros(nx), zeros(nx), zeros(nx),
             zeros(nx), zeros(nx), zeros(nx), zeros(nx), zeros(nx), jac2,
             yScale, ones(nx), 0.0, hev, 0.0, 
-            scaleConstraintsAtEvents, false, false)
+            scaleConstraintsAtEvents, false, false, false)
     end
 end
 
@@ -465,13 +484,13 @@ function getEventResidues_ImplicitIndexOneDAE!(eqInfo::ModiaMath.NonlinearEquati
     hev      = sim.hev
    
     # Copy unknowns (y) to xev and derxev
-    if sim.nc == 0
-        # Unknowns are at the left limit
-        for i in eachindex(y)
-            sim.xev[i]    = sim.xev_old[i]
-            sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
-        end 
-    else # sim.nc > 0
+    #if sim.nc == 0
+    #    # Unknowns are at the left limit
+    #    for i in eachindex(y)
+    #        sim.xev[i]    = sim.xev_old[i]
+    #        sim.derxev[i] = (sim.xev_old[i] - y[i]) / hev            
+    #    end 
+    #else # sim.nc > 0
         for i in eachindex(y)
             if sim.initialization && sim.x_fixed[i]
                 # Unknowns are at the left limit
@@ -483,7 +502,7 @@ function getEventResidues_ImplicitIndexOneDAE!(eqInfo::ModiaMath.NonlinearEquati
                 sim.derxev[i] = (y[i] - sim.xev_old[i]) / hev
             end
         end
-    end
+    #end
    
     # Compute residues
     sim.time = sim.tev
@@ -553,11 +572,12 @@ function getEventResidues_LinearDerivativesWithConstraints!(eqInfo::ModiaMath.No
     Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, residues , sim.w)  
     Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derxev   , residues2, sim.w)  
 
-    for i = 1:sim.nd
-        r[i] = residues[i] - residues2[i]
-    end
-    for i = sim.nd+1:sim.nx 
-        r[i] = residues[i]
+    for i = 1:sim.nx 
+        if sim.is_fc[i]
+            r[i] = residues[i]
+        else 
+            r[i] = residues[i] - residues2[i]
+        end 
     end
 
     eqInfo.lastNorm_r        = norm(r, Inf)
@@ -585,18 +605,14 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
     # Determine consistent xev, der(xev)
     if ModiaMath.isLogEvents(sim)
         if sim.structureOfDAE == ImplicitIndexOneDAE
-            if nc == 0
-                println("        for given x, determine consistent DAE variables der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-            else
-                println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
-            end
+            println("        determine consistent DAE variables x,der(x) (with implicit Euler step; step size = ", sim.hev, ")")
         elseif sim.structureOfDAE == LinearDerivativesWithConstraints
             if nc == 0
                 println("        for given x, determine consistent DAE variables der(x) (solving a linear equation system)")
             else
                 println("        determine consistent DAE variables x,der(x) (with analytical integral over time instant)")
             end
-        elseif sim.structureOfDAE == ExplicitDerivativesWithoutConstraints
+        elseif sim.structureOfDAE == ExplicitDerivatives
             println("        for given x, compute der(x)")
         else 
             error("... Cannot occur. Variable structureOfDAE = ", sim.structureOfDAE, " is wrong.")
@@ -615,7 +631,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
 
     # Print log message
     if ModiaMath.isLogInfos(sim)
-        if sim.structureOfDAE != ExplicitDerivativesWithoutConstraints
+        if sim.structureOfDAE != ExplicitDerivatives
             for i = 1:nx
                 if !isNearlyEqual(sim.xev_beforeEvent[i], sim.xev[i], sim.x_nominal[i], sim.tolerance)
                     xname = sim.getVariableName(model, Category_X, i)
@@ -627,11 +643,13 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
 
 
     # Compute consistent derivatives 
-    if sim.structureOfDAE == ExplicitDerivativesWithoutConstraints
+    if sim.structureOfDAE == ExplicitDerivatives
         Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.derxev, sim.w)
 
     elseif sim.structureOfDAE == LinearDerivativesWithConstraints
         # Determine linear factors
+        #=
+        println("... previous solution")
         jac2 = sim.jac2
         Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues, sim.w)
 
@@ -670,6 +688,65 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
             sim.derxev[j] = -sim.residues[j]
         end
         ldiv!(lu!(jac2),sim.derxev)
+
+        println("\n... der(x)(t0) = ", sim.derxev)
+        =#
+    
+        jac2 = sim.jac2
+        sim.compute_der_fc = true
+        Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues, sim.w)
+
+        # Determine der(fd, der(x)) using the fact that fd is linear in der(x)
+        forwardDifference=false 
+        for j = 1:nx
+            sim.derx_zero[j] = 1.0
+            Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
+            for i = 1:nx 
+                if !sim.is_fc[i] || sim.is_der_fc_for_reinit[i]
+                    # println("... 1: jac2[$i,$j]")
+                    jac2[i,j] = sim.residues2[i] - sim.residues[i]
+                end 
+            end
+            sim.derx_zero[j] = 0.0 
+
+            if !forwardDifference && sim.is_fc[j] && !sim.is_der_fc_for_reinit[j]
+                forwardDifference=true
+            end
+        end 
+        sim.compute_der_fc = false
+
+        # Determine der(fc, x) with forward difference
+        # println("... forwardDifference = ", forwardDifference)
+        if forwardDifference
+            inc::Float64 = 0.0
+            xinc = sim.yNonlinearSolver
+            for j = 1:nx
+                xinc[j] = 0.0
+            end
+            for j = 1:nx
+                xj  = sim.xev[j]
+                inc = small*max( abs(xj), sim.x_nominal[j] )
+                inc = (xj + inc) - xj
+                sim.xev[j] += inc 
+                Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
+                for i = 1:nx
+                    if sim.is_fc[i] && !sim.is_der_fc_for_reinit[i]
+                        # println("... 2: jac2[$i,$j]")
+                        jac2[i,j] = sim.residues2[i]/inc - sim.residues[i]/inc 
+                    end 
+                end
+                sim.xev[j] = xj
+            end
+        end
+
+        # Solve linear system of equation: jac2*derxev = -residue
+        for j = 1:nx
+            sim.derxev[j] = -sim.residues[j]
+        end
+        ldiv!(lu!(jac2),sim.derxev)
+
+        # println("\n... der(x)(t0) = ", sim.derxev)
+    
     end
 end
 
@@ -721,18 +798,18 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
         sim.derxev[i] = 0.0
     end
 
-    if sim.scaleConstraintsAtEvents
-        for i = 1:sim.nd
-            sim.rScale[i] = 1.0
-        end
-        for i = sim.nd + 1:sim.nx
-            sim.rScale[i] = 1.0 / sim.hev
-        end
-    else
+    #if sim.scaleConstraintsAtEvents
+    #    for i = 1:sim.nd
+    #        sim.rScale[i] = 1.0
+    #    end
+    #    for i = sim.nd + 1:sim.nx
+    #        sim.rScale[i] = 1.0 / sim.hev
+    #    end
+    #else
         for i = 1:sim.nx
             sim.rScale[i] = 1.0
         end
-    end
+    #end
 
     # Print initial values   
     if ModiaMath.isLogEvents(sim)

@@ -79,8 +79,8 @@ mutable struct RealVariable{ValueType,ElementType} <: ModiaMath.AbstractRealVari
     nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
     flow::Bool
     numericType::NumericType                                          # how the variable is used in the equations
-    integral::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-    derivative::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    integral::Union{Nothing,RealVariable{ValueType,ElementType}}      # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    derivative::Union{Nothing,RealVariable{ValueType,ElementType}}    # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
     unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
 
     # How the variable is stored in vectors

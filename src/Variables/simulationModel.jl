@@ -38,9 +38,18 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         x_nominal = fill(1.0, var.nx) 
         ModiaMath.copy_start_to_x!(var,x,x_fixed,x_nominal)
 
+        # Last nfc equations are the constraint equations
+        is_fc = fill(false, var.nx)      
+        for i = (var.nx-var.nfc+1):var.nx
+            is_fc[i] = true
+        end
+        is_der_fc_for_reinit = fill(false, var.nx)
+
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
                                                     structureOfDAE = structureOfDAE,
-                                                    x_fixed = x_fixed, x_nominal=x_nominal, nc = var.nfc,
+                                                    is_fc = is_fc,
+                                                    is_der_fc_for_reinit = is_der_fc_for_reinit,
+                                                    x_fixed = x_fixed, x_nominal=x_nominal,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,
                                                     defaultStartTime = startTime,

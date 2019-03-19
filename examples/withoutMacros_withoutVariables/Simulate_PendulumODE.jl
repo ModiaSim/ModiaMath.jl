@@ -13,7 +13,7 @@ import .PendulumODE
 import ModiaMath
 
 # model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2)
-# model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2, structureOfDAE=ModiaMath.ExplicitDerivativesWithoutConstraints)
+# model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2, structureOfDAE=ModiaMath.ExplicitDerivatives)
 model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
 result = ModiaMath.simulate!(model, stopTime=5.0, log=true)
 

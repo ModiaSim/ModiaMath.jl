@@ -16,7 +16,7 @@ include(joinpath(ModiaMath.path, "examples", "Simulate_Pendulum.jl"))
 import .Simulate_Pendulum
 pendulumModel = Simulate_Pendulum.Pendulum(L=0.5, m=1.0, d=0.1, phi0_deg=60.0)
 pendulum1 = ModiaMath.SimulationModel(pendulumModel)
-pendulum2 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.ExplicitDerivativesWithoutConstraints)
+pendulum2 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.ExplicitDerivatives)
 pendulum3 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
 
 @testset "ModiaMath: examples/Simulate_Pendulum.jl" begin 

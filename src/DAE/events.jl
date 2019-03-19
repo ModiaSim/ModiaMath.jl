@@ -95,6 +95,7 @@ function setNextEvent!(h::EventHandler, nextEventTime::Float64;
             end
         end
         h.restart = max(h.restart, restart)
+		h.newEventIteration = true
     end
     return nothing
 end
