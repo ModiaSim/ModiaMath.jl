@@ -238,8 +238,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Allocate N_Vector storage for y and yp
     y_N_Vector  = Sundials.N_VMake_Serial(ny, pointer(y))
     yp_N_Vector = Sundials.N_VMake_Serial(ny, pointer(yp))
-	println("... y_N_vector  = ", y_N_Vector) 
-	println("... yp_N_vector = ", yp_N_Vector)
+    println("... y  = ", y)
+	println("... yp = ", yp)
 	
 
 
