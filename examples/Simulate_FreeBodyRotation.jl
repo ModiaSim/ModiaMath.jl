@@ -55,6 +55,7 @@ using ModiaMath.StaticArrays
                              A=SVector{3,Float64}([3.0,4.0,5.0]),
                              freqHz=SVector{3,Float64}([0.3,0.2,0.1]),
                              phase=SVector{3,Float64}([0,0.5235987755983,1.0471975511966]),
+							 #q0=SVector{4,Float64}([0.08908708063747484, 0.445435403187374, 0.0, 0.8908708063747479]),
                              q0=SVector{4,Float64}([0.1, 0.5, 0.0, 1.0]),
                              w0=SVector{3,Float64}(zeros(3))) begin
     @assert(size(I) == (3, 3))
@@ -96,8 +97,8 @@ function ModiaMath.computeVariables!(b::FreeBodyRotation, sim::ModiaMath.Simulat
     return nothing
 end
 
-simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)
-#simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
+#simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-6)
+simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, interval=0.1, tolerance=1e-8, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
 result          = ModiaMath.simulate!(simulationModel, log=true)
 ModiaMath.plot(result, [:q, :w, :derw, :tau])
 

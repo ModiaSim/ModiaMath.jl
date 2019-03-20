@@ -13,8 +13,8 @@ import .PendulumDAE
 
 import ModiaMath
 
-model  = PendulumDAE.Model()
-# model  = PendulumDAE.Model(;linearDerivatives=true)
+#model  = PendulumDAE.Model()
+model  = PendulumDAE.Model(;linearDerivatives=true)
 result = ModiaMath.simulate!(model, stopTime=2.0, log=true) 
 
 ModiaMath.plot(result, [(:x, :y), (:vx, :vy), :lambda, :mue], heading="Simulate_PendulumDAE.jl (index3 reduced to index1)")

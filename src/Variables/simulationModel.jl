@@ -44,8 +44,6 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
             is_fc[i] = true
         end
         is_der_fc_for_reinit = fill(false, var.nx)
-		println("... is_fc = ", is_fc)
-	    print_ModelVariables(var)
 
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
                                                     structureOfDAE = structureOfDAE,

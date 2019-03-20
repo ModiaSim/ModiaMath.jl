@@ -87,7 +87,7 @@ import .FreeBodyRotation
     @testset "Simulate PendulumDAE" begin
         stopTime  = 2.0
         tolerance = 1e-8
-        m4 = PendulumDAE.Model()
+        m4 = PendulumDAE.Model(;linearDerivatives=true)
         result = ModiaMath.simulate!(m4, stopTime=stopTime, interval=interval, tolerance=tolerance)
         x  = result["x"]
         y  = result["y"]
@@ -108,7 +108,7 @@ import .FreeBodyRotation
     @testset "Simulate PendulumDAE with x_fixed=true" begin
         stopTime  = 2.0
         tolerance = 1e-8
-        m4 = PendulumDAE.Model(x_fixed=true)
+        m4 = PendulumDAE.Model(x_fixed=true; linearDerivatives=true)
         result = ModiaMath.simulate!(m4, stopTime=stopTime, interval=interval, tolerance=tolerance)
         x  = result["x"]
         y  = result["y"]

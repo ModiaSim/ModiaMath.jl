@@ -51,8 +51,9 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(-L <= y0 <= L)      
         simulationState = ModiaMath.SimulationState("PendulumDAE", getModelResidues!, [x0,y0,1.0,1.0,0.0,0.0], getVariableName;
                                 x_fixed=[x_fixed, false, x_fixed, false, false, false],
-                                nc=2, structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
-                                                                           ModiaMath.ImplicitIndexOneDAE)
+                                structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
+                                                                     ModiaMath.ImplicitIndexOneDAE,
+                                is_fc = [false,false,false,false,true,true])
         new(simulationState, L, m, g)
     end
 end 

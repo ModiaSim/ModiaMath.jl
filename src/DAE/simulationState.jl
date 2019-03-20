@@ -647,51 +647,7 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
         Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.derxev, sim.w)
 
     elseif sim.structureOfDAE == LinearDerivativesWithConstraints
-        # Determine linear factors
-        #=
-        println("... previous solution")
-        jac2 = sim.jac2
-        Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues, sim.w)
-
-        # Determine der(fd, der(x)) using the fact that fd is linear in der(x)
-        for j = 1:nx
-            sim.derx_zero[j] = 1.0
-            Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
-            for i = 1:nd
-                jac2[i,j] = sim.residues2[i] - sim.residues[i]
-            end
-            sim.derx_zero[j] = 0.0 
-        end 
-
-        # Determine der(fc, x) with forward difference
-        if nc > 0
-            inc::Float64 = 0.0
-            xinc = sim.yNonlinearSolver
-            for j = 1:nx
-                xinc[j] = 0.0
-            end
-            for j = 1:nx
-                xj  = sim.xev[j]
-                inc = small*max( abs(xj), sim.x_nominal[j] )
-                inc = (xj + inc) - xj
-                sim.xev[j] += inc 
-                Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues2, sim.w)
-                for i = nd+1:nx
-                    jac2[i,j] = sim.residues2[i]/inc - sim.residues[i]/inc 
-                end
-                sim.xev[j] = xj
-            end
-        end
-
-        # Solve linear system of equation: jac2*derxev = -residue
-        for j = 1:nx
-            sim.derxev[j] = -sim.residues[j]
-        end
-        ldiv!(lu!(jac2),sim.derxev)
-
-        println("\n... der(x)(t0) = ", sim.derxev)
-        =#
-    
+        # Determine linear factors  
         jac2 = sim.jac2
         sim.compute_der_fc = true
         Base.invokelatest(sim.getModelResidues!, model, sim.tev, sim.xev, sim.derx_zero, sim.residues, sim.w)
@@ -717,8 +673,8 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
 
         # Determine der(fc, x) with forward difference
         # println("... forwardDifference = ", forwardDifference)
+		inc::Float64 = 0.0
         if forwardDifference
-            inc::Float64 = 0.0
             xinc = sim.yNonlinearSolver
             for j = 1:nx
                 xinc[j] = 0.0
@@ -745,9 +701,6 @@ function reinitialize!(model, sim::SimulationState, tev::Float64)
         end
         ldiv!(lu!(jac2),sim.derxev)
     end
-	
-	println("... sim.xev    = ", sim.xev)
-	println("... sim.derxev = ", sim.derxev)	
 end
 
 function eventIteration!(model, sim::SimulationState, tev::Float64)
@@ -787,7 +740,7 @@ function initialize!(model, sim::SimulationState, t0::Float64, nt::Int, toleranc
     sim.eqInfo.extraInfo = model
     sim.rawResult = ModiaMath.RawResult(nt, sim.getResultNames(model))
     sim.model     = model
-    sim.FTOL      = max(sim.tolerance, eps(Float64)^(1 / 3))   # eps(Float64)^(1 / 3)   # residue tolerance for nonlinear solver
+    sim.FTOL      = sim.tolerance    # max(sim.tolerance, eps(Float64)^(1 / 3))   # eps(Float64)^(1 / 3)   # residue tolerance for nonlinear solver
     # println("... FTOL = ", sim.FTOL)
     sim.initialization = true
 

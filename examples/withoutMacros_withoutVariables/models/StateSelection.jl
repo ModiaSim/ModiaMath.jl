@@ -11,6 +11,7 @@ This model is mainly used to test initialization
 module StateSelection
 
 import ModiaMath
+using  ModiaMath.LinearAlgebra
 
 mutable struct Model <: ModiaMath.AbstractSimulationModel
     simulationState::ModiaMath.SimulationState
@@ -27,9 +28,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(m > 0.0)
         simulationState = ModiaMath.SimulationState("StateSelection", getModelResidues!, [s0,0.0,0.0,0.0,v0,0.0,0.0,0.0,0.0,0.0,0.0,0.0], getVariableName;
                                 x_fixed=[true, false,false,false, true, false,false,false, false, false,false,false],
-                                nc=1, # dummy
-                                hev=1e-4,
-                                scaleConstraintsAtEvents=false)
+                                hev=1e-4)
         new(simulationState, n, m, g, s0, v0)
     end
 end 
@@ -43,6 +42,7 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
     # map x
     s  = _x[1]
     f  = _x[2:4]
+	g  = [0.0, 0.0, m.g]
     sd = _x[5]
     der_der_r = _x[6:8]
     der_der_s = _x[9]
@@ -56,7 +56,7 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
     _r[1]    = sd - ders
     _r[2:4]  = m.n * der_der_s - der_der_r 
     _r[5:7]  = der_der_r - der_v 
-    _r[8:10] = f - m.m * m.g - m.m * der_v
+    _r[8:10] = f - m.m*g - m.m * der_v
     _r[11]   = dot(m.n, f)
     _r[12]   = der_der_s - dersd
     return nothing
