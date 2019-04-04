@@ -16,7 +16,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
     store    # extra storage
    
     function ModiaSimulationModel(name::Symbol, f!::Function, x0::Vector{Float64}, der_x0::Vector{Float64}, jac=nothing;
-                                structureOfDAE = ModiaMath.ImplicitIndexOneDAE,
+                                structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
                                 xNames::Vector{String}=ModiaMath.DAE.nameVector("x", length(x0)),
                                 derxNames::Vector{String}=ModiaMath.DAE.fcNameVector("der", xNames),
                                 wNames::Vector{String}=fill("", 0),
@@ -46,7 +46,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                             getModelResidues!::Function,
                             x_start::Vector{Float64},
                             getVariableName::Function=ModiaMath.DAE.defaultVariableName; 
-                            structureOfDAE = ModiaMath.ImplicitIndexOneDAE,                  
+                            structureOfDAE = ModiaMath.DAE_NoSpecialStructure,                  
                             nc::Int=1,
                             nz::Int=0,                   
                             nw::Int=0,

@@ -51,9 +51,9 @@ residue1 := J1*der(w1) - (emf.tau - clutch.tau)
 residue2 := J2*der(w2) - clutch.tau
 residue3 := if engaged then w2-w1 else clutch.tau
 
-is_fc[1] := false
-is_fc[2] := false
-is_fc[3] := engaged
+is_constraint[1] := false
+is_constraint[2] := false
+is_constraint[3] := engaged
 ------
 
             
@@ -82,8 +82,8 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
       
     function Model(;V0=10.0, J1 = 0.1, J2 = 0.4, w1_start = 0.0, w2_start = 10.0, R=10.0, C=2.0, emf_k = 0.25)
         simulationState = ModiaMath.SimulationState("IdealClutch", getModelResidues!, [w1_start, w2_start, 0.0], getVariableName;
-		                                            structureOfDAE = ModiaMath.LinearDerivativesWithConstraints,
-													is_fc = [false, false, true],
+		                                            structureOfDAE = ModiaMath.DAE_LinearDerivativesAndConstraints,
+													is_constraint = [false, false, true],
                                                     nz=1, nw=3)									
 													
         new(simulationState, V0, J1, J2, R, C, emf_k, T1, true)
@@ -119,8 +119,8 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
 	        ModiaMath.setNextEvent!(sim, m.T_next)
 		end
 		
-		is_fc    = ModiaMath.get_is_fc(sim)
-        is_fc[3] = m.engaged 	
+		is_constraint    = ModiaMath.get_is_constraint(sim)
+        is_constraint[3] = m.engaged 	
     end 	
 	engaged = m.engaged
 

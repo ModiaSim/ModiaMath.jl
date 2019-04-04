@@ -45,13 +45,13 @@ getTolerance(m::ModiaMath.AbstractSimulationModel) = m.simulationState.tolerance
 
 
 """ 
-    ModiaMath.get_is_fc(m::ModiaMath.[AbstractSimulationModel|SimulationState])
+    ModiaMath.get_is_constraint(m::ModiaMath.[AbstractSimulationModel|SimulationState])
 
-Return reference to `is_fc` vector (this vector can be modified in `getModelResidues!` if
+Return reference to `is_constraint` vector (this vector can be modified in `getModelResidues!` if
 [`ModiaMath.isEvent`](@ref) returns true.
 """
-get_is_fc(sim::SimulationState)                 = sim.is_fc
-get_is_fc(m::ModiaMath.AbstractSimulationModel) = m.simulationState.is_fc
+get_is_constraint(sim::SimulationState)                 = sim.is_constraint
+get_is_constraint(m::ModiaMath.AbstractSimulationModel) = m.simulationState.is_constraint
 
 
 """ 

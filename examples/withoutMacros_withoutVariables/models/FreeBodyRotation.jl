@@ -64,12 +64,12 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(minimum(A) > 0.0)
         @assert(length(Q0) == 4)
         @assert(length(w0) == 3)
-        is_fc    = fill(false,7)
-        is_fc[7] = true
+        is_constraint    = fill(false,7)
+        is_constraint[7] = true
         simulationState = ModiaMath.SimulationState("FreeBodyRotation", getModelResidues!, Vector{Float64}([Q0;w0]), getVariableName; 
-                                                    is_fc = is_fc,  
-                                                    structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
-                                                                                         ModiaMath.ImplicitIndexOneDAE) 
+                                                    is_constraint = is_constraint,  
+                                                    structureOfDAE = linearDerivatives ? ModiaMath.DAE_LinearDerivativesAndConstraints :
+                                                                                         ModiaMath.DAE_NoSpecialStructure) 
         new(simulationState, m, SMatrix{3,3,Float64,9}(I), SVector{3,Float64}(A),
                                                        SVector{3,Float64}(freqHz),
                                                        SVector{3,Float64}(phase))

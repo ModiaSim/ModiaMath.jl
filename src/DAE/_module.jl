@@ -25,7 +25,7 @@ The following functions can be called in the DAE model to inquire
 - [`ModiaMath.getStartTime`](@ref)
 - [`ModiaMath.getStopTime`](@ref)
 - [`ModiaMath.getTolerance`](@ref)
-- [`ModiaMath.get_is_fc`](@ref)
+- [`ModiaMath.get_is_constraint`](@ref)
 - [`ModiaMath.get_is_der_fc_for_reinit`](@ref)
 - [`ModiaMath.compute_der_fc`](@ref)
 - [`ModiaMath.isInitial`](@ref)
@@ -67,13 +67,13 @@ module DAE
 export EventRestart, NoRestart, Restart, FullRestart, Terminate
 export getVariableName, getResultNames, defaultVariableName
 
-export getTime, getStartTime, getStopTime, getTolerance, get_is_fc, get_is_der_fc_for_reinit, compute_der_fc
+export getTime, getStartTime, getStopTime, getTolerance, get_is_constraint, get_is_der_fc_for_reinit, compute_der_fc
 export isInitial, isTerminal, isEvent, isZeroCrossing, isAfterSimulationStart, isStoreResult, setNominal!
 export setNextEvent!, positive!, negative!, change!, edge!
 export getSimulationResult
 
 export SimulationState
-export StructureOfDAE, ImplicitIndexOneDAE, ExplicitDerivatives, LinearDerivativesWithConstraints
+export StructureOfDAE, DAE_NoSpecialStructure, DAE_ExplicitDerivatives, DAE_LinearDerivativesAndConstraints
 
 
 # export InitInfo, EventInfo, reset!

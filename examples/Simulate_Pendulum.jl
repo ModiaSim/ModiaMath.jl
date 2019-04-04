@@ -40,8 +40,8 @@ function ModiaMath.computeVariables!(p::Pendulum, sim::ModiaMath.SimulationState
 end
 
 # simulationModel = ModiaMath.SimulationModel(Pendulum(L=0.8, m=0.5, d=0.2); stopTime=5.0)
-simulationModel = ModiaMath.SimulationModel(Pendulum(L=0.8, m=0.5, d=0.2); stopTime=5.0, structureOfDAE=ModiaMath.ExplicitDerivatives)
-# simulationModel = ModiaMath.SimulationModel(Pendulum(L=0.8, m=0.5, d=0.2); stopTime=5.0, structureOfDAE=ModiaMath.LinearDerivativesWithConstraints)
+simulationModel = ModiaMath.SimulationModel(Pendulum(L=0.8, m=0.5, d=0.2); stopTime=5.0, structureOfDAE=ModiaMath.DAE_ExplicitDerivatives)
+# simulationModel = ModiaMath.SimulationModel(Pendulum(L=0.8, m=0.5, d=0.2); stopTime=5.0, structureOfDAE=ModiaMath.DAE_LinearDerivativesAndConstraints)
 result = ModiaMath.simulate!(simulationModel; log=true) 
 
 plot(result, [(:phi, :w) :a])
