@@ -100,9 +100,10 @@ change its value. The equations above are solved with a fixed-point iteration sc
 until ``z_i > 0`` does not change anymore. Afterwards, integration is 
 restarted and the Boolean variable ``z_{pos} = z_{i,ev} > 0`` keeps its value until 
 the next event occurs.
+
 At an event instant some ``f_c`` equations might become ``f_d`` equations and vice versa.
 The constraint equations ``f_c`` can be at any position of the residue vector `r` and at an event
-instant `f_c`` equations might become ``f_d`` equations and vice versa.
+instant ``f_c`` equations might become ``f_d`` equations and vice versa.
 When instantiating a [`SimulationState`](@ref), the initial definition
 of the constraint equations is provided with vector argument `is_constraint`.
 Note, it is also possible to define time events, so triggering events at pre-defined time
