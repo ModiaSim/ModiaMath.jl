@@ -25,7 +25,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(h0 > 0.0)   
         @assert(0.0 <= e <= 1.0)   
         simulationState = ModiaMath.SimulationState("BouncingBall", getModelResidues!, [h0;0.0], getVariableName;
-                                nz=1, nw=1)
+                                                    nz=1, nw=1)
         new(simulationState, h0, e, g, true)
     end
 end

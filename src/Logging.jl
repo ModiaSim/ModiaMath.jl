@@ -13,6 +13,7 @@ Martin Otter, [DLR - Institute of System Dynamics and Control](https://www.dlr.d
 """
 module Logging
 
+import ModiaMath 
 @eval using Printf
 
 export Logger, setLog!, setAllLogCategories!, setLogCategories!
@@ -201,7 +202,7 @@ mutable struct SimulationStatistics
     interval::Float64
     tolerance::Float64
     nEquations::Int
-    nConstraints::Int
+    nConstraints::Union{Int,Missing}
     nResults::Int
     nSteps::Int
     nResidues::Int
@@ -218,7 +219,7 @@ mutable struct SimulationStatistics
     sparseSolver::Bool
     nGroups::Int
 
-    SimulationStatistics(structureOfDAE, nEquations::Int, nConstraints::Int, sparseSolver::Bool, nGroups::Int) =
+    SimulationStatistics(structureOfDAE, nEquations::Int, nConstraints::Union{Int,Missing}, sparseSolver::Bool, nGroups::Int) =
     new(structureOfDAE, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, nEquations, nConstraints, 0, 0, 0, 0, 0, 0, 0, 0, 0, floatmax(Float64),
         floatmax(Float64), 0.0, 0, sparseSolver, nGroups)
 end
@@ -259,7 +260,8 @@ function Base.show(io::IO, stat::SimulationStatistics)
     println(io, "        stopTime       = ", stat.stopTime, " s")
     println(io, "        interval       = ", stat.interval, " s")
     println(io, "        tolerance      = ", stat.tolerance)
-    println(io, "        nEquations     = ", stat.nEquations, " (includes ", stat.nConstraints, " constraints)")
+    println(io, "        nEquations     = ", stat.nEquations, typeof(stat.nConstraints)!=Missing ? 
+                                                                  " (includes " * string(stat.nConstraints) * " constraints)" : "" )
     println(io, "        nResults       = ", stat.nResults)
     println(io, "        nSteps         = ", stat.nSteps)
     println(io, "        nResidues      = ", stat.nResidues, " (includes residue calls for Jacobian)")

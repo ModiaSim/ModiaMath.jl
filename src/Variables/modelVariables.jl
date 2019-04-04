@@ -226,7 +226,7 @@ mutable struct ModelVariables
             ndim[numType] += valueLength(v)
             nvar[numType] += 1
         end
-        
+
         (nx_exp, nx_imp, nx_alg, nx_lambda, nx_mue, nderx_exp, nderx_imp, nfd_imp, nfc, nwr, nwc, dummy1) = ndim
         (nx_exp_var, nx_imp_var, nx_alg_var, nx_lambda_var, nx_mue_var, nderx_exp_var, nderx_imp_var, nfd_imp_var, nfc_var, nwr_var, nwc_var, dummy2) = nvar
         @assert(nx_exp >= nderx_exp)

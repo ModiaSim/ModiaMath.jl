@@ -13,7 +13,6 @@ import .FreeBodyRotation
 import ModiaMath
 
 model  = FreeBodyRotation.Model()
-# model  = FreeBodyRotation.Model(linearDerivatives=true)
 result = ModiaMath.simulate!(model, stopTime=5.0, log=true) 
 
 ModiaMath.plot(result, [("Q[1]", "Q[2]", "Q[3]", "Q[4]"), 
