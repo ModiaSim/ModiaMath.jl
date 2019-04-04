@@ -28,7 +28,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                              stopTime  = 1.0,
                              tolerance = 1e-4,
                              interval  = (stopTime-startTime)/500.0,
-                             structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
+                             structureOfDAE = ModiaMath.DAE_LinearDerivativesAndConstraints,
                              hev = 1e-8,
                              scaleConstraintsAtEvents::Bool = true)
         modelName = ModiaMath.componentName(model)

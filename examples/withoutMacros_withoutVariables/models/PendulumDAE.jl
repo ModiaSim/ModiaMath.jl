@@ -44,7 +44,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     m::Float64
     g::Float64
 
-    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false, linearDerivatives=false)   #y0=-sqrt(L*L - x0*x0))
+    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false, linearDerivatives=true)   #y0=-sqrt(L*L - x0*x0))
         @assert(L > 0.0)
         @assert(m > 0.0)
         @assert(-L <= x0 <= L)

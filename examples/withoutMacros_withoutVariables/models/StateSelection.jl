@@ -28,6 +28,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
         @assert(m > 0.0)
         simulationState = ModiaMath.SimulationState("StateSelection", getModelResidues!, [s0,0.0,0.0,0.0,v0,0.0,0.0,0.0,0.0,0.0,0.0,0.0], getVariableName;
                                 x_fixed=[true, false,false,false, true, false,false,false, false, false,false,false],
+								structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
                                 hev=1e-4)
         new(simulationState, n, m, g, s0, v0)
     end

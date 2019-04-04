@@ -54,7 +54,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     function Model(;m=1.0, I=Diagonal([1.0,2.0,3.0]), A=[3.0,4.0,5.0], freqHz=[0.3,0.2,0.1], 
                   phase=[0,0.5235987755983,1.0471975511966],
                   Q0=[0.1, 0.5, 0.0, 1.0],
-                  w0=zeros(3), linearDerivatives=false)
+                  w0=zeros(3), linearDerivatives=true)
         @assert(m > 0.0)
         @assert(size(I) == (3, 3))
         @assert(isposdef(I))
@@ -71,8 +71,8 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
                                                     structureOfDAE = linearDerivatives ? ModiaMath.DAE_LinearDerivativesAndConstraints :
                                                                                          ModiaMath.DAE_NoSpecialStructure) 
         new(simulationState, m, SMatrix{3,3,Float64,9}(I), SVector{3,Float64}(A),
-                                                       SVector{3,Float64}(freqHz),
-                                                       SVector{3,Float64}(phase))
+                                                           SVector{3,Float64}(freqHz),
+                                                           SVector{3,Float64}(phase))
     end
 end 
 

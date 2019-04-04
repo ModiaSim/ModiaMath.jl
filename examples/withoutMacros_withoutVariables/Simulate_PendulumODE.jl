@@ -12,9 +12,8 @@ include(joinpath("models", "PendulumODE.jl"))
 import .PendulumODE
 import ModiaMath
 
-# model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2)
-# model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2, structureOfDAE=ModiaMath.DAE_ExplicitDerivatives)
-model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2, structureOfDAE=ModiaMath.DAE_LinearDerivativesAndConstraints)
+
+model  = PendulumODE.Model(L=0.8, m=0.5, d=0.2)
 result = ModiaMath.simulate!(model, stopTime=5.0, log=true)
 
 heading = "Simulate_PendulumODE.jl (ODE as index-0 DAE)"

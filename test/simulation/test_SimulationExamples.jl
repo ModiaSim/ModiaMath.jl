@@ -15,7 +15,7 @@ using ModiaMath.Test
 include(joinpath(ModiaMath.path, "examples", "Simulate_Pendulum.jl"))
 import .Simulate_Pendulum
 pendulumModel = Simulate_Pendulum.Pendulum(L=0.5, m=1.0, d=0.1, phi0_deg=60.0)
-pendulum1 = ModiaMath.SimulationModel(pendulumModel)
+pendulum1 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.DAE_NoSpecialStructure)
 pendulum2 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.DAE_ExplicitDerivatives)
 pendulum3 = ModiaMath.SimulationModel(pendulumModel; structureOfDAE=ModiaMath.DAE_LinearDerivativesAndConstraints)
 
@@ -50,7 +50,7 @@ import .Simulate_FreeBodyRotation.FreeBodyRotation
 import .Simulate_FreeBodyRotation.result
 
 @testset "ModiaMath: examples/Simulate_FreeBodyRotation.jl" begin 
-    simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8, structureOfDAE=ModiaMath.DAE_LinearDerivativesAndConstraints)
+    simulationModel = ModiaMath.SimulationModel(FreeBodyRotation(), stopTime=5.0, tolerance=1e-8)
     result2         = ModiaMath.simulate!(simulationModel, log=true)
 
     q1 = result.series["q"]    

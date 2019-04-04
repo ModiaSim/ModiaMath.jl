@@ -386,9 +386,10 @@ mutable struct SimulationState
                              getModelResidues!::Function, 
                              x_start::Vector{Float64},
                              getVariableName::Function=defaultVariableName;
-                             structureOfDAE::StructureOfDAE = DAE_NoSpecialStructure,
+                             structureOfDAE::StructureOfDAE = DAE_LinearDerivativesAndConstraints,
                              is_constraint::Vector{Bool} = fill(false, length(x_start)),
                              is_der_fc_for_reinit::Vector{Bool} = fill(false, length(x_start)),
+                             nc=0,
                              nz=0,
                              nw=0,
                              zDir::Vector{Int}=fill(0, nz),                   
