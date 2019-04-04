@@ -16,6 +16,6 @@ import ModiaMath
 
 model  = IdealClutch.Model()
 result = ModiaMath.simulate!(model, stopTime=500.0; log=true) 
-ModiaMath.plot(result, ("w1", "w2", "C.v"), heading="Simulate_IdealClutch.jl")
+ModiaMath.plot(result, [("inertia1.w", "inertia2.w", "capacitor.v", "engaged")], heading="Simulate_IdealClutch.jl")
 
 end

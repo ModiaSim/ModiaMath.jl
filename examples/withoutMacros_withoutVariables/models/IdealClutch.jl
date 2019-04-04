@@ -91,9 +91,9 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
 end 
 
 getVariableName(model, vcat, vindex) = ModiaMath.getVariableName(model, vcat, vindex;
-                                                                 xNames    = ["w1", "w2", "integral(clutch.tau)"],
-																 derxNames = ["der(w1)", "der(w2)", "clutch.tau"],
-                                                                 wNames    = ["C.v", "C.i", "engaged"])
+                                                                 xNames    = ["inertia1.w", "inertia2.w", "integral(clutch.tau)"],
+																 derxNames = ["der(inertia1.w)", "der(inertia2.w)", "clutch.tau"],
+                                                                 wNames    = ["capacitor.v", "capacitor.i", "engaged"])
    
 function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vector{Float64}, _r::Vector{Float64}, _w::Vector{Float64})
     sim = m.simulationState

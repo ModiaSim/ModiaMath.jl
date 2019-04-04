@@ -1019,6 +1019,265 @@ package ModelicaReferenceModels
         Diagram(coordinateSystem(preserveAspectRatio=false)),
         experiment(StopTime=500));
     end IdealClutch_LNCS2;
+
+    model IdealClutch_LNCSb
+      Modelica.Electrical.Analog.Basic.Resistor R(R=10)
+        annotation (Placement(transformation(extent={{-60,40},{-40,60}})));
+      Modelica.Electrical.Analog.Basic.Capacitor capacitor(C=2) annotation (
+          Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-30,30})));
+      Modelica.Electrical.Analog.Basic.EMF emf(k=0.25)
+        annotation (Placement(transformation(extent={{-10,20},{10,40}})));
+      Modelica.Electrical.Analog.Sources.ConstantVoltage constantVoltage(V=10)
+        annotation (Placement(transformation(
+            extent={{-10,-10},{10,10}},
+            rotation=-90,
+            origin={-70,30})));
+      Modelica.Electrical.Analog.Basic.Ground ground
+        annotation (Placement(transformation(extent={{-80,-12},{-60,8}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia1(J=0.1)
+        annotation (Placement(transformation(extent={{18,20},{38,40}})));
+      IdealClutch                                     idealClutch(
+                                                             fn_max=1000)
+        annotation (Placement(transformation(extent={{48,20},{68,40}})));
+      Modelica.Mechanics.Rotational.Components.Inertia inertia2(J=0.4, w(start=
+              10))
+        annotation (Placement(transformation(extent={{76,20},{96,40}})));
+      Modelica.Blocks.Sources.BooleanExpression engaged(y=time < 100 or time
+             >= 300)
+        annotation (Placement(transformation(extent={{-12,50},{28,70}})));
+    equation
+      connect(R.n, capacitor.p) annotation (Line(points={{-40,50},{-30,50},{-30,
+              40}}, color={0,0,255}));
+      connect(R.n, emf.p)
+        annotation (Line(points={{-40,50},{0,50},{0,40}}, color={0,0,255}));
+      connect(constantVoltage.p, R.p) annotation (Line(points={{-70,40},{-70,50},
+              {-60,50}}, color={0,0,255}));
+      connect(constantVoltage.n, capacitor.n) annotation (Line(points={{-70,20},
+              {-70,14},{-30,14},{-30,20}}, color={0,0,255}));
+      connect(capacitor.n, emf.n) annotation (Line(points={{-30,20},{-30,14},{0,
+              14},{0,20}}, color={0,0,255}));
+      connect(ground.p, constantVoltage.n)
+        annotation (Line(points={{-70,8},{-70,20}}, color={0,0,255}));
+      connect(emf.flange, inertia1.flange_a)
+        annotation (Line(points={{10,30},{18,30}}, color={0,0,0}));
+      connect(inertia1.flange_b, idealClutch.flange_a)
+        annotation (Line(points={{38,30},{48,30}}, color={0,0,0}));
+      connect(idealClutch.flange_b, inertia2.flange_a)
+        annotation (Line(points={{68,30},{76,30}}, color={0,0,0}));
+      connect(engaged.y, idealClutch.f_normalized)
+        annotation (Line(points={{30,60},{58,60},{58,41}}, color={255,0,255}));
+      annotation (
+        Icon(coordinateSystem(preserveAspectRatio=false)),
+        Diagram(coordinateSystem(preserveAspectRatio=false)),
+        experiment(StopTime=500));
+    end IdealClutch_LNCSb;
+
+    model IdealClutch "Clutch based on Coulomb friction"
+      extends ModelicaReferenceModels.Friction.IdealClutchIcon;
+      extends
+        Modelica.Mechanics.Rotational.Interfaces.PartialCompliantWithRelativeStates;
+
+      parameter Real mue_pos[:, 2]=[0, 0.5]
+        "[w,mue] positive sliding friction coefficient (w_rel>=0)";
+      parameter Real peak(final min=1) = 1
+        "peak*mue_pos[1,2] = maximum value of mue for w_rel==0";
+      parameter Real cgeo(final min=0) = 1
+        "Geometry constant containing friction distribution assumption";
+      parameter Modelica.SIunits.Force fn_max(final min=0, start=1)
+        "Maximum normal force";
+
+      extends Modelica.Mechanics.Rotational.Interfaces.PartialFriction;
+      extends
+        Modelica.Thermal.HeatTransfer.Interfaces.PartialElementaryConditionalHeatPortWithoutT;
+
+      Real mue0 "Friction coefficient for w=0 and forward sliding";
+      Modelica.SIunits.Force fn "Normal force (fn=fn_max*f_normalized)";
+      Modelica.Blocks.Interfaces.BooleanInput
+                                           f_normalized
+        "Normalized force signal 0..1 (normal force = fn_max*f_normalized; clutch is engaged if > 0)"
+        annotation (Placement(transformation(
+            origin={0,110},
+            extent={{20,-20},{-20,20}},
+            rotation=90)));
+
+    equation
+      // Constant auxiliary variable
+      mue0 = Modelica.Math.Vectors.interpolate(mue_pos[:,1], mue_pos[:,2], 0, 1);
+
+      // Relative quantities
+      w_relfric = w_rel;
+      a_relfric = a_rel;
+
+      // Normal force and friction torque for w_rel=0
+      fn = fn_max*f_normalized;
+      free = fn <= 0;
+      tau0 = mue0*cgeo*fn;
+      tau0_max = peak*tau0;
+
+      // Friction torque
+      tau = if locked then sa*unitTorque else if free then 0 else cgeo*fn*(
+        if startForward then
+          Modelica.Math.Vectors.interpolate(mue_pos[:,1], mue_pos[:,2], w_rel, 1)
+        else if startBackward then
+          -Modelica.Math.Vectors.interpolate(mue_pos[:,1], mue_pos[:,2], w_rel, 1)
+        else if pre(mode) == Forward then
+          Modelica.Math.Vectors.interpolate(mue_pos[:,1], mue_pos[:,2], w_rel, 1)
+        else
+          -Modelica.Math.Vectors.interpolate(mue_pos[:,1], mue_pos[:,2], -w_rel, 1));
+      lossPower = tau*w_relfric;
+      annotation (Icon(
+          coordinateSystem(preserveAspectRatio=true,
+            extent={{-100,-100},{100,100}}),
+            graphics={
+          Text(extent={{-150,-110},{150,-70}},
+            textString="%name",
+            lineColor={0,0,255}),
+          Line(visible=useHeatPort,
+            points={{-100,-100},{-100,-40},{0,-40}},
+            color={191,0,0},
+            pattern=LinePattern.Dot)}), Documentation(info="<html>
+<p>
+This component models a <b>clutch</b>, i.e., a component with
+two flanges where friction is present between the two flanges
+and these flanges are pressed together via a normal force.
+The normal force fn has to be provided as input signal f_normalized in a normalized form
+(0 &le; f_normalized &le; 1),
+fn = fn_max*f_normalized, where fn_max has to be provided as parameter. Friction in the
+clutch is modelled in the following way:
+</p>
+<p>
+When the relative angular velocity is not zero, the friction torque is a
+function of the velocity dependent friction coefficient  mue(w_rel) , of
+the normal force \"fn\", and of a geometry constant \"cgeo\" which takes into
+account the geometry of the device and the assumptions on the friction
+distributions:
+</p>
+<pre>
+        frictional_torque = <b>cgeo</b> * <b>mue</b>(w_rel) * <b>fn</b>
+</pre>
+<p>
+   Typical values of coefficients of friction:
+</p>
+<pre>
+      dry operation   :  <b>mue</b> = 0.2 .. 0.4
+      operating in oil:  <b>mue</b> = 0.05 .. 0.1
+</pre>
+<p>
+   When plates are pressed together, where  <b>ri</b>  is the inner radius,
+   <b>ro</b> is the outer radius and <b>N</b> is the number of friction interfaces,
+   the geometry constant is calculated in the following way under the
+   assumption of a uniform rate of wear at the interfaces:
+</p>
+<pre>
+         <b>cgeo</b> = <b>N</b>*(<b>r0</b> + <b>ri</b>)/2
+</pre>
+<p>
+    The positive part of the friction characteristic <b>mue</b>(w_rel),
+    w_rel >= 0, is defined via table mue_pos (first column = w_rel,
+    second column = mue). Currently, only linear interpolation in
+    the table is supported.
+</p>
+<p>
+   When the relative angular velocity becomes zero, the elements
+   connected by the friction element become stuck, i.e., the relative
+   angle remains constant. In this phase the friction torque is
+   calculated from a torque balance due to the requirement, that
+   the relative acceleration shall be zero.  The elements begin
+   to slide when the friction torque exceeds a threshold value,
+   called the  maximum static friction torque, computed via:
+</p>
+<pre>
+       frictional_torque = <b>peak</b> * <b>cgeo</b> * <b>mue</b>(w_rel=0) * <b>fn</b>   (<b>peak</b> >= 1)
+</pre>
+<p>
+This procedure is implemented in a \"clean\" way by state events and
+leads to continuous/discrete systems of equations if friction elements
+are dynamically coupled. The method is described in
+(see also a short sketch in <a href=\"modelica://Modelica.Mechanics.Rotational.UsersGuide.ModelingOfFriction\">UsersGuide.ModelingOfFriction</a>):
+</p>
+<dl>
+<dt>Otter M., Elmqvist H., and Mattsson S.E. (1999):</dt>
+<dd><b>Hybrid Modeling in Modelica based on the Synchronous
+    Data Flow Principle</b>. CACSD'99, Aug. 22.-26, Hawaii.</dd>
+</dl>
+<p>
+More precise friction models take into account the elasticity of the
+material when the two elements are \"stuck\", as well as other effects,
+like hysteresis. This has the advantage that the friction element can
+be completely described by a differential equation without events. The
+drawback is that the system becomes stiff (about 10-20 times slower
+simulation) and that more material constants have to be supplied which
+requires more sophisticated identification. For more details, see the
+following references, especially (Armstrong and Canudas de Witt 1996):
+</p>
+<dl>
+<dt>Armstrong B. (1991):</dt>
+<dd><b>Control of Machines with Friction</b>. Kluwer Academic
+    Press, Boston MA.<br></dd>
+<dt>Armstrong B., and Canudas de Wit C. (1996):</dt>
+<dd><b>Friction Modeling and Compensation.</b>
+    The Control Handbook, edited by W.S.Levine, CRC Press,
+    pp. 1369-1382.<br></dd>
+<dt>Canudas de Wit C., Olsson H., Astroem K.J., and Lischinsky P. (1995):</dt>
+<dd><b>A new model for control of systems with friction.</b>
+    IEEE Transactions on Automatic Control, Vol. 40, No. 3, pp. 419-425.</dd>
+</dl>
+
+<p>
+See also the discussion
+<a href=\"modelica://Modelica.Mechanics.Rotational.UsersGuide.StateSelection\">State Selection</a>
+in the User's Guide of the Rotational library.
+</p>
+</html>"));
+    end IdealClutch;
+
+    model IdealClutchIcon "Icon of a clutch"
+
+      annotation (Icon(graphics={
+          Rectangle(  lineColor={64,64,64},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.HorizontalCylinder,
+            extent={{-30.0,-60.0},{-10.0,60.0}}),
+          Rectangle(  lineColor={64,64,64},
+            extent={{-30.0,-60.0},{-10.0,60.0}}),
+          Rectangle(  lineColor={64,64,64},
+            fillColor={255,255,255},
+            fillPattern=FillPattern.HorizontalCylinder,
+            extent={{10.0,-60.0},{30.0,60.0}}),
+          Rectangle(  lineColor={64,64,64},
+            extent={{10.0,-60.0},{30.0,60.0}}),
+          Rectangle(  lineColor={64,64,64},
+            fillColor={192,192,192},
+            fillPattern=FillPattern.HorizontalCylinder,
+            extent={{30.0,-10.0},{100.0,10.0}}),
+          Polygon(  lineColor={255,0,255},
+            fillColor={255,0,255},
+            fillPattern=FillPattern.Solid,
+            points={{-30.0,40.0},{-60.0,50.0},{-60.0,30.0},{-30.0,40.0}}),
+          Polygon(  lineColor={255,0,255},
+            fillColor={255,0,255},
+            fillPattern=FillPattern.Solid,
+            points={{30.0,40.0},{60.0,50.0},{60.0,30.0},{30.0,40.0}}),
+          Line(  points={{0.0,90.0},{90.0,70.0},{90.0,40.0},{30.0,40.0}},
+            color={255,0,255}),
+          Line(  points={{0.0,90.0},{-90.0,70.0},{-90.0,40.0},{-30.0,40.0}},
+            color={255,0,255}),
+          Rectangle(  lineColor={64,64,64},
+            fillColor={192,192,192},
+            fillPattern=FillPattern.HorizontalCylinder,
+            extent={{-100,-10},{-30,10}})},
+          coordinateSystem(extent={{-100.0,-100.0},{100.0,100.0}},
+            preserveAspectRatio=true)),
+          Documentation(info="<html>
+<p>
+This is the icon of a clutch from the rotational package.
+</p>
+</html>"));
+
+    end IdealClutchIcon;
   end Friction;
 
   package ODAEs
