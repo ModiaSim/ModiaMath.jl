@@ -72,44 +72,11 @@ closeTimePoints(t1::Float64, t2::Float64, epsilon::Float64) = abs(t1 - t2) / max
 Simulates a DAE `simulationModel` that is defined with package `Modia`, package `Modia3D` or
 with the `ModiaMath.@component` macro. The DAE is mathematically described as 
 implicit, index 1 DAE with events (containing an ODE or a semi-explicit 
-index 1 DAE as special cases):
+index 1 DAE as special cases). For details see [`ModiaMath.StructureOfDAE`](@ref).
 
-```math
-\\begin{align}
- 0       &= f_d(\\dot{x}, x, t, z_{pos}) \\\\
- 0       &= f_c(x, t, z_{pos}) \\\\
- z       &= f_z(x,t) \\\\
- z_{pos} &= \\text{event}() \\; ? \\; z > 0 \\; : \\; \\text{last}(z_{pos}) \\\\
- J       &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};  
-                    \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular}
-\\end{align}
-```
-
-with initial conditions ``x_0^{-}``:
-
-```math
-\\lim_{\\epsilon \\rightarrow 0} x(t_0 - \\epsilon) = x_0^{-}
-```
-
-During continuous integration, equation system (1)-(4) is solved with the
+During continuous integration, the DAE is solved with the
 [Sundials](https://computation.llnl.gov/projects/sundials) IDA solver
 (accessed via the Julia [Sundials](https://github.com/JuliaDiffEq/Sundials.jl) interface package).
-ModiaMath assumes that ``J`` (5) is **regular** for all time instants.
-If this condition is violated, initialization and simulation will usually fail and an error message of the
-form *"Solver does not converge"* might appear. Note, ModiaMath does not check this condition and can therefore
-not provide better diagnostics in such cases.
-
-If one of the elements of ``z`` crosses zero, an event is triggered and simulation is halted.
-At an event, equation ``z_{pos} = z > 0`` (element wise) is added. The equation system (1)-(4)
-is then solved with a fixed-point iteration scheme (= *event iteration*). Afterwards, integration is 
-restarted and ``z_{pos}`` keeps its value until the next event occurs.
-
-Initial conditions ``x_0^{-}`` must be provided before simulation can start. 
-Best is if they fulfil the constraint equation ``0 = f_c(x_0^{-}, t_0, z > 0)``.
-If this is not the case, initialization will simulate for an infinitesimal small time instant 
-so that ``x_0^{-}`` changes discontinuously to ``x_0^{+}`` with ``f_c (x_0^{+}, t_0, z > 0 )=0``. 
-Note, ``\\dot{x}`` is a Dirac impulse in this case.
-
 
 Input arguments
 

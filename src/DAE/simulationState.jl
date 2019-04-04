@@ -91,15 +91,23 @@ where
 ```
 
 Equations ``f_d`` are linear in the derivatives ``\\dot{x}``.
-Equations ``z=z(t)`` are zero-crossing functions. Whenever a ``z_i(t)`` crosses zero, 
-integration is halted, the DAE equations ``f_d, f_c`` might be changed and afterwards integration is restarted. 
-At an event instant some ``f_c`` equations might become ``f_d`` equations and vice versa.
-If is required that the Jacobian ``J`` is **regular**, that is the DAE has an index 1
+It is required that the Jacobian ``J`` is **regular**, that is the DAE has an index 1
 (= by differentiating ``f_c`` once, the system can be transformed to an ODE).
 
+Equations ``z=z(t)`` are zero-crossing functions. Whenever a ``z_i(t)`` crosses zero, 
+an event is triggered and simulation is halted. During an event, ``z_i > 0`` can
+change its value. The equations above are solved with a fixed-point iteration scheme (= *event iteration*)
+until ``z_i > 0`` does not change anymore. Afterwards, integration is 
+restarted and the Boolean variable ``z_{pos} = z_{i,ev} > 0`` keeps its value until 
+the next event occurs.
+At an event instant some ``f_c`` equations might become ``f_d`` equations and vice versa.
 The constraint equations ``f_c`` can be at any position of the residue vector `r` and at an event
-instant they can change. When instantiating a [`SimulationState`](@ref), the initial definition
-of the constraint equations is provided with vector argument `is_constraint`. 
+instant `f_c`` equations might become ``f_d`` equations and vice versa.
+When instantiating a [`SimulationState`](@ref), the initial definition
+of the constraint equations is provided with vector argument `is_constraint`.
+Note, it is also possible to define time events, so triggering events at pre-defined time
+instants, for example to model sampled data systems 
+(see [`ModiaMath.setNextEvent!`](@ref)).
 
 Initial conditions ``x_{ev}^{-}`` must be provided before simulation can start (``x_{ev}^{-} = x_0^{-}``) or at
 an event restart. They need 
@@ -141,7 +149,7 @@ Initialization and re-initialization is trivial, because ``x_{ev}^{+}`` is provi
 as initial value or at event restart from the model and then:
 
 ```math
-der(x)^{+} := f_d(0, x_{ev}^{+}, t_{ev})
+der(x_{ev})^{+} := f_d(0, x_{ev}^{+}, t_{ev})
 ```
 
 Note, if a Dirac impulse occurs in the model, then this property has to be
@@ -239,7 +247,7 @@ end
                                  = false, `residue[i]` is not a constraint equation.
                                  (is only used for `structureOfDAE = DAE_LinearDerivativesAndConstraints`)
 
-- `has_constraintDerivatives::Vector{Bool}`: if [`ModiaMath.compute_der_fc`](@ref)` returns true
+- `has_constraintDerivatives::Vector{Bool}`: if [`ModiaMath.compute_der_fc`](@ref) returns true
                         and `is_constraint[i] = true`:
                          = true , `residue[i]` is the derivative of an `fc` equation
                          = false, `residue[i]` is an `fc` equation

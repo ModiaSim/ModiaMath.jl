@@ -47,13 +47,13 @@ instead the instructions
 
 - **Version is not backwards compatible**:
   * The values of `@enum structureOfDAE` have changed.
-  * `ModiaMath.SimulationState.structureOfDAE` has default `DAE_LinearDerivativesAndConstraints`
-    instead of `DAE_NoSpecialStructure`.
+  * `ModiaMath.SimulationState`: Keyword argument `structureOfDAE` has 
+    default `DAE_LinearDerivativesAndConstraints` instead of `DAE_NoSpecialStructure`.
     The consequence is that by default it is assumed that the DAE depends linearly
     on the derivatives (this should probably always be the case, so this should be uncritical).
     However, the constraint equations (fc) must be now precisely identified via
     the new keyword argument `is_constraint`.
-  * `ModiaMath.SimulationState.nc` has no effect anymore (is ignored).
+  * `ModiaMath.SimulationState`: Keyword argument `nc` has no effect anymore (is ignored).
     Instead with new keyword argument `is_constraint` it is defined which
     residue element is a constraint (fc) equation.
     At an event instant, the value of `is_constraint` can change.
@@ -69,7 +69,8 @@ instead the instructions
 - New function `ModiaMath.get_is_constraint` to get a reference to the `is_constraint` vector.
 
 - New function `ModiaMath.compute_der_fc` to inquire in a model whether the constraint
-  equations (fc) or its derivatives (der(fc)) shall be computed.
+  equations (fc) or its derivatives (der(fc)) shall be computed, if
+  `has_constraintDerivative` was defined to be `true`.
   This feature is demonstrated in model
   `examples/withoutMacros_withoutVariables/models/PendulumDAE.jl`.
 
@@ -78,14 +79,14 @@ instead the instructions
   second inertia. It is demonstrated how the index can change during simulation and 
   how Dirac impulses are handled during initialization and at events.
 
-- Adapted tolerance of nonlinear solver so that it is identical to integrator tolerance.
+- Adapted tolerance of nonlinear solver so that it is identical to integrator tolerance
+  (to avoid failed initialization for integrator tolerances smaller as 1e-6).
 
 - Bugs in event iteration corrected:
   * Number of event iterations is limited (more as 20 iterations triggers an error),
     to avoid infinite looping.
-  * Also at a time-event, re-initialization is performed (to compute consistent
-    `x, der(x)` variables).
-  
+  * Also at a time-event, re-initialization is performed to compute consistent `x, der(x)` variables.
+
 - Documentation `docs/src/man/Overview.md` considerably improved. Now reflecting the
   current status of ModiaMath.
 
