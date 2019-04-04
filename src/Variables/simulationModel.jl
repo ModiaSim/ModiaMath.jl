@@ -29,6 +29,7 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                              tolerance = 1e-4,
                              interval  = (stopTime-startTime)/500.0,
                              structureOfDAE = ModiaMath.DAE_LinearDerivativesAndConstraints,
+							 has_constraintDerivatives = false,
                              hev = 1e-8,
                              scaleConstraintsAtEvents::Bool = true)
         modelName = ModiaMath.componentName(model)
@@ -43,12 +44,11 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         for i = (var.nx-var.nfc+1):var.nx
             is_constraint[i] = true
         end
-        is_der_fc_for_reinit = fill(false, var.nx)
 
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
                                                     structureOfDAE = structureOfDAE,
                                                     is_constraint = is_constraint,
-                                                    is_der_fc_for_reinit = is_der_fc_for_reinit,
+                                                    has_constraintDerivatives = has_constraintDerivatives,
                                                     x_fixed = x_fixed, x_nominal=x_nominal,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,

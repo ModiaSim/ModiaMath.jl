@@ -55,20 +55,10 @@ get_is_constraint(m::ModiaMath.AbstractSimulationModel) = m.simulationState.is_c
 
 
 """ 
-    ModiaMath.get_is_der_fc_for_reinit(m::ModiaMath.[AbstractSimulationModel|SimulationState])
-
-Return reference to `is_der_fc_for_reinit` vector (this vector can be modified in `getModelResidues!` if
-[`ModiaMath.isEvent`](@ref) returns true.
-"""
-get_is_der_fc_for_reinit(sim::SimulationState)                 = sim.is_der_fc_for_reinit
-get_is_der_fc_for_reinit(m::ModiaMath.AbstractSimulationModel) = m.simulationState.is_der_fc_for_reinit
-
-
-""" 
     ModiaMath.compute_der_fc(m::ModiaMath.[AbstractSimulationModel|SimulationState])
 
-If true is returned, return the derivative of the constraint equation in residues `r[i]`
-that are identified by `is_der_fc_for_reinit[i] = true`. Otherwise return constraint equation.
+If true is returned, return the derivative of the constraint equation in residues `r[i]`. 
+Otherwise return constraint equations.
 """
 compute_der_fc(sim::SimulationState)                 = sim.compute_der_fc
 compute_der_fc(m::ModiaMath.AbstractSimulationModel) = m.simulationState.compute_der_fc
