@@ -18,6 +18,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
     function ModiaSimulationModel(name::Symbol, f!::Function, x0::Vector{Float64}, der_x0::Vector{Float64}, jac=nothing;
                                 structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
                                 is_constraint=fill(false,length(x0)),
+								has_constraintDerivatives=false,
                                 xNames::Vector{String}=ModiaMath.DAE.nameVector("x", length(x0)),
                                 derxNames::Vector{String}=ModiaMath.DAE.fcNameVector("der", xNames),
                                 wNames::Vector{String}=fill("", 0),
@@ -31,6 +32,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
         simulationState = ModiaMath.SimulationState(string(name), getModelResidues!, x0;
                                 structureOfDAE = structureOfDAE,
                                 is_constraint = is_constraint,
+								has_constraintDerivatives = has_constraintDerivatives,
                                 nc=nc == 0 ? 1 : nc,
                                 nz=nz,
                                 jac=jac,
@@ -49,7 +51,8 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                             x_start::Vector{Float64},
                             getVariableName::Function=ModiaMath.DAE.defaultVariableName; 
                             structureOfDAE = ModiaMath.DAE_NoSpecialStructure,     
-                            is_constraint=fill(false,length(x_start)),             
+                            is_constraint=fill(false,length(x_start)),
+							has_constraintDerivatives=false,							
                             nc::Int=1,
                             nz::Int=0,                   
                             nw::Int=0,
@@ -65,7 +68,8 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
       
         simulationState = ModiaMath.SimulationState(name, getModelResidues!, x_start, getVariableName;
                             structureOfDAE = structureOfDAE,
-                            is_constraint = is_constraint,                            
+                            is_constraint = is_constraint, 
+							has_constraintDerivatives = has_constraintDerivatives,
                             nc=nc,
                             nz=nz,
                             nw=nw,

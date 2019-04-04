@@ -104,15 +104,17 @@ instead the instructions
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_PendulumDAE.jl") # index-3 DAE
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_SimpleStateEvents.jl")
   include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_BouncingBall.jl")
+  include("$(ModiaMath.path)/examples/withoutMacros_withoutVariables/Simulate_IdealClutch.jl") # Dirac impulses
 
   # run all tests
   include("$(ModiaMath.path)/test/runtests.jl")
+    
 ```
 
 
 ## Status
 
-The ModiaMath version number is 0.4.0 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.5.0 and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
