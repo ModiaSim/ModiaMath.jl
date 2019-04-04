@@ -49,6 +49,10 @@ instead the instructions
   * The values of `@enum structureOfDAE` have changed.
   * `ModiaMath.SimulationState.structureOfDAE` has default `DAE_LinearDerivativesAndConstraints`
     instead of `DAE_NoSpecialStructure`.
+    The consequence is that by default it is assumed that the DAE depends linearly
+    on the derivatives (this should probably always be the case, so this should be uncritical).
+    However, the constraint equations (fc) must be now precisely identified via
+    the new keyword argument `is_constraint`.
   * `ModiaMath.SimulationState.nc` has no effect anymore (is ignored).
     Instead with new keyword argument `is_constraint` it is defined which
     residue element is a constraint (fc) equation.
@@ -56,7 +60,8 @@ instead the instructions
     This allows to model varying index systems (with Dirac impulses).
 
 - `ModiaMath.SimulationState`: New keyword argument `has_constraintDerivatives`.
-  If true, also the derivatives of the constraint equations (`der(fc)`) can be computed.
+  If `true`, the derivatives of the constraint equations (`der(fc)`) must be returned in the
+  model residue, if `ModiaMath.compute_der_fc = true`.
   During initialization/reinitialization the Jacobian that is used to compute `der(x)`
   is then no longer computed with finite differences but by using `der(fc)` which gives
   a more reliable numerical solution.
@@ -75,6 +80,12 @@ instead the instructions
 
 - Adapted tolerance of nonlinear solver so that it is identical to integrator tolerance.
 
+- Bugs in event iteration corrected:
+  * Number of event iterations is limited (more as 20 iterations triggers an error),
+    to avoid infinite looping.
+  * Also at a time-event, re-initialization is performed (to compute consistent
+    `x, der(x)` variables).
+  
 - Documentation `docs/src/man/Overview.md` considerably improved. Now reflecting the
   current status of ModiaMath.
 

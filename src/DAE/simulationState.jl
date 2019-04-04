@@ -735,24 +735,31 @@ function eventIteration!(model, sim::SimulationState, tev::Float64)
     initEventIteration!(eh, tev)
 
     # Perform event iteration
-    while true
+	iter_max = 20
+	success  = false
+    for iter = 1:iter_max
         # Determine event branches
         for i = 1:sim.nx
             sim.xev_beforeEvent[i] = sim.xev[i]
         end
         eh.event = true
         Base.invokelatest(sim.getModelResidues!, model, tev, sim.xev, sim.derxev, sim.residues, sim.w)
-      
-        if terminateEventIteration!(eh)
-            eh.event = false
-            break
-        end
-      
+           
         # Fix event branches and determine new consistent sim.derxev_start (and sim.xev_start during initialization)
         eh.event   = false
         eh.initial = false
         reinitialize!(model, sim, tev)
+        
+		if terminateEventIteration!(eh)
+            eh.event = false
+			success  = true
+            break
+        end
     end
+	
+	if !success
+		error("Maximum number of event iterations (= $iter_max) reached")
+    end		
 end
 
 
