@@ -28,7 +28,8 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
                              stopTime  = 1.0,
                              tolerance = 1e-4,
                              interval  = (stopTime-startTime)/500.0,
-                             structureOfDAE = ModiaMath.ImplicitIndexOneDAE,
+                             structureOfDAE = ModiaMath.DAE_LinearDerivativesAndConstraints,
+							 has_constraintDerivatives = false,
                              hev = 1e-8,
                              scaleConstraintsAtEvents::Bool = true)
         modelName = ModiaMath.componentName(model)
@@ -38,9 +39,17 @@ mutable struct SimulationModel <: ModiaMath.AbstractSimulationModel
         x_nominal = fill(1.0, var.nx) 
         ModiaMath.copy_start_to_x!(var,x,x_fixed,x_nominal)
 
+        # Last nfc equations are the constraint equations
+        is_constraint = fill(false, var.nx)      
+        for i = (var.nx-var.nfc+1):var.nx
+            is_constraint[i] = true
+        end
+
         simulationState = ModiaMath.SimulationState(modelName, getModelResidues!, x, getVariableName; 
                                                     structureOfDAE = structureOfDAE,
-                                                    x_fixed = x_fixed, x_nominal=x_nominal, nc = var.nfc,
+                                                    is_constraint = is_constraint,
+                                                    has_constraintDerivatives = has_constraintDerivatives,
+                                                    x_fixed = x_fixed, x_nominal=x_nominal,
                                                     getResultNames = getResultNames, storeResult! = storeVariables!,
                                                     getResult        = getResult,
                                                     defaultStartTime = startTime,

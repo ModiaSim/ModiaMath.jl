@@ -25,6 +25,9 @@ import .SimpleStateEvents
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "BouncingBall.jl"))
 import .BouncingBall
 
+include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "IdealClutch.jl"))
+import .IdealClutch
+
 
 @testset "\nTest ModiaMath: withoutMacros_withoutVariables/*.jl with events" begin
 
@@ -50,9 +53,22 @@ import .BouncingBall
         @test nStateEvents == 18
     end
 
+    @testset "Simulate IdealClutch" begin
+        m2 = IdealClutch.Model()
+        result = ModiaMath.simulate!(m2, stopTime=500.0)
+
+        w1_end = result["inertia1.w"][end]
+		w2_end = result["inertia2.w"][end]
+		w_end_required = 38.9277466565
+		
+        @test isapprox(w1_end, w_end_required; atol=0.001 )
+        @test isapprox(w2_end, w_end_required; atol=0.001 )		 
+    end
+	
 end
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_SimpleStateEvents.jl"))
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_BouncingBall.jl"))
+include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_IdealClutch.jl"))
 
 end

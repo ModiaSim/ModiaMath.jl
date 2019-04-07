@@ -44,15 +44,15 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     m::Float64
     g::Float64
 
-    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false, linearDerivatives=false)   #y0=-sqrt(L*L - x0*x0))
+    function Model(;L=1.0, m=1.0, g=9.81, x0=L / 2.0, y0=-0.5, x_fixed=false)   #y0=-sqrt(L*L - x0*x0))
         @assert(L > 0.0)
         @assert(m > 0.0)
         @assert(-L <= x0 <= L)
         @assert(-L <= y0 <= L)      
         simulationState = ModiaMath.SimulationState("PendulumDAE", getModelResidues!, [x0,y0,1.0,1.0,0.0,0.0], getVariableName;
                                 x_fixed=[x_fixed, false, x_fixed, false, false, false],
-                                nc=2, structureOfDAE = linearDerivatives ? ModiaMath.LinearDerivativesWithConstraints :
-                                                                           ModiaMath.ImplicitIndexOneDAE)
+                                is_constraint = [false,false,false,false,true,true],
+								has_constraintDerivatives = true)
         new(simulationState, L, m, g)
     end
 end 
@@ -75,9 +75,14 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
     _r[2] = _derx[2] - vy + y * mue
     _r[3] = m.m * dervx + lambda * x
     _r[4] = m.m * dervy + lambda * y + m.m * m.g
-    _r[5] = (x * x + y * y - m.L * m.L) / 2.0
-    _r[6] = x * vx + y * vy
-     
+	
+	if ModiaMath.compute_der_fc(m)
+		_r[5] = x * _derx[1] + y * _derx[2]
+		_r[6] = x * dervx + y * dervy + vx*vx + vy*vy
+	else
+		_r[5] = (x * x + y * y - m.L * m.L) / 2.0
+		_r[6] = x * vx + y * vy
+    end
     return nothing
 end
 

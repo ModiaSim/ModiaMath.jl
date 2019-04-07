@@ -30,6 +30,8 @@ import .PendulumDAE
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "FreeBodyRotation.jl"))
 import .FreeBodyRotation
 
+include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "models", "StateSelection.jl"))
+import .StateSelection
 
 @testset "ModiaMath: withoutMacros_withoutVariables/*.jl without events" begin
     # Simulate PT1 block "T*der(x) + x = 0" in different variants
@@ -140,12 +142,20 @@ import .FreeBodyRotation
         @test isapprox(dervy[end],  0.97702 ; atol=1e-3 )
         =#
     end
-   
+
+    @testset "Simulate State Selection" begin
+        m6 = StateSelection.Model()
+        result = ModiaMath.simulate!(m6, stopTime=1.0)
+		f3 = result["f[3]"][end]
+
+        @test isapprox(f3[end], 9.81; atol=1e-3 )
+    end   
 end 
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_PT1.jl"))
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_PendulumODE.jl"))
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_PendulumDAE.jl"))
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_FreeBodyRotation.jl"))
+include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_StateSelection.jl"))
 
 end

@@ -23,7 +23,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     function Model(;T=1.0, x0=1.0)
         @assert(T > 0.0)
         simulationState = ModiaMath.SimulationState("PT1", getModelResidues!, [x0];
-                                                    structureOfDAE = ModiaMath.ExplicitDerivativesWithoutConstraints)
+                                                    structureOfDAE = ModiaMath.DAE_ExplicitDerivatives)
         new(simulationState, T, x0)
     end
 end 

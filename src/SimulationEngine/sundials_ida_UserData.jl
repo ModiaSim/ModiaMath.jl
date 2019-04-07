@@ -195,7 +195,7 @@ const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.
 
 function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::Cstring,
                              message::Cstring, simModel::IntegratorData)
-    modelName = simModel.model.modelName
+    modelName = simModel.simulationState.name
     if error_code > 0
         # Print information text
         println("\n\n!!! Warning from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction), 

@@ -20,7 +20,7 @@ mutable struct Model <: ModiaMath.AbstractSimulationModel
     d::Float64
     g::Float64
 
-    function Model(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90, structureOfDAE = ModiaMath.ImplicitIndexOneDAE)
+    function Model(;L=1.0, m=1.0, d=0.1, g=9.81, phi0_deg=90, structureOfDAE = ModiaMath.DAE_LinearDerivativesAndConstraints)
         @assert(L > 0.0)
         @assert(m > 0.0)
         @assert(d >= 0.0)
