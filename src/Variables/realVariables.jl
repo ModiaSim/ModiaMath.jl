@@ -34,7 +34,7 @@ The vectors are partitioned as:
              lambda;        # LAMBDA    : index-1 algebraic variable; is provided by integrator (used in model)
              mue        ]   # MUE       : stabilizing variable to reduce higher index to index 1; is provided by integrator (used in model)
 
-   residue = [fd_exp;       #           : residue of explicitly solved fd equations; computed by code below (e.g. if x[1] = phi and x[2] = v (= der(phi)), then residue[1] = derx[1] - v)
+   residue = [fd_exp;       #           : residue of explicitly solved fd equations; computed by code below (e.g. if x[1] = phi and x[2] = v (= der(phi)), then residue[1] = v- derx[1])
               fd_imp;       # FD_IMP    : residue of implicitly solved fd equations (is provided by model)
               fc]           # FC        : residue of fc equations (is provided by model)
 
@@ -79,8 +79,8 @@ mutable struct RealVariable{ValueType,ElementType} <: ModiaMath.AbstractRealVari
     nominal::ElementType                                              # nominal value; is used to compute absolute tolerances and might be used for scaling
     flow::Bool
     numericType::NumericType                                          # how the variable is used in the equations
-    integral::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
-    derivative::Union{Nothing,RealVariable{ValueType,ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    integral::Union{Nothing,RealVariable{ValueType,ElementType}}      # if present, integral is the variable that represents the integral of the actual variable (so variable = d(integral)/dt     derivative::Union{Nothing, RealVariable{ValueType, ElementType}}  # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
+    derivative::Union{Nothing,RealVariable{ValueType,ElementType}}    # if present, derivative is the variable that represents the derivative of the actual variable (so derivative = d(variable)/dt)
     unit::String                                                      # unit of the variable (temporal solution until package Unitful is supported in Julia v0.7)
 
     # How the variable is stored in vectors
