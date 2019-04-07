@@ -43,11 +43,20 @@ instead the instructions
 
 ## Release Notes
 
+### Version 0.5.1
+
+- New example ModiaMath/examples/Simulate_PendulumDAE (pendulum as index 3 system with
+  variables "x" and "y" (and not angle). Transformation to index 1 form with the
+  Gear-Gupta-Leimkuhler transformation.
+
+- Minor errors in Print/log output of lambda/mue variables corrected.
+
+
 ### Version 0.5.0
 
 - **Version is not backwards compatible**:
   * The values of `@enum structureOfDAE` have changed.
-  * `ModiaMath.SimulationState`: Keyword argument `structureOfDAE` has 
+  * `ModiaMath.SimulationState`: Keyword argument `structureOfDAE` has
     default `DAE_LinearDerivativesAndConstraints` instead of `DAE_NoSpecialStructure`.
     The consequence is that by default it is assumed that the DAE depends linearly
     on the derivatives (this should probably always be the case, so this should be uncritical).
@@ -76,7 +85,7 @@ instead the instructions
 
 - New example `examples/withoutMacros_withoutVariables/Simulate_IdealClutch.jl` to simulate
   an electrical circuit driving an inertia that is connected with an ideal clutch to a
-  second inertia. It is demonstrated how the index can change during simulation and 
+  second inertia. It is demonstrated how the index can change during simulation and
   how Dirac impulses are handled during initialization and at events.
 
 - Adapted tolerance of nonlinear solver so that it is identical to integrator tolerance
@@ -101,7 +110,7 @@ instead the instructions
 
 - ModiaMath.SimulationState has a new keyword argument `structureOfDAE`.
   It is now possible to define that the DAE is linear in all derivatives or all derivatives
-  are explicitely solved (= ODE). If one of the new structures is selected, 
+  are explicitely solved (= ODE). If one of the new structures is selected,
   initialization and re-initialization is more robust and more efficient
   (in particular no implicit Euler step is used).
 
