@@ -53,9 +53,9 @@ end
 ##################################################################
 
 
-function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_Vector, _r::Sundials.N_Vector, simModel::IntegratorData)
-    Sundials.IDAGetCurrentStep(simModel.ida_mem, simModel.hcur)
-    Sundials.IDAGetCurrentOrder(simModel.ida_mem, simModel.order)
+function idasol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64}, simModel::IntegratorData)
+#    simModel.hcur[1] = simModel.sol_mem.hcur
+#    simModel.order[1] = simModel.sol_mem.order
     stat           = simModel.statistics
     stat.hMin      = min(stat.hMin, simModel.hcur[1])
     stat.hMax      = max(stat.hMax, simModel.hcur[1])
@@ -68,87 +68,54 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
     simModel.last_norm_y = norm(simModel.y, Inf)
 
     # Check that simModel.y is still identical to _y
-    if pointer(simModel.y) === Sundials.__N_VGetArrayPointer_Serial(_y)
-       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
-        y  = simModel.y
-    else
-        y  = Sundials.asarray(_y)
-        println("\n!!! Info message from ModiaMath.simulate:\n",
-                 "    idasol_f assumption SimModel.y === _y is not valid; using asarray(_y).")
-    end
+    #simModel.y[:] = _y
 
-    if pointer(simModel.yp) === Sundials.__N_VGetArrayPointer_Serial(_yp)
-       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
-        yp = simModel.yp
-    else
-        yp = Sundials.asarray(_yp)
-        println("\n!!! Info message from ModiaMath.simulate:\n",
-                 "    idasol_f assumption SimModel.yp === _yp is not valid; using asarray(_yp).")
-    end
+    #simModel.yp[:] = _yp
 
-    ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
-    # Copy simModel.r to _r
-    unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
-    return Cint(0)   # indicates normal return
-end
-
-
-@noinline function old_cfunction(f, r, a)
-    ccall(:jl_function_ptr, Ptr{Cvoid}, (Any, Any, Any), f, r, a)
+    ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, simModel.r, simModel.hcur[1])
+    _r = simModel.r
+    #println(_y, _yp, t, _r, simModel.hcur[1] )
+    return _r
 end
 
 
 #------- root finding
-function idasol_g(t::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, gout::Ptr{Sundials.realtype}, simModel::IntegratorData)
+function idasol_g(t::Float64, y::Vector{Float64}, yp::Vector{Float64},  simModel::IntegratorData)
     simModel.statistics.nZeroCrossings += 1
     sim      = simModel.simulationState
     sim.time = t
-    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, Sundials.asarray(y), Sundials.asarray(yp), simModel.z)
-
+    old_z = simModel.z
+    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, y, yp, simModel.z)
+    zd = []
     for i = 1:simModel.simulationState.nz
-        unsafe_store!(gout, simModel.z[i], i)
+        z = ((simModel.z[i]*old_z[i]) > 0)  ? 1 : 0
+        push!(zd, z)
     end
-    return Cint(0)   # indicates normal return
+    simModel.zDir = zd
+    return simModel.zDir   # indicates normal return
 end
 
 
 #------- full jacobian
-function idasol_fulljac(t::Sundials.realtype, cj::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_Vector, _r::Sundials.N_Vector,
-                        _fulljac::Sundials.SUNMatrix, simModel::IntegratorData,
-                        tmp1::Sundials.N_Vector, tmp2::Sundials.N_Vector, tmp3::Sundials.N_Vector)
+function idasol_fulljac(t::Float64, cj::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64},
+                        _fulljac::Array{Float64}, simModel::IntegratorData,
+                        tmp1::Vector{Float64}, tmp2::Vector{Float64}, tmp3::Vector{Float64})
     # Compute full Jacobian
     sim      = simModel.simulationState
     sim.time = t
-    Sundials.IDAGetCurrentStep(simModel.ida_mem, simModel.hcur)
-    IDAGetErrWeights(simModel.ida_mem, simModel.eweight)
+    simModel.hcur[1] = simModel.sol_data.hcur
+    simModel.eweight = simModel.sol_data.weights
 
 
-    # Check that simModel.y is still identical to _y
-    if pointer(simModel.y) === Sundials.__N_VGetArrayPointer_Serial(_y)
-       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
-        y  = simModel.y
-    else
-        y  = Sundials.asarray(_y)
-        println("\n!!! Info message from ModiaMath.simulate:\n",
-                 "    idasol_fulljac assumption SimModel.y === _y is not valid; using asarray(_y).")
-    end
+    simModel.y = _y
 
-    if pointer(simModel.yp) === Sundials.__N_VGetArrayPointer_Serial(_yp)
-       # If this assumption is true, no unnecessary memory is allocated via Sundials.asarray(..)
-        yp = simModel.yp
-    else
-        yp = Sundials.asarray(_yp)
-        println("\n!!! Info message from ModiaMath.simulate:\n",
-                 "    idasol_fulljac assumption SimModel.yp === _yp is not valid; using asarray(_yp).")
-    end
+    simModel.yp = _yp
 
-    r = Sundials.asarray(_r)
+    r = _r
     ModiaMath.DAE.computeJacobian!(simModel.model, sim, t, y, yp, r, simModel.fulljac, simModel.hcur[1], cj, simModel.eweight)
     simModel.statistics += sim.nx
 
-    # Copy simModel.fulljac to fulljac
-    unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_fulljac), pointer(simModel.fulljac), sim.nx)
-    return Cint(0)   # indicates normal return
+    return 0   # indicates normal return
 end
 
 
@@ -191,7 +158,7 @@ const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.
                                                     Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
 =#
 
-
+#=
 function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::Cstring,
                              message::Cstring, simModel::IntegratorData)
     modelName = simModel.simulationState.name
@@ -218,3 +185,4 @@ function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::
     end
     nothing
 end
+=#

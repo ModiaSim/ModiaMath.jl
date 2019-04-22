@@ -9,13 +9,12 @@ Simulation engine for implicit index 1 DAE models with events.
 
 # Main developer
 
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/),
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 """
 module SimulationEngine
 
 export simulate!
-
 
 import Sundials
 import ModiaMath
@@ -27,6 +26,6 @@ using LinearAlgebra
 
 # include code
 # include("IDA_UserData.jl")  # is included within simulate.jl
-include("simulate.jl")
+include("diffeq_simulate.jl")
 
 end

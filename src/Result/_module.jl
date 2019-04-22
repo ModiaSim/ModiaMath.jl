@@ -13,9 +13,9 @@ signal names and their unit. Example:
 
 ```julia
 ModiaMath.plot(result, [ (:phi,:r)      (:phi,:phi2,:w);
-                         (:w,:w2,:phi2) (:phi,:w)      ], 
+                         (:w,:w2,:phi2) (:phi,:w)      ],
                heading="Matrix of plots")
-``` 
+```
 
 generates the following plot:
 
@@ -23,7 +23,7 @@ generates the following plot:
 
 # Main developer
 
-[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/), 
+[Martin Otter](https://rmc.dlr.de/sr/de/staff/martin.otter/),
 [DLR - Institute of System Dynamics and Control](https://www.dlr.de/sr/en)
 """
 module Result
@@ -57,7 +57,7 @@ include("plotResult_with_Nothing.jl")
 
 # If PyPlot is in the current environment, import it in the REPL and install plot functions based on PyPlot
 function __init__()
-    if !Requires.isprecompiling()  
+    if !Requires.isprecompiling()
         @eval Main begin
             pyplotAvailable = false
             try
@@ -76,14 +76,14 @@ function __init__()
                     println("... From ModiaMath: PyCall is added, since needed to set default options for PyPlot")
                     import Pkg
                     Pkg.add("PyCall")
-                    import PyCall       
+                    import PyCall
                 end
 
-                pyplot_rc = PyCall.PyDict(PyPlot.matplotlib["rcParams"])
+                pyplot_rc = PyCall.PyDict(PyPlot.matplotlib."rcParams")
                 pyplot_rc["axes.formatter.limits"] = [-3,4]
                 pyplot_rc["font.size"]        = 8.0
                 pyplot_rc["lines.linewidth"]  = 1.0
-                pyplot_rc["grid.linewidth"]   = 0.5 
+                pyplot_rc["grid.linewidth"]   = 0.5
                 pyplot_rc["axes.grid"]        = true
                 pyplot_rc["axes.titlesize"]   = "medium"
                 pyplot_rc["figure.titlesize"] = "medium"

@@ -32,6 +32,6 @@ import ModiaMath
 
 # include code
 include("solveOneNonlinearEquation.jl")
-include("sundials_kinsol.jl")
+include("nonlinear_solver.jl")
 
 end
