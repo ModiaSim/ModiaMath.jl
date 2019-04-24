@@ -80,7 +80,29 @@ end
 
 
 #------- root finding
-function idasol_g(t::Float64, y::Vector{Float64}, yp::Vector{Float64},  simModel::IntegratorData)
+function idasol_g(ts::Tuple{Float64,Float64}, ys::Vector{Vector{Float64}}, yps::Vector{Vector{Float64}}, simModel::IntegratorData)
+    for iter in n-1
+        _t = sol.t[iter+1]
+        _y = sol.u[iter+1]
+        _yp = sol.du[iter+1]
+        old_z = copy(simModel.z)
+        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, _t, _y, _yp, simModel.z)
+        zs = old_z.*(simModel.z)
+        z = simModel.z
+        for i in nz
+            if zs[i]<0
+                flag = true
+                idasol_g(_t, _y, )
+                if old_z[i] > 0
+                    simModel.zDir[i] = -1
+                else
+                    simModel.zDir[i] = 1
+                end
+                break
+            end
+        end
+    end
+
     simModel.statistics.nZeroCrossings += 1
     sim      = simModel.simulationState
     sim.time = t

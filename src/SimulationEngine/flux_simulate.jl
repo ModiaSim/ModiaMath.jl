@@ -4,14 +4,20 @@
 # This file is part of module
 #   ModiaMath.SimulationEngine(ModiaMath/SimulationEngine/_module.jl)
 #
-import Sundials, DASSL
-import ForwardDiff
-using Sundials, ForwardDiff, DASSL
+import DASSL, NLsolve
+using DASSL, NLsolve
 
-mutable struct SolData{T<:AbstractFloat}
-           hcur::T
-           order::Int32
-           weights::Vector{T}
+mutable struct SolData
+       abstol::Float64
+       reltol::Vector{Float64}
+       hcur::Float64
+       hmin::Float64
+       hmax::Float64
+       order::Int32
+       weights::Vector{Float64}
+       steps::Int32
+       jac_evals::Int32
+       fails::Int32
        end
 
 mutable struct IntegratorData
@@ -23,19 +29,17 @@ mutable struct IntegratorData
                                 # (allocated during instanciation according to nz).
     zDir::Vector{Int32}          # zDir[i] =  0: Root is reported for both crossing directions
                                 #         =  1: Root is reported when crossing from negative to positive direction
-                                #         = -1: Root is reported when crossing from positive to negative direction
-
-    eweight::Vector{Float64}     # Weight vector
+    eweight::Vector{Float64}    # Weight vector
     last_t::Float64              # Time instant of the last call to idasol_f (residue function)
     last_norm_y::Float64         # Norm of y of the last call to idasol_f (residue function)
     hcur::MVector{1,Float64}     # Current step size argument for IDAGetCurrentStep
     order::MVector{1,Int32}       # Current order for IDAGetCurrentOrder
-    r::Vector{Float64}           # Residues vector used in idasol_f function
-    sol_mem::SolData{Float64}        # IDA pointer (to access all IDAgetXXX functions)
+    r::Vector{Float64} # Residues vector used in idasol_f function
+    sol_mem::SolData       # IDA pointer (to access all IDAgetXXX functions)
 
     y::Vector{Float64}    # Julia vector of y wrapping y_N_Vector vector
     yp::Vector{Float64}   # Julia vector of yp wrapping yp_N_Vector vector
-    fulljac::Matrix{Float64}  # Julia matrix of fulljac
+    fulljac::Union{Matrix{Float64}, Nothing}  # Julia matrix of fulljac wrapping fulljac_N_xxx
 
     function IntegratorData(model::ModiaMath.AbstractSimulationModel, simulationState::ModiaMath.SimulationState)
         ny = simulationState.nx
@@ -48,16 +52,19 @@ end
 
 include("UserData.jl")
 
-function updateIDAstatistics!(nsteps, stat::ModiaMath.SimulationStatistics)
+function updateStatistics!(sol_mem, stat::ModiaMath.SimulationStatistics)
+    info = 0
+    info = sol_mem.steps
+    stat.nSteps        += info
 
-    stat.nSteps        += nsteps
+    info = sol_mem.jac_evals
+    stat.nJac          += info
 
+    info = sol_mem.fails
+    stat.nErrTestFails += info
 
-    stat.nJac          += 1
-
-
-    h0 = [0.0]
-    stat.h0 = min(stat.h0, h0[1])
+    h0 = sol_mem.hcur
+    stat.h0 = min(stat.h0, h0)
 end
 
 
@@ -76,44 +83,11 @@ closeTimePoints(t1::Float64, t2::Float64, epsilon::Float64) = abs(t1 - t2) / max
 Simulates a DAE `simulationModel` that is defined with package `Modia`, package `Modia3D` or
 with the `ModiaMath.@component` macro. The DAE is mathematically described as
 implicit, index 1 DAE with events (containing an ODE or a semi-explicit
-index 1 DAE as special cases):
+index 1 DAE as special cases). For details see [`ModiaMath.StructureOfDAE`](@ref).
 
-```math
-\\begin{align}
- 0       &= f_d(\\dot{x}, x, t, z_{pos}) \\\\
- 0       &= f_c(x, t, z_{pos}) \\\\
- z       &= f_z(x,t) \\\\
- z_{pos} &= \\text{event}() \\; ? \\; z > 0 \\; : \\; \\text{last}(z_{pos}) \\\\
- J       &= \\left[ \\frac{\\partial f_d}{\\partial \\dot{x}};
-                    \\frac{\\partial f_c}{\\partial x} \\right] \\; \\text{is regular}
-\\end{align}
-```
-
-with initial conditions ``x_0^{-}``:
-
-```math
-\\lim_{\\epsilon \\rightarrow 0} x(t_0 - \\epsilon) = x_0^{-}
-```
-
-During continuous integration, equation system (1)-(4) is solved with the
+During continuous integration, the DAE is solved with the
 [Sundials](https://computation.llnl.gov/projects/sundials) IDA solver
 (accessed via the Julia [Sundials](https://github.com/JuliaDiffEq/Sundials.jl) interface package).
-ModiaMath assumes that ``J`` (5) is **regular** for all time instants.
-If this condition is violated, initialization and simulation will usually fail and an error message of the
-form *"Solver does not converge"* might appear. Note, ModiaMath does not check this condition and can therefore
-not provide better diagnostics in such cases.
-
-If one of the elements of ``z`` crosses zero, an event is triggered and simulation is halted.
-At an event, equation ``z_{pos} = z > 0`` (element wise) is added. The equation system (1)-(4)
-is then solved with a fixed-point iteration scheme (= *event iteration*). Afterwards, integration is
-restarted and ``z_{pos}`` keeps its value until the next event occurs.
-
-Initial conditions ``x_0^{-}`` must be provided before simulation can start.
-Best is if they fulfil the constraint equation ``0 = f_c(x_0^{-}, t_0, z > 0)``.
-If this is not the case, initialization will simulate for an infinitesimal small time instant
-so that ``x_0^{-}`` changes discontinuously to ``x_0^{+}`` with ``f_c (x_0^{+}, t_0, z > 0 )=0``.
-Note, ``\\dot{x}`` is a Dirac impulse in this case.
-
 
 Input arguments
 
@@ -131,9 +105,6 @@ Input arguments
   additionally added to the result.
   If interval=NaN, the default interval is used that is defined by the `simulationModel`.
 """
-
-
-
 function simulate!(model::ModiaMath.AbstractSimulationModel;
                    tolerance=NaN,
                    startTime=NaN,
@@ -143,8 +114,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                    KLUorderingChoice::Int=1)
 
     use_fulljac = false
-    nsteps = 0
-    njac = 0
+
     sim           = model.simulationState
     sim.model     = model
     sim.tolerance = isnan(tolerance) ? sim.defaultTolerance : convert(Float64, tolerance)
@@ -214,7 +184,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     simModel = IntegratorData(model, sim)
     stateEvent::Bool = false
     timeEvent::Bool  = false
-    flag::Int32 = 0
+    flag = false
     ny = sim.nx
     nz = sim.nz
 
@@ -222,9 +192,13 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     yp = copy(init.yp0)
     simModel.y  = y
     simModel.yp = yp
-    fulljac = zeros(sim.nx, sim.nx)
-    simModel.fulljac = fulljac
-
+    reltol = 0.1*tolerance
+    if use_fulljac
+        fulljac = zeros(sim.nx, sim.nx)
+        simModel.fulljac = fulljac
+    else
+        simModel.fulljac = nothing
+    end
 
     eventInfo = DAE.EventInfo()
     tret    = [0.0]
@@ -233,31 +207,51 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         rootInfo = fill(0, nz)
     end
 
-
-    y_Vector  = y
-    yp_Vector = yp
-    r = simModel.r
-    throw(DomainError(yp, "yp"))
-    if use_fulljac
-        # IDADlsJacFn
-        jac = ForwardDiff.jacobian
-    end
-
-
-    #IDASStolerances(mem, tolerance, 0.1*tolerance)
+    # Create IDA
+    # Allocate N_Vector storage for y and yp
+    y_Vector  = deepcopy(y)
+    yp_Vector = deepcopy(yp)
     tolAbs = 0.1 * tolerance * init.y_nominal
     for i in 1:ny
         if !init.y_errorControl[i]
             tolAbs[i] = 1e5 * init.y_nominal[i]   # switch tolerance control off
         end
     end
+    # Run solution
+    # Initialize solvers
+    tReached = t0
+    #println(tolerance, tolAbs, sim.hev, simModel.hcur[1], Inf, 6, fill(0.0, ny), 0, 0)
+    mem = SolData(tolerance, tolAbs, sim.hev, simModel.hcur[1], Inf, 6, fill(0.0, ny), 0, 0, 0)
+    simModel.sol_mem = deepcopy(mem)
+    solver = dassl()
+    #println(solver)
 
+    y0 = y_Vector
+    yp0 = yp_Vector
+    if use_fulljac
+        # IDADlsJacFn
+        jac_fun = idasol_fulljac
+    end
+
+
+    # Sundials.IDASetId(mem, y_states_nvector)
+    #if sim.sparse
+    #   nnz_jac = nnz(sim.jac)
+    #   Sundials.IDAKLU(mem, ny, nnz_jac)
+    #   Sundials.IDAKLUSetOrdering(mem, KLUorderingChoice)
+    #   Sundials.IDASlsSetSparseJacFn(mem);
+    #else
+    #A  = Sundials.SUNDenseMatrix(ny, ny)
+    #LS = Sundials.SUNDenseLinearSolver(y, A)
+    #Sundials.IDADlsSetLinearSolver(mem, LS, A)
+    #end
 
     # Initialize zero crossing function, if required
     hasZeroCross = nz > 0
     if hasZeroCross
-        root_func = idasol_g
-        root_dir = sim.zDir
+        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t0, y0, yp0, simModel.z)
+        simModel.zDir = zeros(nz)
+        sim.zDir = simModel.zDir
     end
 
     # Initialize event variables
@@ -275,15 +269,13 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         end
 
         DAE.reset!(eventInfo)
-        DAE.processEvent!(model, sim, tReached, y, yp, eventInfo)
+        DAE.processEvent!(model, sim, tReached, y_Vector, yp_Vector, eventInfo)
         restart          = eventInfo.restart
         maxTime          = eventInfo.maxTime
         nextEventTime    = eventInfo.nextEventTime
         integrateToEvent = eventInfo.integrateToEvent
 
         statistics.nTimeEvents += 1
-        nsteps += 1
-        njac += 1
         if ModiaMath.isLogEvents(logger)
             println("        restart = ", restart)
         end
@@ -291,7 +283,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         # Reinitialize IDA if required by model
         if restart == ModiaMath.Restart
             statistics.nRestartEvents += 1
-
+            #Sundials.__IDAReInit(mem, tReached, y_N_Vector, yp_N_Vector);
         end
     end
 
@@ -299,6 +291,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     cpuStartIntegration = time_ns()
 
     while tReached < tEnd && restart != ModiaMath.Terminate  #------------------ while --------------
+        #println("entered")
         if tReached >= tc
             # Last communication point reached -> increment communication point
             jc += 1
@@ -319,47 +312,81 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             tStop = min(tEnd, maxTime)
         end
 
-        y=simModel.y
-        yp=simModel.yp
-        r=simModel.r
-        resprob!(r, yp,y, simModel, tReached) = idasol_f(tReached, y, yp, r, simModel)
-        tspan = (tReached, tNext)
         # Integrate in direction of tStop
-        print("tspan ", tspan, "\n")
-        prob = DAEProblem(resprob!,yp,y, tspan, simModel)
-        hcur =  simModel.hcur
-        order =  simModel.order
-        function numjac(t, y, dy, a)
-            b=dy-a*y
-            f(y1) = F(t,y1,a*y1+b)
-            jac = ForwardDiff.jacobian(f, y)
-            jac
+        #println("... tReached = ", tReached, ", tNext = ", tNext, ", tStop = ", tStop,
+        #        ", y = ", y[1], ", yp = ", yp[1])
+        #initialize derivatives
+        #flag = Sundials.IDASolve(mem, tNext, tret, simModel.y, simModel.yp, Sundials.IDA_NORMAL)
+        tspan = (tReached, tNext)
+
+        resprob!(r, du, u, p, t) = ModiaMath.DAE.getResidues!(simModel.model, sim, t, u, du, r, simModel.hcur[1])
+        differential_vars = [true,true,false]
+        prob = DAEProblem{true}(resprob!, yp, y, tspan, differential_vars=differential_vars)
+        sol = solve(prob, solver, reltol = mem.reltol, abstol = mem.abstol/100, initstep = simModel.hcur[1] )
+        flag = false
+        if hasZeroCross
+            old_z = copy(simModel.z)
+            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[end], sol.u[end], sol.du[end], simModel.z)
+            zs = old_z.*(simModel.z)
+            z = simModel.z
+            flag = any(x->x<0, zs)
         end
+        if flag
+            rootprob! = (z, du, u, p, t) = ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, u, du, z)
+            nSteps = length(sol.t)-1
+            int_z = old_z
+            for i in nSteps
+                ind = i+1
+                ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[ind], sol.u[ind], sol.du[ind], simModel.z)
+                zs = int_z.*(simModel.z)
+                int_z = copy(simModel.z)
+                if any(x->x<0, zs) #event found - go deeper
+                    step = tolerance
+                    tspan = (sol.t[i], sol.t[ind])
+                    prob = DAEProblem{true}(resprob!, sol.du[i], sol.u[i], tspan, differential_vars=differential_vars)
+                    sol2 = solve(prob, solver, reltol = mem.reltol/10, abstol = mem.abstol/100)
+                    newinds = findall(x->sum(x)<tolerance, sol2.u) #small us
+                    for inds in newinds #check for event
+                        if inds==1
+                            continue
+                        end
+                        t1 = sol2.t[inds-1]
+                        y1 = sol2.u[inds-1]
+                        yp1 = sol2.du[inds-1]
 
-        solver = IDA()
-        solver2 = dassl()
-        print("hcur=", hcur, "\n")
-        #try
-        sol = solve(prob, solver, minstep = hcur, initstep = 1e-2, reltol = tolerance, abstol = tolerance)
-        tReached = tNext
-        #catch
-        #    sol = solve(prob, dassl(factorize_jacobian=false),  minstep=hcur, reltol = tolerance, jacobian=ForwardDiff.jacobian, factorize_jacobian=false)
-        #    tReached = tReached + sol.t[2]
-        #end
-        tret = [tNext]
-        print("tReached ", tReached)
-        print("tret ", tret)
-        print(" sol ", sol, "\n")
-        print(" solver ", solver, "\n")
-        print(" solver2 ", solver2, "\n")
+                        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t1, y1, yp1, simModel.z)
+                        z1 = simModel.z
 
+                        t2 = sol2.t[inds]
+                        y2 = sol2.u[inds]
+                        yp2 = sol2.du[inds]
 
-        #println("    tReached = ", tReached)
-
-        stateEvent = 0
+                        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t2, y2, yp2, simModel.z)
+                        z2 = simModel.z
+                        zs2 = z1.*z2
+                        if any(x->x<0, zs2)
+                            tReached = sol2.t[inds]
+                            y = sol2.u[inds]
+                            yp = sol2.du[inds]
+                            break
+                        end
+                    end #--end for event checking
+                    break
+                end #--end if event found
+            end # -- end for i in nSteps
+        else #-- if not flag --
+            tReached = sol.t[end]
+            y = sol.u[end]
+            yp = sol.du[end]
+        end #-- end if flag --
+        simModel.y = y
+        simModel.yp = yp
+        re = (sol.retcode==:Default || sol.retcode==:Success)
+        stateEvent = (flag && re)
         timeEvent  = event && closeTimePoints(tNext, tReached, epsilon)
         isEvent    = timeEvent || stateEvent
 
+        #println("y = $y and yp = $yp")
         # Store result point at tReached
         DAE.computeAndStoreResult!(model, sim, tReached, y, yp)
 
@@ -376,9 +403,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
 
                 if stateEvent
                    # Print information about the root
-                    gout = 0
-                    idasol_g(tReached, y, yp, simModel)
-                    rootInfo = simModel.z
+                    Sundials.IDAGetRootInfo(mem, rootInfo)
                     print(" (")
                     firstRoot = true
                     for iroot in eachindex(rootInfo)
@@ -394,7 +419,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                     print(")\n")
                 end
             end
-
+            old_z = simModel.z
             # Trigger event
             DAE.reset!(eventInfo)
             DAE.processEvent!(model, sim, tReached, y, yp, eventInfo)
@@ -422,10 +447,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             # Handle restart flag
             if restart == ModiaMath.Restart
                 # Restart (dimensions do not change)
-                updateIDAstatistics!(nsteps, statistics)
-                simModel.y = y,
-                simModel.yp = yp,
-                idasol_f(tReached, y, yp, simModel.r, simModel);
+                updateStatistics!(mem, statistics)
+                #Sundials.__IDAReInit(mem, tReached, y_N_Vector, yp_N_Vector);
             elseif restart == ModiaMath.FullRestart
                 error("FullRestart not yet supported")
             end
@@ -442,7 +465,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     end #---------------------- end while ------------------------------------
 
     # Finalize statistics for simulation run
-    updateIDAstatistics!(nsteps, statistics)
+    updateStatistics!(mem, statistics)
 
     @label TerminateSimulation
     if ModiaMath.isLogInfos(logger)

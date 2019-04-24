@@ -4,8 +4,8 @@
 # This file is part of module
 #   ModiaMath.SimulationEngine(ModiaMath/SimulationEngine/_module.jl)
 #
-import DASSL, NLsolve
-using DASSL, NLsolve
+import DASSL, DifferentialEquations
+using DASSL, DifferentialEquations
 
 mutable struct SolData
        abstol::Float64
@@ -63,8 +63,6 @@ function updateStatistics!(sol_mem, stat::ModiaMath.SimulationStatistics)
     info = sol_mem.fails
     stat.nErrTestFails += info
 
-    h0 = sol_mem.hcur
-    stat.h0 = min(stat.h0, h0)
 end
 
 
@@ -152,7 +150,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Initialize simulation model and store result after initialization
     statistics = sim.statistics
     ModiaMath.reInitializeStatistics!(statistics, t0, stopTime2, interval, tolerance)
-
+    statistics.h0 = interval
+    statistics.hMin = Inf
+    statistics.hMax = 0
     if ModiaMath.isLogInfos(logger)
         println("      Initialization at time = ", t0, " s")
     end
@@ -249,7 +249,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Initialize zero crossing function, if required
     hasZeroCross = nz > 0
     if hasZeroCross
-        simModel.zDir =  idasol_g(tReached, y, yp, simModel)
+        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t0, y0, yp0, simModel.z)
+        simModel.zDir = zeros(nz)
         sim.zDir = simModel.zDir
     end
 
@@ -317,58 +318,50 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         #initialize derivatives
         #flag = Sundials.IDASolve(mem, tNext, tret, simModel.y, simModel.yp, Sundials.IDA_NORMAL)
         tspan = (tReached, tNext)
-        #println("y = $y and yp = $yp")
-        #nlprob!(r, yp) = ModiaMath.DAE.getResidues!(simModel.model, sim, tReached, y, yp, r, simModel.hcur[1])
-        #nsol = nlsolve(nlprob!, yp, ftol = eps(Float64)^(1 / 3))
-        #yp = nsol.zero
 
         resprob!(r, du, u, p, t) = ModiaMath.DAE.getResidues!(simModel.model, sim, t, u, du, r, simModel.hcur[1])
-
         differential_vars = [true,true,false]
         prob = DAEProblem{true}(resprob!, yp, y, tspan, differential_vars=differential_vars)
-        sol = solve(prob, solver, reltol = mem.reltol, abstol = mem.abstol/100, factorize_jacobian=false )
+        sol = solve(prob, solver, reltol = tolAbs, abstol = tolerance, initstep = interval, minstep = interval/100)
+        flag = false
+        if hasZeroCross
+            old_z = copy(simModel.z)
+            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[end], sol.u[end], sol.du[end], simModel.z)
+            zs = old_z.*(simModel.z)
+            z = simModel.z
+            flag = any(x->x<0, zs)
+        end
         tReached = sol.t[end]
+        nSteps = length(sol.t)-1
+        steps = zeros(nSteps)
+        for it in nSteps
+            step = sol.t[it+1] - sol.t[it]
+            steps[it] = step
+        end
+        statistics.nSteps+=nSteps
+        statistics.h0 = steps[end]
+        println("stat = ", statistics.h0)
+        statistics.hMin = min(statistics.hMin, minimum(steps))
+        statistics.hMax = max(statistics.hMax, maximum(steps))
         y = sol.u[end]
         yp = sol.du[end]
+        if flag
+            rootprob!(z, y, p, t) = ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, y, yp, z)
+            prob2 = ODEProblem(rootprob!, y, tspan)
+            integrator =DifferentialEquations.init(prob2,Tsit5(); dt = tolerance)
+            step!(integrator)
+            #println("int = $integrator")
+            tReached = integrator.t
+        else #-- if not flag --
+        end #-- end if flag --
         simModel.y = y
         simModel.yp = yp
-        #
-        #sol = solve(prob, solver, abstol = mem.abstol)
-
-        #println("    result = ", sol)
-        #println("    alg = ", sol.alg)
-        #println("    du = ", sol.du)
-        #println("    prob = ", sol.prob)
-
-        #up = sol.du[end]
-
-
-        ModiaMath.DAE.getResidues!(simModel.model, sim, tReached, y, yp, simModel.r, simModel.hcur[1])
-        r=simModel.r
-        #println("y = $y and yp = $yp and r=$r")
-        #println("    tReached = ", tReached)
-        flag = false
-        if (nz>0)
-            old_z = simModel.z
-            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, tReached, y, yp, simModel.z)
-            zs = old_z.*(simModel.z)
-            for i in nz
-                if zs[i]<0
-                    flag = true
-                    if old_z[i] > 0
-                        simModel.zDir[i] = -1
-                    else
-                        simModel.zDir[i] = 1
-                    end
-                end
-            end
-        end
         re = (sol.retcode==:Default || sol.retcode==:Success)
         stateEvent = (flag && re)
         timeEvent  = event && closeTimePoints(tNext, tReached, epsilon)
         isEvent    = timeEvent || stateEvent
-        simModel.y = y
-        simModel.yp = yp
+
+        #println("y = $y and yp = $yp")
         # Store result point at tReached
         DAE.computeAndStoreResult!(model, sim, tReached, y, yp)
 
@@ -384,18 +377,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 end
 
                 if stateEvent
-                    simModel.statistics.nZeroCrossings += 1
-                    sim.time = tReached
-                    old_z = simModel.z
-                    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, y, yp, simModel.z)
-                    zd = []
-                    for i = 1:simModel.simulationState.nz
-                        z = ((simModel.z[i]*old_z[i]) < 0)  ? 1 : 0
-                        push!(zd, z)
-                    end
-                    simModel.zDir = zd
                    # Print information about the root
-                    rootInfo = zd
+                    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, tReached, y, yp, simModel.z)
+                    rootInfo = simModel.z
                     print(" (")
                     firstRoot = true
                     for iroot in eachindex(rootInfo)
@@ -411,7 +395,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                     print(")\n")
                 end
             end
-
+            old_z = simModel.z
             # Trigger event
             DAE.reset!(eventInfo)
             DAE.processEvent!(model, sim, tReached, y, yp, eventInfo)

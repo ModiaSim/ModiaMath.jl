@@ -42,7 +42,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
     itnum = Int32(1000.0 * norm(yScale, Inf))
     nsol_f!(r, y) = eqInfo.getResidues!(eqInfo, y, r)
     #nsol = nlsolve(nsol_f!, y, method = :newton, ftol=FTOL, iterations=itnum, linesearch=LineSearches.HagerZhang())
-    nsol = nlsolve(nsol_f!, y, method = :newton, ftol=FTOL, iterations=itnum)
+    nsol = nlsolve(nsol_f!, y, ftol=FTOL, iterations=itnum)
     eqInfo.y0 .= nsol.zero
     return nothing
 end

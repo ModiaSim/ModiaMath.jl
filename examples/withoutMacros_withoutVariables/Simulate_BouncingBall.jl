@@ -14,7 +14,7 @@ import ModiaMath
 
 # Simulate
 model  = BouncingBall.Model()
-result = ModiaMath.simulate!(model, stopTime=3.0, log=true) 
+result = ModiaMath.simulate!(model, stopTime=3.0, log=true)
 
 ModiaMath.plot(result, [:h, (:v, :flying)], heading="Simulate_BouncingBall.jl")
 
