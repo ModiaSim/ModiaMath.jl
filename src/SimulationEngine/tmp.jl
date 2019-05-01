@@ -326,35 +326,22 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         tspan = (tReached, tNext)
         #println("r = ", simModel.r)
 
-        println("entered dassl: y = $y, yp = $yp")
-        #resprob!(r, du, u, p, t) =sol_f(t, u, du, r, simModel)
         resprob!(r, du, u, p, t) = ModiaMath.DAE.getResidues!(simModel.model, sim, t, u, du, r, simModel.hcur[1])
         differential_vars = [true,true,false]
         prob = DAEProblem{true}(resprob!, yp, y, tspan, differential_vars=differential_vars)
         sol = solve(prob, solver, reltol = relTol, abstol = tolAbs, initstep = simModel.hcur[1] )
         ModiaMath.DAE.getResidues!(simModel.model, sim, tReached, sol.u[1], sol.du[1], simModel.r, simModel.hcur[1])
-        println("sol = $sol" )
+        #println("r = $r, simModel.r =  ", simModel.r, ", solu[1] = ", sol.u[1], ", soldu[1] = ", sol.du[1] )
 
-        endInd = length(sol.t)
+
         if hasZeroCross
-            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[1], sol.u[1], sol.du[1], simModel.z)
             old_z = copy(simModel.z)
-            println("old_z = $old_z")
-            len = length(sol.t)
-            for el in 2:len
-                ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[el], sol.u[el], sol.du[el], simModel.z)
-                zs = old_z.*(simModel.z)
-                z = copy(simModel.z)
-                println("new_z = $z, zs = $zs")
-                #println("Event ind = $z")
-                if (tReached!=t0)
-                    flag = any(x->x<0, zs)
-                    println("flag = $flag")
-                end
-                if flag
-                endInd = el
-                    break
-                end
+            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[end], sol.u[end], sol.du[end], simModel.z)
+            zs = old_z.*(simModel.z)
+            z = copy(simModel.z)
+            #println("Event ind = $z")
+            if (tReached!=t0)
+                flag = any(x->x<0, zs) && !flag
             end
         end
 
@@ -369,6 +356,10 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             simModel.hcur[1] = steps[end]
             statistics.h0 = steps[end]
 
+
+            statistics.nResidues += nSteps
+
+            sim                  = simModel.simulationState
             sim.time             = tReached
             simModel.last_t      = tReached
             simModel.last_norm_y = norm(simModel.y, Inf)
@@ -377,9 +368,9 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             statistics.hMax = max(statistics.hMax, maximum(steps))
         end
 
-        yt = sol.u[endInd]
-        ypt = sol.du[endInd]
-        tReachedt = sol.t[endInd]
+        yt = sol.u[end]
+        ypt = sol.du[end]
+        tReachedt = sol.t[end]
         #println("y old = $yt, yp = $ypt,  tol = $tolerance, t = $tReachedt")
         if flag
             FTOL=eps(Float64)^(1/2)
@@ -390,14 +381,14 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             #prob2 = DAEProblem{true}(resprob2!, yp, y, tspan, differential_vars=differential_vars)
             #sol = solve(prob2, solver, reltol = FTOL, abstol = FTOL, initstep = FTOL) #solve with better precision
             println("sol = $sol")
-            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[endInd], sol.u[endInd], sol.du[endInd], simModel.z)
+            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[end], sol.u[end], sol.du[end], simModel.z)
             zs = old_z.*(simModel.z)
             if !any(x->x<0, zs)
-                println("no root after better search, zs = $zs")
-                y = sol.u[endInd]
-                yp = sol.du[endInd]
-                tReached = sol.t[endInd]
-                flag = false
+                println("no root after better search")
+                y = sol.u[end]
+                yp = sol.du[end]
+                tReached = sol.t[end]
+                break
             else #binary search
                 len = length(sol.u)
                 ind_l = 1
@@ -418,13 +409,11 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 yMax = sol.u[ind_r]
                 ypMax = sol.du[ind_r]
                 tMax = sol.t[ind_r]
-                z = copy(simModel.z)
-                while !any(x->abs(x)<eps(one(z[1]))^3, z) #binsearch by values approx
+                while !any(x->abs(x)<tolerance^3, yMax - yMin) #binsearch by values approx
                     yMid = (yMax + yMin)/2
                     ypMid = (ypMax + ypMin)/2
                     tMid = (tMax + tMin)/2
                     ModiaMath.DAE.getEventIndicators!(simModel.model, sim, tMid, yMid, ypMid, simModel.z)
-                    z = copy(simModel.z)
                     if any(x->x<0, old_z.*(simModel.z))
                         yMax = yMid
                         ypMax = ypMid
@@ -434,7 +423,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                         ypMin = ypMid
                         tMin = tMid
                     end
-                    println("y internal = $yMid, yp = $ypMid,  z = $z, t = $tMid")
+                    #println("y internal = $yMid, yp = $ypMid,  tol = $tolerance, t = $tMid")
                 end  #end binsearch by values approx
                 y = yMax
                 tReached = tMax
@@ -460,12 +449,6 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         #println("y new = $y, yp = $yp,  tol = $tolerance, t = $tReached")
         simModel.y = y
         simModel.yp = yp
-
-
-        sim.time             = tReached
-        simModel.last_t      = tReached
-        simModel.last_norm_y = norm(simModel.y, Inf)
-
         stateEvent = flag
         timeEvent  = event && closeTimePoints(tNext, tReached, epsilon)
         isEvent    = timeEvent || stateEvent

@@ -53,7 +53,7 @@ end
 ##################################################################
 
 
-function idasol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64}, simModel::IntegratorData)
+function sol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64}, simModel::IntegratorData)
 #    simModel.hcur[1] = simModel.sol_mem.hcur
 #    simModel.order[1] = simModel.sol_mem.order
     stat           = simModel.statistics
@@ -62,59 +62,32 @@ function idasol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vec
     stat.orderMax  = max(stat.orderMax, simModel.order[1])
     stat.nResidues += 1
 
+    simModel.y = _y
+
+    simModel.yp = _yp
+    
     sim                  = simModel.simulationState
     sim.time             = t
     simModel.last_t      = t
     simModel.last_norm_y = norm(simModel.y, Inf)
 
     # Check that simModel.y is still identical to _y
-    #simModel.y[:] = _y
 
-    #simModel.yp[:] = _yp
 
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, simModel.r, simModel.hcur[1])
     _r = simModel.r
-    #println(_y, _yp, t, _r, simModel.hcur[1] )
+    println(_y, _yp, t, _r, simModel.hcur[1] )
     return _r
 end
 
 
 #------- root finding
-function idasol_g(ts::Tuple{Float64,Float64}, ys::Vector{Vector{Float64}}, yps::Vector{Vector{Float64}}, simModel::IntegratorData)
-    for iter in n-1
-        _t = sol.t[iter+1]
-        _y = sol.u[iter+1]
-        _yp = sol.du[iter+1]
-        old_z = copy(simModel.z)
-        ModiaMath.DAE.getEventIndicators!(simModel.model, sim, _t, _y, _yp, simModel.z)
-        zs = old_z.*(simModel.z)
-        z = simModel.z
-        for i in nz
-            if zs[i]<0
-                flag = true
-                idasol_g(_t, _y, )
-                if old_z[i] > 0
-                    simModel.zDir[i] = -1
-                else
-                    simModel.zDir[i] = 1
-                end
-                break
-            end
-        end
-    end
-
-    simModel.statistics.nZeroCrossings += 1
+function sol_g(t::Float64, y::Vector{Float64}, simModel::IntegratorData)
     sim      = simModel.simulationState
     sim.time = t
-    old_z = simModel.z
+    yp = simModel.yp
     ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, y, yp, simModel.z)
-    zd = []
-    for i = 1:simModel.simulationState.nz
-        z = ((simModel.z[i]*old_z[i]) > 0)  ? 1 : 0
-        push!(zd, z)
-    end
-    simModel.zDir = zd
-    return simModel.zDir   # indicates normal return
+    return simModel.z   # indicates normal return
 end
 
 
@@ -143,68 +116,16 @@ end
 
 
 
-#=
-#-------- Jacobian
-function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N_Vector, yp::Sundials.N_Vector, r::Sundials.N_Vector,
-                     jacKLU::SlsMat, simModel::IntegratorData,
-                     tmp1::Sundials.N_Vector, tmp2::Sundials.N_Vector, tmp3::Sundials.N_Vector)
-    # Compute non-zero values of jac
-    sim      = simModel.simulationState
-    sim.time = t
-    h        = IDAGetCurrentStep(simModel.ida_mem)
-    IDAGetErrWeights(simModel.ida_mem, simModel.eweight)
+function find_roots(t::Array{Float64, 1}, ys::Array{Array{Float64, 1}, 1}, yps::Array{Array{Float64,1},1}, simModel::IntegratorData,  resprob!, abstol::Float64, reltol::Array{Float64,1})
+    #solve again with better precision to be sure
+    FTOL=eps(Float64)^(1 / 3)
+    sim = simModel.simulationState
+    nsol_f!(r, y) = ModiaMath.DAE.getResidues!(simModel.model, sim, t[1], ys[1], yps[1], r, simModel.hcur[1])
+    nsol = nlsolve(nsol_f!, ys[1], ftol=FTOL)
+    y = nsol.zero
+    prob = DAEProblem{true}(resprob!, yps[1], y, (t[1], t[end]), differential_vars=[true,true,false])
+    sol = solve(prob, dassl(), reltol = reltol, abstol = abstol/100)
 
-    ModiaMath.SparseJacobian.computeJacobian!(ModiaMath.DAE.getResidues!, simModel.model, simModel.simulationState,
-                                              t, Sundials.asarray(y), Sundials.asarray(yp), Sundials.asarray(r),
-                                              sim.cg, c_j, h, Sundials.asarray(simModel.eweight), Sundials.asarray(tmp1), sim.jac)
-    simModel.statistics.nResidues += sim.cg.ngroups
 
-    # Copy userData.jac to jacKLU
-    #   function call gives a Julia crash: CSCtoSlsMat!(simModel.cm.jac, jacKLU)
-    #   Manually inlining the function works
-    jac = sim.jac
-    for i = 1:length(jac.nzval)
-      unsafe_store!(jacKLU.data   , jac.nzval[i], i)
-      unsafe_store!(jacKLU.rowvals, jac.rowval[i]-1, i)
-    end
-
-    for i = 1:length(jac.colptr)
-      unsafe_store!(jacKLU.colptrs, jac.colptr[i]-1, i)
-    end
-
-    return Cint(0)   # indicates normal return
+    return sol.t[end], sol.u[end], sol.du[end]
 end
-
-
-const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
-                                                    Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
-=#
-
-#=
-function idasol_ErrHandlerFn(error_code::Cint, IDAmodule::Cstring, IDAfunction::Cstring,
-                             message::Cstring, simModel::IntegratorData)
-    modelName = simModel.simulationState.name
-    if error_code > 0
-        # Print information text
-        println("\n\n!!! Warning from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
-               "(...) returned with [", unsafe_string(IDAmodule), "] error_code  = ",
-               error_code, ":\n", unsafe_string(message), "\n")
-    elseif error_code < 0
-        # Raise error
-        time   = simModel.last_t
-        norm_y = simModel.last_norm_y
-
-        if time > typemin(Float64)
-            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
-                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n",
-                unsafe_string(message), "\n( norm( x(t=", @sprintf("%0.3g",time), " s) ) = ", @sprintf("%0.3g",norm_y),
-                "; if this value is large, the model is unstable )\n")
-        else
-            error("\n\n!!! Error from ModiaMath.simulate(", modelName, ", ...): ", unsafe_string(IDAfunction),
-                "(...) returned with an [", unsafe_string(IDAmodule), "] error:\n",
-                unsafe_string(message), "\n")
-        end
-    end
-    nothing
-end
-=#

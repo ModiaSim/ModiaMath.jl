@@ -324,7 +324,6 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
 
             # If event at tReached, handle the event
             if isEvent
-                println("rr =" , Sundials.IDA_ROOT_RETURN, ", flag = $flag")
                 if ModiaMath.isLogEvents(logger)
                     if timeEvent && stateEvent
                         print("\n      Time and state (zero-crossing) event at time = $tReached s")
@@ -333,6 +332,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                     elseif stateEvent
                         print("\n      State event (zero-crossing) at time = $tReached s")
                     end
+                    println("\n y = $y, yp=$yp, t = tReached")
 
                     if stateEvent
                        # Print information about the root
@@ -360,7 +360,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 maxTime          = eventInfo.maxTime
                 nextEventTime    = eventInfo.nextEventTime
                 integrateToEvent = eventInfo.integrateToEvent
-
+                println("\n  event = $eventInfo")
+                println("\n y new  = $y, yp=$yp, t = tReached")
                 if timeEvent
                     statistics.nTimeEvents += 1
                 end
