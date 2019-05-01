@@ -150,7 +150,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Initialize simulation model and store result after initialization
     statistics = sim.statistics
     ModiaMath.reInitializeStatistics!(statistics, t0, stopTime2, interval, tolerance)
-    statistics.h0 = tolerance/10000
+    statistics.h0 = tolerance/100
     statistics.hMin = Inf
     statistics.hMax = 0
     if ModiaMath.isLogInfos(logger)
@@ -193,7 +193,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     yp = copy(init.yp0)
     simModel.y  = y
     simModel.yp = yp
-    tolAbs = 0.1*tolerance
+    tolAbs = 0.01*tolerance
     if use_fulljac
         fulljac = zeros(sim.nx, sim.nx)
         simModel.fulljac = fulljac
@@ -337,18 +337,19 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
 
         endInd = length(sol.t)
         if hasZeroCross
-            ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[1], sol.u[1], sol.du[1], simModel.z)
-            old_z = copy(simModel.z)
-            println("old_z = $old_z")
+
             len = length(sol.t)
             for el in 2:len
+                ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[el-1], sol.u[el-1], sol.du[el-1], simModel.z)
+                old_z = copy(simModel.z)
+                println("old_z = $old_z")
                 ModiaMath.DAE.getEventIndicators!(simModel.model, sim, sol.t[el], sol.u[el], sol.du[el], simModel.z)
                 zs = old_z.*(simModel.z)
                 z = copy(simModel.z)
                 println("new_z = $z, zs = $zs")
                 #println("Event ind = $z")
                 if (tReached!=t0)
-                    flag = any(x->x<0, zs)
+                    flag = any(x->x<0, zs) && !flag
                     println("flag = $flag")
                 end
                 if flag
