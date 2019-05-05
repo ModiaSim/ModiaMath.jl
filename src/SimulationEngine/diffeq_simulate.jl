@@ -4,8 +4,8 @@
 # This file is part of module
 #   ModiaMath.SimulationEngine(ModiaMath/SimulationEngine/_module.jl)
 #
-import DASSL, NLsolve
-using DASSL, NLsolve
+import DASSL
+using DASSL
 
 mutable struct SolData
        abstol::Float64
@@ -150,7 +150,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Initialize simulation model and store result after initialization
     statistics = sim.statistics
     ModiaMath.reInitializeStatistics!(statistics, t0, stopTime2, interval, tolerance)
-    statistics.h0 = tolerance/100
+    statistics.h0 = interval
     statistics.hMin = Inf
     statistics.hMax = 0
     if ModiaMath.isLogInfos(logger)
@@ -193,7 +193,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     yp = copy(init.yp0)
     simModel.y  = y
     simModel.yp = yp
-    tolAbs = 0.01*tolerance
+    tolAbs = tolerance*0.01
     if use_fulljac
         fulljac = zeros(sim.nx, sim.nx)
         simModel.fulljac = fulljac
@@ -212,7 +212,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
     # Allocate N_Vector storage for y and yp
     y_Vector  = deepcopy(y)
     yp_Vector = deepcopy(yp)
-    relTol = 0.1 * tolerance * init.y_nominal
+    relTol = 0.01*tolerance * init.y_nominal
     for i in 1:ny
         if !init.y_errorControl[i]
             tolAbs[i] = 1e5 * init.y_nominal[i]   # switch tolerance control off
@@ -286,7 +286,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             statistics.nRestartEvents += 1
             simModel.y = y
             simModel.yp = yp
-            DAE.reinitialize!(simModel.model, sim, tReached)
+            #DAE.reinitialize!(simModel.model, sim, tReached)
         end
     end
 
@@ -325,14 +325,14 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         r =  simModel.r
         tspan = (tReached, tNext)
         #println("r = ", simModel.r)
-
+        FTOL=eps(Float64)^(1/2)
         println("entered dassl: y = $y, yp = $yp")
         #resprob!(r, du, u, p, t) =sol_f(t, u, du, r, simModel)
-        resprob!(r, du, u, p, t) = ModiaMath.DAE.getResidues!(simModel.model, sim, t, u, du, r, simModel.hcur[1])
+        resprob!(r, du, u, p, t) = sol_f!(simModel, sim, t, u, du, r, simModel.hcur[1])
         differential_vars = [true,true,false]
         prob = DAEProblem{true}(resprob!, yp, y, tspan, differential_vars=differential_vars)
-        sol = solve(prob, solver, reltol = relTol, abstol = tolAbs, initstep = simModel.hcur[1] )
-        ModiaMath.DAE.getResidues!(simModel.model, sim, tReached, sol.u[1], sol.du[1], simModel.r, simModel.hcur[1])
+        sol = solve(prob, solver, reltol = relTol*tolAbs, abstol = tolAbs^4, initstep = tolAbs^2 )
+        #ModiaMath.DAE.getResidues!(simModel.model, sim, tReached, sol.u[1], sol.du[1], simModel.r, simModel.hcur[1])
         println("sol = $sol" )
 
         endInd = length(sol.t)
@@ -348,10 +348,11 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 z = copy(simModel.z)
                 println("new_z = $z, zs = $zs")
                 #println("Event ind = $z")
-                if (tReached!=t0)
+                if (sol.t[1]!=t0)
                     flag = any(x->x<0, zs) && !flag
                     println("flag = $flag")
                 end
+
                 if flag
                 endInd = el
                     break
@@ -370,10 +371,10 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             simModel.hcur[1] = steps[end]
             statistics.h0 = steps[end]
 
-            sim.time             = tReached
-            simModel.last_t      = tReached
-            simModel.last_norm_y = norm(simModel.y, Inf)
-            #println("stat = ", statistics.h0)
+            #sim.time             = tReached
+            #simModel.last_t      = tReached
+            #simModel.last_norm_y = norm(simModel.y, Inf)
+            println("stat = ", statistics.h0)
             statistics.hMin = min(statistics.hMin, minimum(steps))
             statistics.hMax = max(statistics.hMax, maximum(steps))
         end
@@ -383,7 +384,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         tReachedt = sol.t[endInd]
         #println("y old = $yt, yp = $ypt,  tol = $tolerance, t = $tReachedt")
         if flag
-            FTOL=eps(Float64)^(1/2)
+
             root_found = false
 
             #resprob2!(r, du, u, p, t) = ModiaMath.DAE.getResidues!(simModel.model, sim, t, u, du, r, statistics.h0)
@@ -420,12 +421,16 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 ypMax = sol.du[ind_r]
                 tMax = sol.t[ind_r]
                 z = copy(simModel.z)
-                while !any(x->abs(x)<eps(one(z[1]))^3, z) #binsearch by values approx
+                amp = abs(maximum(z))*(tolAbs/2)
+                while !any(x->abs(x)<amp, z) #binsearch by values approx
                     yMid = (yMax + yMin)/2
                     ypMid = (ypMax + ypMin)/2
                     tMid = (tMax + tMin)/2
                     ModiaMath.DAE.getEventIndicators!(simModel.model, sim, tMid, yMid, ypMid, simModel.z)
                     z = copy(simModel.z)
+                    _r = simModel.r
+                    ModiaMath.DAE.getResidues!(simModel.model, sim, tMid, yMid, ypMid, _r, statistics.h0)
+                    _r = copy(simModel.r)
                     if any(x->x<0, old_z.*(simModel.z))
                         yMax = yMid
                         ypMax = ypMid
@@ -435,7 +440,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                         ypMin = ypMid
                         tMin = tMid
                     end
-                    println("y internal = $yMid, yp = $ypMid,  z = $z, t = $tMid")
+
+                    println("y internal = $yMid, yp = $ypMid,  z = $z, t = $tMid, _r = $_r, amp = $amp")
                 end  #end binsearch by values approx
                 y = yMax
                 tReached = tMax
@@ -536,10 +542,10 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 updateStatistics!(mem, statistics)
                 simModel.y = y
                 simModel.yp = yp
-                DAE.reinitialize!(simModel.model, sim, tReached)
-                y = simModel.y
-                yp = simModel.yp
-                #Sundials.__IDAReInit(mem, tReached, y_N_Vector, yp_N_Vector);
+                #DAE.reinitialize!(simModel.model, sim, tReached)
+                #y = simModel.y
+                #yp = simModel.yp
+                ##Sundials.__IDAReInit(mem, tReached, y_N_Vector, yp_N_Vector);
             elseif restart == ModiaMath.FullRestart
                 error("FullRestart not yet supported")
             end

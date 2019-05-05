@@ -34,15 +34,15 @@ end
 
 
 function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Float64};
-                                  FTOL::Float64=eps(Float64)^(1 / 2),
+                                  FTOL::Float64=eps(Float64)^(1 / 3),
                                   yScale::Vector{Float64}=ones(length(y)),
                                   rScale::Vector{Float64}=ones(length(y)))
                                   #inputs are the same for backwards compatibility
     eqInfo.y0 .= y
-    itnum = Int32(1000.0 * norm(yScale, Inf))
+    itnum = Int32(10000.0 * norm(yScale, Inf))
     nsol_f!(r, y) = eqInfo.getResidues!(eqInfo, y, r)
-    nsol = nlsolve(nsol_f!, y, method = :newton, ftol=FTOL, iterations=itnum, linesearch=LineSearches.HagerZhang())
-    #nsol = nlsolve(nsol_f!, y, ftol=FTOL, iterations=itnum)
+    nsol = nlsolve(nsol_f!, y, method = :newton, xtol = FTOL^6, ftol=FTOL^6, iterations=itnum, linesearch=LineSearches.HagerZhang())
+    #nsol = nlsolve(nsol_f!, y, xtol = FTOL^6, ftol=FTOL^6, iterations=itnum)
     eqInfo.y0 .= nsol.zero
     return nothing
 end

@@ -53,7 +53,7 @@ end
 ##################################################################
 
 
-function sol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64}, simModel::IntegratorData)
+function sol_f!(simModel::IntegratorData, sim, t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, r::Vector{Float64}, hcur)
 #    simModel.hcur[1] = simModel.sol_mem.hcur
 #    simModel.order[1] = simModel.sol_mem.order
     stat           = simModel.statistics
@@ -62,10 +62,10 @@ function sol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector
     stat.orderMax  = max(stat.orderMax, simModel.order[1])
     stat.nResidues += 1
 
-    simModel.y = _y
+    #simModel.y = _y
 
-    simModel.yp = _yp
-    
+    #simModel.yp = _yp
+
     sim                  = simModel.simulationState
     sim.time             = t
     simModel.last_t      = t
@@ -74,10 +74,10 @@ function sol_f(t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector
     # Check that simModel.y is still identical to _y
 
 
-    ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, simModel.r, simModel.hcur[1])
-    _r = simModel.r
-    println(_y, _yp, t, _r, simModel.hcur[1] )
-    return _r
+    ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, r, hcur)
+    #_r = simModel.r
+    #println(_y, _yp, t, r, hcur )
+    return nothing
 end
 
 
