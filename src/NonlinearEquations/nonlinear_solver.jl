@@ -39,11 +39,12 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
                                   rScale::Vector{Float64}=ones(length(y)))
                                   #inputs are the same for backwards compatibility
     eqInfo.y0 .= y
-    itnum = Int32(10000.0 * norm(yScale, Inf))
+    itnum = Int32(1000.0 * norm(yScale, Inf))
     nsol_f!(r, y) = eqInfo.getResidues!(eqInfo, y, r)
-    nsol = nlsolve(nsol_f!, y, method = :newton, xtol = FTOL^6, ftol=FTOL^6, iterations=itnum, linesearch=LineSearches.HagerZhang())
-    #nsol = nlsolve(nsol_f!, y, xtol = FTOL^6, ftol=FTOL^6, iterations=itnum)
+    nsol = nlsolve(nsol_f!, y, method = :newton, xtol = FTOL, ftol=FTOL, iterations=itnum)
+    #nsol = nlsolve(nsol_f!, y, xtol = FTOL, ftol=FTOL, iterations=itnum)
     eqInfo.y0 .= nsol.zero
+    println("nsol zero = ", nsol)
     return nothing
 end
 

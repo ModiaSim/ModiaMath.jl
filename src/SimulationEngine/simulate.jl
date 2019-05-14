@@ -220,7 +220,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         end
 
         #IDASStolerances(mem, tolerance, 0.1*tolerance)
-        tolAbs = 0.1 * tolerance * init.y_nominal
+        tolAbs = 0.0001 * tolerance * init.y_nominal
         for i in 1:ny
             if !init.y_errorControl[i]
                 tolAbs[i] = 1e5 * init.y_nominal[i]   # switch tolerance control off
@@ -260,7 +260,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         if closeTimePoints(t0, nextEventTime, epsilon)
             tReached = t0
             if ModiaMath.isLogEvents(logger)
-                println("\n      Time event at time = $tReached s")
+                println("\n   init!!!   Time event at time = $tReached s")
             end
 
             DAE.reset!(eventInfo)
@@ -313,11 +313,13 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             #flag = Sundials.IDASolve(mem, tNext, tret, simModel.y, simModel.yp, Sundials.IDA_NORMAL)
             flag = Sundials.__IDASolve(mem, tNext, tret, y_N_Vector, yp_N_Vector, Sundials.IDA_NORMAL)
             tReached = tret[1]
-            #println("    tReached = ", tReached)
+            #println("    tret = ", tret)
 
             stateEvent = flag == Sundials.IDA_ROOT_RETURN
             timeEvent  = event && closeTimePoints(tNext, tReached, epsilon)
             isEvent    = timeEvent || stateEvent
+
+            #println("\n y = $y, yp=$yp, t = tReached")
 
             # Store result point at tReached
             DAE.computeAndStoreResult!(model, sim, tReached, y, yp)
@@ -326,13 +328,16 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             if isEvent
                 if ModiaMath.isLogEvents(logger)
                     if timeEvent && stateEvent
-                        print("\n      Time and state (zero-crossing) event at time = $tReached s")
+                        print("\n  !!!    Time and state (zero-crossing) event at time = $tReached s")
                     elseif timeEvent
-                        println("\n      Time event at time = $tReached s")
+                        println("\n  !!!     Time event at time = $tReached s")
+                        println("\n  !!!    Time event at time = $tReached s")
+                        println("\n  !!!    Time event at time = $tReached s")
+                        println("\n  !!!    Time event at time = $tReached s")
                     elseif stateEvent
                         print("\n      State event (zero-crossing) at time = $tReached s")
                     end
-                    println("\n y = $y, yp=$yp, t = tReached")
+                    println("\n brfore event y = $y, yp=$yp, t = $tReached")
 
                     if stateEvent
                        # Print information about the root
@@ -361,7 +366,8 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 nextEventTime    = eventInfo.nextEventTime
                 integrateToEvent = eventInfo.integrateToEvent
                 println("\n  event = $eventInfo")
-                println("\n y new  = $y, yp=$yp, t = tReached")
+                println("\n  event = $eventInfo, \n next time = ", eventInfo.nextEventTime)
+                println("\n y new  = $y, yp=$yp, t = $tReached")
                 if timeEvent
                     statistics.nTimeEvents += 1
                 end

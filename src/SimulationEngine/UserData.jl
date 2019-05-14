@@ -75,7 +75,6 @@ function sol_f!(simModel::IntegratorData, sim, t::Float64, _y::Vector{Float64}, 
 
 
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, r, hcur)
-    #_r = simModel.r
     #println(_y, _yp, t, r, hcur )
     return nothing
 end
