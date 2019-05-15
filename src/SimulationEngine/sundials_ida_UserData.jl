@@ -22,13 +22,9 @@ type SlsMat
                                   #                in the matrix and hence points one past the end
                                   #                of the active data in the data and rowvals arrays.
 end
-
 const SlsMat_Ptr = Ptr{SlsMat}
-
-
 """
     CSCtoSlsMat!(mat, matKLU)
-
 Copy SparseMatrixCSC mat to SlsMat data structure matKLU
 (storage for both objects are provided in the calling program)
 """
@@ -37,7 +33,6 @@ function CSCtoSlsMat!(mat::SparseMatrixCSC{Float64,Cint}, matKLU::SlsMat)
       unsafe_store!(matKLU.data   , mat.nzval[i], i)
       unsafe_store!(matKLU.rowvals, mat.rowval[i]-1, i)
    end
-
    for i = 1:length(mat.colptr)
       unsafe_store!(matKLU.colptrs, mat.colptr[i]-1, i)
    end
@@ -87,6 +82,7 @@ function idasol_f(t::Sundials.realtype, _y::Sundials.N_Vector, _yp::Sundials.N_V
     end
 
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, y, yp, simModel.r, simModel.hcur[1])
+
     # Copy simModel.r to _r
     unsafe_copyto!(Sundials.__N_VGetArrayPointer_Serial(_r), pointer(simModel.r), simModel.simulationState.nx)
     return Cint(0)   # indicates normal return
@@ -178,15 +174,12 @@ function idasol_sjac(t::Sundials.realtype, c_j::Sundials.realtype, y::Sundials.N
       unsafe_store!(jacKLU.data   , jac.nzval[i], i)
       unsafe_store!(jacKLU.rowvals, jac.rowval[i]-1, i)
     end
-
     for i = 1:length(jac.colptr)
       unsafe_store!(jacKLU.colptrs, jac.colptr[i]-1, i)
     end
 
     return Cint(0)   # indicates normal return
 end
-
-
 const idasol_sjacc = cfunction(idasol_sjac, Int32, (Sundials.realtype, Sundials.realtype, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector, Ref{SlsMat},
                                                     Ref{IntegratorData}, Sundials.N_Vector, Sundials.N_Vector, Sundials.N_Vector))
 =#

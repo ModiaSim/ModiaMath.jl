@@ -68,18 +68,14 @@ closeTimePoints(t1::Float64, t2::Float64, epsilon::Float64) = abs(t1 - t2) / max
 """
     ModiaMath.simulate!(simulationModel; log=false, startTime=NaN, stopTime=NaN,
                                                     tolerance=NaN, interval=NaN)
-
 Simulates a DAE `simulationModel` that is defined with package `Modia`, package `Modia3D` or
 with the `ModiaMath.@component` macro. The DAE is mathematically described as
 implicit, index 1 DAE with events (containing an ODE or a semi-explicit
 index 1 DAE as special cases). For details see [`ModiaMath.StructureOfDAE`](@ref).
-
 During continuous integration, the DAE is solved with the
 [Sundials](https://computation.llnl.gov/projects/sundials) IDA solver
 (accessed via the Julia [Sundials](https://github.com/JuliaDiffEq/Sundials.jl) interface package).
-
 Input arguments
-
 - `simulationModel::ModiaMath.AbstractSimulationModel`: Model struct (generated with Modia, Modia3D or `ModiaMath.@component`).
 - `log::Bool`: = true, if logging is enabled, otherwise it is disabled.
 - `startTime::Float64`: Start time of the simulation in [s].
@@ -220,7 +216,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         end
 
         #IDASStolerances(mem, tolerance, 0.1*tolerance)
-        tolAbs = 0.0001 * tolerance * init.y_nominal
+        tolAbs = 0.1 * tolerance * init.y_nominal
         for i in 1:ny
             if !init.y_errorControl[i]
                 tolAbs[i] = 1e5 * init.y_nominal[i]   # switch tolerance control off
@@ -260,7 +256,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         if closeTimePoints(t0, nextEventTime, epsilon)
             tReached = t0
             if ModiaMath.isLogEvents(logger)
-                println("\n   init!!!   Time event at time = $tReached s")
+                println("\n      Time event at time = $tReached s")
             end
 
             DAE.reset!(eventInfo)
@@ -313,13 +309,11 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             #flag = Sundials.IDASolve(mem, tNext, tret, simModel.y, simModel.yp, Sundials.IDA_NORMAL)
             flag = Sundials.__IDASolve(mem, tNext, tret, y_N_Vector, yp_N_Vector, Sundials.IDA_NORMAL)
             tReached = tret[1]
-            #println("    tret = ", tret)
+            #println("    tReached = ", tReached)
 
             stateEvent = flag == Sundials.IDA_ROOT_RETURN
             timeEvent  = event && closeTimePoints(tNext, tReached, epsilon)
             isEvent    = timeEvent || stateEvent
-
-            #println("\n y = $y, yp=$yp, t = tReached")
 
             # Store result point at tReached
             DAE.computeAndStoreResult!(model, sim, tReached, y, yp)
@@ -328,16 +322,12 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
             if isEvent
                 if ModiaMath.isLogEvents(logger)
                     if timeEvent && stateEvent
-                        print("\n  !!!    Time and state (zero-crossing) event at time = $tReached s")
+                        print("\n      Time and state (zero-crossing) event at time = $tReached s")
                     elseif timeEvent
-                        println("\n  !!!     Time event at time = $tReached s")
-                        println("\n  !!!    Time event at time = $tReached s")
-                        println("\n  !!!    Time event at time = $tReached s")
-                        println("\n  !!!    Time event at time = $tReached s")
+                        println("\n      Time event at time = $tReached s")
                     elseif stateEvent
                         print("\n      State event (zero-crossing) at time = $tReached s")
                     end
-                    println("\n brfore event y = $y, yp=$yp, t = $tReached")
 
                     if stateEvent
                        # Print information about the root
@@ -365,9 +355,7 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
                 maxTime          = eventInfo.maxTime
                 nextEventTime    = eventInfo.nextEventTime
                 integrateToEvent = eventInfo.integrateToEvent
-                println("\n  event = $eventInfo")
-                println("\n  event = $eventInfo, \n next time = ", eventInfo.nextEventTime)
-                println("\n y new  = $y, yp=$yp, t = $tReached")
+
                 if timeEvent
                     statistics.nTimeEvents += 1
                 end
