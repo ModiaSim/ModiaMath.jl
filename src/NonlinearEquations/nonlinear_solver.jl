@@ -41,10 +41,9 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
     eqInfo.y0 .= y
     itnum = Int32(1000.0 * norm(yScale, Inf))
     nsol_f!(r, y) = eqInfo.getResidues!(eqInfo, y, r)
-    nsol = nlsolve(nsol_f!, y, method = :newton, xtol = FTOL, ftol=FTOL, iterations=itnum)
-    #nsol = nlsolve(nsol_f!, y, xtol = FTOL, ftol=FTOL, iterations=itnum)
+    nsol = nlsolve(nsol_f!, y, xtol = FTOL, ftol=FTOL, iterations=itnum)
     eqInfo.y0 .= nsol.zero
-    println("nsol zero = ", nsol)
+    #println("nsol = $nsol")
     return nothing
 end
 

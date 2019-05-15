@@ -54,24 +54,19 @@ end
 
 
 function sol_f!(simModel::IntegratorData, sim, t::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, r::Vector{Float64}, hcur)
-#    simModel.hcur[1] = simModel.sol_mem.hcur
-#    simModel.order[1] = simModel.sol_mem.order
+
     stat           = simModel.statistics
     stat.hMin      = min(stat.hMin, simModel.hcur[1])
     stat.hMax      = max(stat.hMax, simModel.hcur[1])
     stat.orderMax  = max(stat.orderMax, simModel.order[1])
     stat.nResidues += 1
 
-    #simModel.y = _y
-
-    #simModel.yp = _yp
 
     sim                  = simModel.simulationState
     sim.time             = t
     simModel.last_t      = t
     simModel.last_norm_y = norm(simModel.y, Inf)
 
-    # Check that simModel.y is still identical to _y
 
 
     ModiaMath.DAE.getResidues!(simModel.model, sim, t, _y, _yp, r, hcur)
@@ -80,18 +75,8 @@ function sol_f!(simModel::IntegratorData, sim, t::Float64, _y::Vector{Float64}, 
 end
 
 
-#------- root finding
-function sol_g(t::Float64, y::Vector{Float64}, simModel::IntegratorData)
-    sim      = simModel.simulationState
-    sim.time = t
-    yp = simModel.yp
-    ModiaMath.DAE.getEventIndicators!(simModel.model, sim, t, y, yp, simModel.z)
-    return simModel.z   # indicates normal return
-end
-
-
 #------- full jacobian
-function idasol_fulljac(t::Float64, cj::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64},
+function sol_fulljac(t::Float64, cj::Float64, _y::Vector{Float64}, _yp::Vector{Float64}, _r::Vector{Float64},
                         _fulljac::Array{Float64}, simModel::IntegratorData,
                         tmp1::Vector{Float64}, tmp2::Vector{Float64}, tmp3::Vector{Float64})
     # Compute full Jacobian
