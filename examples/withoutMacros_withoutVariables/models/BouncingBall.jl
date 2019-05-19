@@ -12,18 +12,18 @@ import ModiaMath
 
 mutable struct Model <: ModiaMath.AbstractSimulationModel
     simulationState::ModiaMath.SimulationState
-   
+
     # Parameters
     h0::Float64   # initial height
     e::Float64    # coefficient of restitution
     g::Float64    # gravity constant
-   
+
     # Discrete variables
     flying::Bool
-   
+
     function Model(;h0=1.0, e=0.7, g=9.81)
-        @assert(h0 > 0.0)   
-        @assert(0.0 <= e <= 1.0)   
+        @assert(h0 > 0.0)
+        @assert(0.0 <= e <= 1.0)
         simulationState = ModiaMath.SimulationState("BouncingBall", getModelResidues!, [h0;0.0], getVariableName;
                                                     nz=1, nw=1)
         new(simulationState, h0, e, g, true)
@@ -47,10 +47,10 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
         end
         return
     end
-   
+
     h = _x[1]
     v = _x[2]
-   
+
     if ModiaMath.edge!(sim, 1, -h, "-h")
         v = -m.e * v
         if v < 0.01
@@ -58,7 +58,7 @@ function getModelResidues!(m::Model, t::Float64, _x::Vector{Float64}, _derx::Vec
             v = 0.0
             if ModiaMath.isLogInfos(sim)
                 println("        flying = ", m.flying)
-            end         
+            end
         end
         _x[2] = v    # re-initialize state vector x
     end

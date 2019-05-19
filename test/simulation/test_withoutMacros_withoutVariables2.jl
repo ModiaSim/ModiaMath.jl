@@ -60,11 +60,11 @@ import .IdealClutch
         w1_end = result["inertia1.w"][end]
 		w2_end = result["inertia2.w"][end]
 		w_end_required = 38.9277466565
-		
+
         @test isapprox(w1_end, w_end_required; atol=0.001 )
-        @test isapprox(w2_end, w_end_required; atol=0.001 )		 
+        @test isapprox(w2_end, w_end_required; atol=0.001 )
     end
-	
+
 end
 
 include(joinpath(ModiaMath.path, "examples", "withoutMacros_withoutVariables", "Simulate_SimpleStateEvents.jl"))
