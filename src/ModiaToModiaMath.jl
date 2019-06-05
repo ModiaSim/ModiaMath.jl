@@ -12,9 +12,9 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
     getModiaResidues!::Function
     preInitial::Bool
     nz_preInitial::Int
-    nw::Int 
+    nw::Int
     store    # extra storage
-   
+
     function ModiaSimulationModel(name::Symbol, f!::Function, x0::Vector{Float64}, der_x0::Vector{Float64}, jac=nothing;
                                 structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
                                 is_constraint=fill(false,length(x0)),
@@ -27,7 +27,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                                 startTime=0.0,
                                 stopTime=1.0,
                                 tolerance=1e-4,
-                                interval=(stopTime - startTime) / 500.0)                
+                                interval=(stopTime - startTime) / 500.0)
 
         simulationState = ModiaMath.SimulationState(string(name), getModelResidues!, x0;
                                 structureOfDAE = structureOfDAE,
@@ -42,33 +42,33 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                                 defaultStopTime=stopTime,
                                 defaultTolerance=tolerance,
                                 defaultInterval=interval)
-                                
-        new(string(name), simulationState, f!, false, 0, length(wNames), nothing)     
-    end      
 
-    function ModiaSimulationModel(name::String, 
+        new(string(name), simulationState, f!, false, 0, length(wNames), nothing)
+    end
+
+    function ModiaSimulationModel(name::String,
                             getModelResidues!::Function,
                             x_start::Vector{Float64},
-                            getVariableName::Function=ModiaMath.DAE.defaultVariableName; 
-                            structureOfDAE = ModiaMath.DAE_NoSpecialStructure,     
+                            getVariableName::Function=ModiaMath.DAE.defaultVariableName;
+                            structureOfDAE = ModiaMath.DAE_NoSpecialStructure,
                             is_constraint=fill(false,length(x_start)),
-							has_constraintDerivatives=false,							
+							has_constraintDerivatives=false,
                             nc::Int=1,
-                            nz::Int=0,                   
+                            nz::Int=0,
                             nw::Int=0,
-                            x_fixed::Vector{Bool}=fill(false, length(x_start)),      
-                            x_nominal::Vector{Float64}=fill(NaN, length(x_start)),                                                 
+                            x_fixed::Vector{Bool}=fill(false, length(x_start)),
+                            x_nominal::Vector{Float64}=fill(NaN, length(x_start)),
                             hev::Float64=1e-8,
-                            scaleConstraintsAtEvents::Bool=false,               
+                            scaleConstraintsAtEvents::Bool=false,
                             jac=nothing, maxSparsity::Float64=0.1,
                             startTime=0.0,
                             stopTime=1.0,
                             tolerance=1e-4,
                             interval=(stopTime - startTime) / 500.0)
-      
+
         simulationState = ModiaMath.SimulationState(name, getModelResidues!, x_start, getVariableName;
                             structureOfDAE = structureOfDAE,
-                            is_constraint = is_constraint, 
+                            is_constraint = is_constraint,
 							has_constraintDerivatives = has_constraintDerivatives,
                             nc=nc,
                             nz=nz,
@@ -83,10 +83,10 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
                             defaultStopTime=stopTime,
                             defaultTolerance=tolerance,
                             defaultInterval=interval)
-                                
-        new(name, simulationState, getModelResidues!, false, 0, nw, nothing) 
+
+        new(name, simulationState, getModelResidues!, false, 0, nw, nothing)
     end
-   
+
 
     function ModiaSimulationModel()
         function emptyFunction
@@ -95,7 +95,7 @@ mutable struct ModiaSimulationModel <: ModiaMath.AbstractSimulationModel
         simulationState = ModiaMath.DAE.SimulationState("???", emptyFunction, zeros(1))
         new("???", simulationState, emptyFunction, true, 0, 0, nothing)
     end
-end 
+end
 
 
 function getModelResidues!(m::ModiaSimulationModel, t::Float64, y::Vector{Float64}, yp::Vector{Float64}, residues::Vector{Float64}, w::Vector{Float64})
@@ -104,7 +104,7 @@ function getModelResidues!(m::ModiaSimulationModel, t::Float64, y::Vector{Float6
         Base.invokelatest(m.getModiaResidues!, m, y, yp, residues)
     else
         Base.invokelatest(m.getModiaResidues!, m, y, yp, residues, w)
-    end 	  
+    end
 end
 
 
@@ -119,7 +119,7 @@ function getRawResult(m::ModiaSimulationModel)
     W     = @view res.data[1:nt,2 * nx + 2:end]
     return (t, X, DER_X, W)
 end
- 
+
 
 #export ModiaSimulationModel
 #export EventRestart, NoRestart, Restart, FullRestart, Terminate
@@ -138,9 +138,9 @@ isAfterSimulationStart(m::ModiaSimulationModel) = m.simulationState.eventHandler
 
 
 setNextEvent!(m::ModiaSimulationModel, nextEventTime::Float64;
-              integrateToEvent::Bool=true, restart::ModiaMath.EventRestart=ModiaMath.Restart) = ModiaMath.setNextEvent!(m.simulationState.eventHandler, nextEventTime; 
+              integrateToEvent::Bool=true, restart::ModiaMath.EventRestart=ModiaMath.Restart) = ModiaMath.setNextEvent!(m.simulationState.eventHandler, nextEventTime;
                                                                                                      integrateToEvent=integrateToEvent, restart=restart)
-    
+
 function positive!(crossing::Float64, m::ModiaSimulationModel, nr::Int, crossingAsString="????"; restart::ModiaMath.EventRestart=ModiaMath.Restart)
     if m.preInitial
         m.nz_preInitial = max(m.nz_preInitial, nr)
@@ -170,19 +170,19 @@ simulate(m::ModiaSimulationModel, t; log::Bool=false, tolRel::Float64=1e-4, KLUo
            simulate(m, collect(t); log=log, tolRel=tolRel, KLUorderingChoice=KLUorderingChoice)
 
 function simulate(m::ModiaSimulationModel, t::Vector{Float64};
-                  log::Bool=false, 
-                  tolRel::Float64=1e-4, 
-                  KLUorderingChoice::Int=1)     
+                  log::Bool=false,
+                  tolRel::Float64=1e-4,
+                  KLUorderingChoice::Int=1)
     startTime = t[1]
-    stopTime = t[end]   
-    interval = (stopTime - startTime) / (length(t) - 1)  
-    
-    ModiaMath.simulate!(m;stopTime=stopTime, 
-                        tolerance=tolRel, 
-                        startTime=startTime, 
-                        interval=interval, 
+    stopTime = t[end]
+    interval = (stopTime - startTime) / (length(t) - 1)
+
+    ModiaMath.simulate!(m;stopTime=stopTime,
+                        tolerance=tolRel,
+                        startTime=startTime,
+                        interval=interval,
                         log=log,
                         KLUorderingChoice=KLUorderingChoice)
-end                    
-                   
+end
+
 end

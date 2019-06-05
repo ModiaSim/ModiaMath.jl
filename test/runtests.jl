@@ -4,7 +4,7 @@ import ModiaMath
 
 # Desired:
 #   using Test
-# 
+#
 # In order that Test need not to be defined in the user environment, it is included via ModiaMath:
 using ModiaMath.Test
 

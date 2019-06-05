@@ -4,11 +4,14 @@ authors = ["Martin Otter <Martin.Otter@dlr.de>"]
 version = "0.5.2-dev"
 
 [deps]
+DASSL = "e993076c-0cfd-5d6b-a1ac-36489fdf7917"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+NLsolve = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
