@@ -11,7 +11,7 @@ The goal is to solve the same system several times with KINSOL.
 
 module KINSOL
 
-import NLsolve, LineSearches
+import NLsolve
 import ModiaMath
 using LinearAlgebra
 using NLsolve
