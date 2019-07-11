@@ -25,9 +25,10 @@ It is planned to adapt ModiaMath to Julia package
 [DifferentialEquations](https://github.com/JuliaDiffEq/DifferentialEquations.jl)
 and use IDA and other appropriate integrators via this package in the future.
 
-Additionally, ModiaMath provides functions to perform plotting in a convenient way,
-to generate and use rotation matrices and quaternions for kinematic transformations in 3D,
-and to provide an infrastructure for DAE variables as needed by Modia3D.
+Additionally, ModiaMath provides functions to perform
+[plotting in a convenient way](https://modiasim.github.io/ModiaMath.jl/latest/lib/Result.html),
+to generate and use
+[rotation matrices and quaternions](https://modiasim.github.io/ModiaMath.jl/latest/lib/Frames.html) for kinematic transformations in 3D, and to provide an infrastructure for DAE variables as needed by Modia3D.
 
 
 ## Installation
@@ -114,7 +115,9 @@ instead the instructions
 
 ## Status
 
-The ModiaMath version number is 0.5.1 and functionality and robustness is planned to be improved for the 1.0 version,
+The ModiaMath version number is 0.5.2, for details see the
+[release notes](https://modiasim.github.io/ModiaMath.jl/latest/#Release-Notes-1),
+and functionality and robustness is planned to be improved for the 1.0 version,
 see [Plans for ModiaMath version 1.0](https://ModiaSim.github.io/ModiaMath.jl/latest/man/Plans.html).
 
 
