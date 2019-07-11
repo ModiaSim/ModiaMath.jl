@@ -43,6 +43,15 @@ instead the instructions
 
 ## Release Notes
 
+### Version 0.5.2
+
+- New options `defaultMaxStepSize, defaultMaxNumberOfSteps` for `ModiaMath.SimulationState`.
+- New options `maxStepSize, maxNumberOfSteps` for `ModiaMath.simulate!(..)`.
+- New option `minXaxisTickLabels` for `ModiaMath.plot`. The default is to show all xaxis tick labels
+  in order that when zooming into a plot, the xaxis labels are shown.
+- Fixed warning: `getindex(o::PyObject, s::AbstractString)` is deprecated in favor of dot overloading (`getproperty`) [...]
+
+
 ### Version 0.5.1
 
 - New example ModiaMath/examples/Simulate_PendulumDAE (pendulum as index 3 system with
