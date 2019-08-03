@@ -26,6 +26,6 @@ using LinearAlgebra
 
 # include code
 # include("IDA_UserData.jl")  # is included within simulate.jl
-include("diffeq_simulate.jl")
+include("simulate.jl")
 
 end
