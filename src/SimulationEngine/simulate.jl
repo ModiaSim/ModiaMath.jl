@@ -309,13 +309,13 @@ function simulate!(model::ModiaMath.AbstractSimulationModel;
         differential_vars = [true,true,false]
         prob = DAEProblem{true}(resprob!, yp, y, tspan, differential_vars=differential_vars)
         sol = Vector{Any}
-        #try #some problems require higher tolerance than passed, some fail with this hish tolerance
-        sol = solve(prob, solver, reltol = relTol, abstol = tolAbs, initstep = simModel.hcur[1] )
-        #catch
-        #    tAbs = tolAbs * 100
-        #    rTol = relTol * 100
-        #    sol = solve(prob, solver, reltol = rTol, abstol = tAbs, initstep = simModel.hcur[1] )
-        #end
+        try #some problems require higher tolerance than passed, some fail with this hish tolerance
+            sol = solve(prob, solver, reltol = relTol, abstol = tolAbs, initstep = simModel.hcur[1] )
+        catch
+            tAbs = tolAbs * 100
+            rTol = relTol * 100
+            sol = solve(prob, solver, reltol = rTol, abstol = tAbs, initstep = simModel.hcur[1] )
+        end
 
 
 

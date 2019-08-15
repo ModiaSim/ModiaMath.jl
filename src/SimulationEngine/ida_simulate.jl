@@ -38,7 +38,7 @@ mutable struct IntegratorData
     end
 end
 
-include("sundials_ida_UserData.jl")
+include("IDA_UserData.jl")
 
 function updateIDAstatistics!(mem, stat::ModiaMath.SimulationStatistics)
     info = Clong[0]

@@ -44,7 +44,7 @@ function solveNonlinearEquations!(eqInfo::NonlinearEquationsInfo, y::Vector{Floa
     nsol = nlsolve(nsol_f!, y, xtol = FTOL, ftol=FTOL, iterations=itnum)
     eqInfo.y0 .= nsol.zero
     #println("nsol = $nsol")
-    return nothing
+    #return nothing
 end
 
 end
