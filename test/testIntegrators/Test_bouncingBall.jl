@@ -28,7 +28,12 @@ end
 function affect_neg(integrator)
     println("Event (affect_neg) at time = ", integrator.t, ", h = ", integrator.u[1])
     integrator.u[2] = -0.8*integrator.u[2]
-    # set_proposed_dt!(integrator, 1e-5)
+    #set_proposed_dt!(integrator, 1e-5)
+    #println("    after set_proposed_dt!: integrator.dt = ", integrator.dt)
+    println("   before reset: integrator.dt = ", integrator.dt)
+    auto_dt_reset!(integrator)
+    println("   after reset : integrator.dt = ", integrator.dt)
+    set_proposed_dt!(integrator, integrator.dt)
 end
 
 cb = ContinuousCallback(condition,nothing,affect_neg! = affect_neg)
