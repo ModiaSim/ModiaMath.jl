@@ -149,7 +149,7 @@ end
 
 
 function outputs2!(x, t, integrator)::Nothing
-    println("outputs!2 called at time = ", t)
+    # println("outputs!2 called at time = ", t)
     return nothing
 end
 
@@ -167,7 +167,7 @@ end
 
 "affect!: Called at an event instant (either as affect! or here as affect_neg!)"
 function affect!(integrator, event_index)::Nothing
-    println("affect! called at time = ", integrator.t, ", h = ", integrator.u[1])
+    #println("affect! called at time = ", integrator.t, ", h = ", integrator.u[1])
     m::Model = integrator.p
     h = m.eventHandler
     h.event = true
@@ -203,7 +203,6 @@ cb3 = FunctionCallingCallback(outputs2!, funcat=tspan2)
 
 prob1 = ODEProblem(derivatives!, x₀, tspan, model1)
 sol1  = solve(prob1, Tsit5(), reltol = 1e-6, saveat=t_inc, callback=CallbackSet(cb1,cb2,cb3))
-println("fieldnames(sol) = ", fieldnames(typeof(sol1.prob.p)))
 
 println("Simulation successful")
 
@@ -228,7 +227,7 @@ Float64(v::Measurement{Float64}) = Measurements.value(v)
 
 model2 = Model(m=1.0 ± 0.1, e=0.7 ± 0.1, h0=1.0± 0.1, g=9.81)
 #println("model2 = $model2")
-println("typeof(model2) = ", typeof(model2))
+#println("typeof(model2) = ", typeof(model2))
 #x2₀ = deepcopy(model2.x_start)
 
 saved_values2=SavedValues(typeof(model2.x_start[1]), Model)
@@ -250,6 +249,6 @@ plot(sol2.t, hmin, label="\$h_{min}\$")
 plot(sol2.t, h, label="\$h_{mean}\$")
 grid(true)
 legend()
-title("SimplePendulum with Measurement{Float64}")
+title("Bouncing ball with Measurement{Float64}")
 
 end

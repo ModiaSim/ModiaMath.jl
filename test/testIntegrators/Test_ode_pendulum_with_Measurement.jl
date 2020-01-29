@@ -69,7 +69,7 @@ tspan2  = t_start:t_inc:t_end
 
 # Problem 1 with Float64
 model1 = Model(m=1.0, L=1.0, d=0.2, g=9.81)
-println("model1 = $model1")
+# println("model1 = $model1")
 x1₀ = [π/2, 0.0]
 
 saved_values1=SavedValues(typeof(x1₀[1]), Model)
@@ -79,10 +79,6 @@ prob1 = ODEProblem(simplePendulum1!, x1₀, tspan, model1)
 sol1 = solve(prob1, Tsit5(), reltol = 1e-6, saveat=t_inc, callback=cb1)
 #prob1b = deepcopy(prob1)
 #sol3 = solve(prob1, Tsit5(), reltol = 1e-6, saveat=t_inc)
-println("sol: ", propertynames(sol1))
-println("sol1.destats = ", sol1.destats)
-println("sol1.interp: ", propertynames(sol1.interp))
-println("sol.prob: ", propertynames(sol1.prob))
 
 figure(1)
 clf()
@@ -107,8 +103,8 @@ title("SimplePendulum with Float64")
 
 # Problem 2 with Measurement
 model2 = Model(m=1.0 ± 0.1, L=1.00 ± 0.01, d=0.2± 0.05, g=9.81)
-println("model2 = $model2")
-println("typeof(model2.r) = ", typeof(model2.r))
+# println("model2 = $model2")
+# println("typeof(model2.r) = ", typeof(model2.r))
 x2₀ = [π/2 ± 0.1, 0.0 ± 0]
 
 saved_values2=SavedValues(typeof(x2₀[1]), Model)
@@ -127,7 +123,7 @@ figure(3)
 clf()
 plot(sol2.t, ϕmax, label="\$\\varphi_{max}\$")
 plot(sol2.t, ϕmin, label="\$\\varphi_{min}\$" )
-plot(sol2.t, ϕ   , label="\$\\varphi_{mean}\$" )
+plot(sol2.t, ϕm  , label="\$\\varphi_{mean}\$" )
 grid(true)
 legend()
 title("SimplePendulum with Measurement{Float64}")
