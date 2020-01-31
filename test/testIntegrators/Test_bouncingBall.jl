@@ -21,7 +21,7 @@ end
 
 function condition(u,t,integrator) # Event when event_f(u,t) == 0
     z = u[1] + 1e-12
-    println("condition called at time = ", t, ", z = ", z)
+    # println("condition called at time = ", t, ", z = ", z)
     return z
 end
 
@@ -43,6 +43,13 @@ tspan = (0.0,3.0)
 prob = ODEProblem(f,u0,tspan)
 sol = solve(prob,Tsit5(),saveat=0.01,callback=cb)
 #sol = solve(prob,CVODE_BDF(),saveat=0.01,callback=cb)
+#=
+println("propertynames(prob) = ", propertynames(prob))
+println("propertynames(sol) = ", propertynames(sol))
+println("propertynames(sol.prob) = ", propertynames(sol.prob))
+println("typeof(sol.prob.problem_type) = ", typeof(sol.prob.problem_type))
+println("typeof(sol.alg) = ", typeof(sol.alg))
+=#
 
 figure(1)
 clf()

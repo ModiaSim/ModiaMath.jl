@@ -1,15 +1,23 @@
 # License for this file: MIT (expat)
-# Copyright 2017-2018, DLR Institute of System Dynamics and Control
+# Copyright 2020, DLR Institute of System Dynamics and Control
 
 """
     module ModiaTest_ode_pendulum
 
 ODE-model of a mass point attached via a rod to a revolute joint with 2 states.
+
+This test is used to evalute how to use DifferentialEquations.jl in ModiaMath
+utilizing the new Modia structure that is currently under development.
 """
 module ModiaTest_ode_pendulum
 
 import DifferentialEquations
-using  StaticArrays
+using PyPlot        # For plotting
+
+using StaticArrays  # Test of StaticArrays with parameterized data
+using DoubleFloats  # Test with higher precision (128 bit instead of 64 bit floating point)
+using Measurements  # Test with uncertain variables (nominal value + uncertainty)
+
 
 #= Number types supported by DifferentialEquations.jl: https://tutorials.juliadiffeq.org/html/type_handling/01-number_types.html
 
@@ -36,19 +44,39 @@ using BigFloat   // ArbNumerics is faster, but BigFLoat is supported by more Jul
 #---------------------------------------- ModiaMath definitions
 
 """
-    AbstractModel{StateType<:Real,RealType<:Real}
+    AbstractVariables{StateType<:Real,RealType<:Real}
 
-Supertype of all models
+Supertype of all types that operate on variables.
+
+- StateType: Type of the state vector and of its derivative:
+                x::Vector{StateType}
+                der_x::Vector{StateType}
+             and all variables that are used to compute der_x from x.
+             Parameters can be either of StateType (e.g. to support parameters with uncertainty)
+             or RealType (if not to be included in sensitivity analysis)
+
+- RealType : Type of floating point variables that are not of type StateType, such as:
+             time, tolerance, startTime, StopTime, interval, nominal, ...
+
+From a user point of view, the instance of the root struct "Model <: AbstractVariables"
+defines the concrete types (typically `model = Model{Float64,Float64})()`) and all structs and functions that
+operate on the `model` deduce their concrete types from this Model type. This means that the
+concrete types need to be defined only once at the Model instance.
 """
-abstract type AbstractModel{StateType<:Real,RealType<:Real} end
+abstract type AbstractVariables{StateType<:Real,RealType<:Real} end
+abstract type AbstractSimulationModel{StateType<:Real,RealType<:Real} end
 
+mutable struct SimulationState{StateType,RealType} <: AbstractVariables{StateType,RealType}
+    modelName::AbstractString
 
-mutable struct SimulationState{StateType<:Real, RealType<:Real}
     x_start::Vector{StateType}
     der_x_start::Vector{StateType}
 
     # Cache
     der_x::Vector{StateType}
+
+    # Type of model
+    dae::Bool    # = true: DAE; =false: ODE
 
     # Functions for ODE models
     setStates!::Function
@@ -61,6 +89,7 @@ mutable struct SimulationState{StateType<:Real, RealType<:Real}
     getResiduals!::Function
     evaluate!::Function
     outputs!::Function
+    Result                   # constructor for result data structure
     addToResult!::Function
 
     # Problem variables
@@ -74,40 +103,26 @@ mutable struct SimulationState{StateType<:Real, RealType<:Real}
 
     # Reference to simulation model
     simulationModel
-    ode::Bool    # = true: ODE; =false: DAE
 
-    SimulationState{StateType,RealType}(x_start,
+    # Simulation result
+    result
+
+    SimulationState{StateType,RealType}(modelName, x_start,
                                         setStates!, getDerivatives!, setStatesAndDerivatives!, getResiduals!,
-                                        evaluate!,  outputs!, addToResult!,
-                                        tolerance, startTime, stopTime, interval, ode) where {StateType<:Real, RealType<:Real} =
-         new(x_start, similar(x_start), similar(x_start), setStates!, getDerivatives!, setStatesAndDerivatives!, getResiduals!,
-             evaluate!, outputs!, addToResult!, tolerance, startTime, stopTime, interval, false, nothing, ode)
+                                        evaluate!,  outputs!, Result, addToResult!;
+                                        tolerance=1e-4, startTime=0.0, stopTime=1.0, interval=0.02, dae=true) where {StateType, RealType} =
+         new(modelName, x_start, similar(x_start), similar(x_start), dae, setStates!, getDerivatives!, setStatesAndDerivatives!, getResiduals!,
+             evaluate!, outputs!, Result, addToResult!, tolerance, startTime, stopTime, interval, false)
 end
 
 
-mutable struct SimulationModel{StateType,RealType}
-    modelName::AbstractString                  # Name of top level model instance
-    model::AbstractModel{StateType,RealType}   # Data structure of model variable values
-    variables                                  # Data structure of model variable definition
-    result                                     # Data structure of result
-    simulationState::SimulationState{StateType, RealType}
-
-    function SimulationModel{StateType,RealType}(modelName, model::AbstractModel{StateType,RealType}, variables, result,
-                             simulationState::SimulationState{StateType,RealType}) where {StateType<:Real, RealType<:Real}
-        obj = new{StateType,RealType}(modelName, model, variables, result, simulationState)
-        simulationState.simulationModel = obj
-        return obj
-    end
-end
-
-# The following definition tells DifferentialEquations.jl that a SimulationModel is mutable (otherwise stack overflow error)
-using ArrayInterface
-ArrayInterface.ismutable(::Type{SimulationModel}) = true
-
+#
+# x, der_x, residuals need not to be Vector{..}, e.g. Sundials.IDA provides N_Vector
+#
 
 "derivatives!: Called by ODE integrator for ODE model"
-function derivatives!(der_x, x, simulationModel::SimulationModel, t)::Nothing
-    sim = simulationModel.simulationState
+function derivatives!(der_x::AbstractVector, x::AbstractVector, simulationModel::AbstractSimulationModel, t)::Nothing
+    sim::SimulationState = simulationModel.simulationState
     sim.setStates!(simulationModel, x)
     sim.evaluate!(simulationModel)
     sim.getDerivatives!(simulationModel, der_x)
@@ -116,8 +131,8 @@ end
 
 
 "ODEresiduals!: Called by DAE integrator for ODE model"
-function ODEresiduals!(residuals, der_x, x, simulationModel::SimulationModel, t)::Nothing
-    sim = simulationModel.simulationState
+function ODEresiduals!(residuals::AbstractVector, der_x::AbstractVector, x::AbstractVector, simulationModel::AbstractSimulationModel, t)::Nothing
+    sim::SimulationState = simulationModel.simulationState
     derivatives!(sim.der_x, x, simulationModel, t)
     for i = 1:length(der_x)
         residuals[i] = sim.der_x[i] - der_x[i]
@@ -127,57 +142,41 @@ end
 
 
 "ODEoutputs!: Called by ODE or DAE integrator for ODE model at every communication point"
-function ODEoutputs!(x, t, integrator)::Nothing
+function ODEoutputs!(x::AbstractVector, t, integrator)::Nothing
     simulationModel = integrator.p
-    sim = simulationModel.simulationState
+    sim::SimulationState = simulationModel.simulationState
     sim.setStates!(simulationModel, x)
     sim.storeResult = true
     sim.evaluate!(simulationModel)
     sim.storeResult = false
-    sim.addToResult!(simulationModel.result, t, simulationModel.model)
+    sim.addToResult!(sim.result, t, simulationModel)
     return nothing
 end
 
 
-function setStatesAndDerivativesDummy!(simModel::SimulationModel{StateType,RealType}, x::Vector{StateType}, der_x::Vector{StateType})::Nothing where {StateType<:Real, RealType<:Real}
+function setStatesAndDerivativesDummy!(simulationModel::AbstractSimulationModel, x::AbstractVector, der_x::AbstractVector)::Nothing
     error("setStatesAndDerivativesDummy! should never be called")
     return nothing
 end
 
 
-"ODESimulationModel: Constructor for ODE SimulationModel"
-function ODESimulationModel(modelName, model::AbstractModel{StateType,RealType}, variables, result, x_start::Vector{StateType}, setStates!, getDerivatives!, evaluate!, addToResult!;
-                            tolerance=1/10^4, startTime=0.0, stopTime=1.0, interval=NaN) where {StateType<:Real, RealType<:Real}
-
-    @assert(tolerance > 0)
-    @assert(stopTime >= startTime)
-    tolerance2 = RealType(tolerance)
-    startTime2 = RealType(startTime)
-    stopTime2  = RealType(stopTime)
-    interval2  = isnan(interval) ? (stopTime2 - startTime2)/RealType(500) : RealType(interval)
-
-    simulationState = SimulationState{StateType,RealType}(x_start, setStates!, getDerivatives!, setStatesAndDerivativesDummy!,
-                                      ODEresiduals!, evaluate!, ODEoutputs!, addToResult!,
-                                      tolerance2, startTime2, stopTime2, interval2, true)
-
-    simulationModel = SimulationModel{StateType,RealType}(modelName, model, variables, result, simulationState)
-end
-
-
 "solve!: Return DifferentialEquations.solve(...)"
-function solve!(simulationModel::SimulationModel{StateType,RealType}, integrator; tolerance=NaN, startTime=NaN, stopTime=NaN, interval=NaN) where {StateType<:Real, RealType<:Real}
-    sim = simulationModel.simulationState
+function solve!(simulationModel::AbstractSimulationModel{StateType,RealType}, integrator; tolerance=NaN, startTime=NaN, stopTime=NaN, interval=NaN) where {StateType<:Real, RealType<:Real}
+    sim::SimulationState = simulationModel.simulationState
+
+    # Construct a new result instance
+    sim.result = sim.Result{StateType,RealType}(simulationModel)
 
     # Change tolerance, startTime, stopTime, interval if required
     if !isnan(tolerance); @assert(tolerance > 0); sim.tolerance = RealType(tolerance); end
     if !isnan(interval) ; @assert(interval  > 0); sim.interval  = RealType(interval) ; end
     if !isnan(startTime); sim.startTime = RealType(startTime); end
-    if !isnan(stopTime) ; sim.stopTime  = RealType(stopTime) ; @assert(sim.stopTime >= sim.StartTime); end
+    if !isnan(stopTime) ; sim.stopTime  = RealType(stopTime) ; end
 
     # Define problem based on integrator and model type
     if typeof(integrator) <: DifferentialEquations.IDA
         # DAE integrator
-        if sim.ode
+        if !sim.dae
             # ODE model
             derivatives!(sim.der_x_start, sim.x_start, simulationModel, sim.startTime)
             problem = DifferentialEquations.DAEProblem(ODEresiduals!, sim.der_x_start, sim.x_start, (sim.startTime, sim.stopTime), simulationModel)
@@ -195,13 +194,17 @@ function solve!(simulationModel::SimulationModel{StateType,RealType}, integrator
     cb1 = DifferentialEquations.FunctionCallingCallback(sim.outputs!, funcat=tspan)
 
     # Simulation
-    println("... Simulation started for model ", simulationModel.modelName, " using integrator ", typeof(integrator), " with StateType = ", string(StateType) )
+    println("... Simulation started for model ", sim.modelName, " using integrator ", typeof(integrator), " with StateType = ", string(StateType) )
     solution = DifferentialEquations.solve(problem, integrator, reltol=sim.tolerance, saveat=sim.stopTime-sim.startTime, callback=cb1)
 end
 
 
 
-#---------------------------------------- General definitions for models (e.g. provided by Modia)
+#------------------------------------------------------------------------------------------------
+#---------------------------------------- Provided by Modia (rough sketch as needed for testing)
+#------------------------------------------------------------------------------------------------
+
+#--------------------------------------- Generic for all models
 mutable struct Variable
     typ
     start
@@ -214,10 +217,27 @@ end
 const VariableDict = Dict{Symbol, Variable}
 
 
+mutable struct ModelResult{StateType,RealType} <: AbstractVariables{StateType,RealType}
+    t::Vector{RealType}
+    model::AbstractVector
+    variables::VariableDict
 
-#---------------------------------------- Specific to a particular model (e.g. provided by Modia)
+    ModelResult{StateType,RealType}(m::AbstractSimulationModel) where {StateType<:Real, RealType<:Real} =
+          new(RealType[], typeof(m.model)[], m.variables)
+end
 
-mutable struct Model{StateType,RealType} <: AbstractModel{StateType,RealType}
+
+function addToResult!(result::ModelResult{StateType,RealType}, t, m::AbstractSimulationModel{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
+    push!(result.t, deepcopy(t))
+    push!(result.model, deepcopy(m.model))
+    return nothing;
+end
+
+
+
+#---------------------------------------- Specific to a particular model (here: Pendulum)
+
+mutable struct Model{StateType,RealType} <: AbstractVariables{StateType,RealType}
     # Parameters
     L::StateType
     m::StateType
@@ -232,29 +252,12 @@ mutable struct Model{StateType,RealType} <: AbstractModel{StateType,RealType}
     # Variables at communication points
     r::SVector{2,StateType}   # absolute position of end point
 
-    function Model{StateType,RealType}(;L=1.0, m=1.0, d=0.1, g=9.81) where {StateType<:Real, RealType<:Real}
+    function Model{StateType,RealType}(;L=1.0, m=1.0, d=0.1, g=9.81) where {StateType, RealType}
         @assert(L > 0)
         @assert(m > 0)
         @assert(d >= 0)
         new(L, m, d, g, 0, 0, 0, SVector{2,StateType}(0,0))
     end
-end
-
-
-#=
-mutable struct ModelResult{StateType<:Real, RealType<:Real}
-    t::Vector{RealType}
-    model::Vector{Model{StateType,RealType}}
-    ModelResult{StateType,RealType}() where {StateType<:Real, RealType<:Real} = new(RealType[], Model{StateType,RealType}[])
-end
-=#
-
-mutable struct ModelResult{StateType<:Real, RealType<:Real}
-    t::Vector{RealType}
-    model::Vector{Model{StateType,RealType}}
-    variables::VariableDict
-
-    ModelResult(m::Model{StateType,RealType}, var::VariableDict) where {StateType<:Real, RealType<:Real} = new{StateType,RealType}(RealType[], Model{StateType,RealType}[], var)
 end
 
 
@@ -279,31 +282,39 @@ function ModelVariables()::VariableDict
 end
 
 
+mutable struct Pendulum{StateType,RealType} <: AbstractSimulationModel{StateType,RealType}
+    # Required:
+    simulationState::SimulationState{StateType, RealType}
 
-function InitialStates(m::Model{StateType,RealType}, var::VariableDict)::Vector{StateType} where {StateType<:Real, RealType<:Real}
+    # Defined by Modia
+    model::Model{StateType,RealType}    # Data structure of model variable values
+    variables::Dict{Symbol, Variable}   # Data structure of model variable definition
+end
+
+
+function InitialStates(model::Model{StateType,RealType}, var::VariableDict)::Vector{StateType} where {StateType<:Real, RealType<:Real}
     x_start = [StateType(var[:phi].start),
                StateType(var[:w].start)]
     return x_start
 end
 
-function setStates!(simModel::SimulationModel{StateType,RealType}, x)::Nothing where {StateType<:Real, RealType<:Real}
-    m = simModel.model
+function setStates!(obj::Pendulum{StateType,RealType}, x::AbstractVector)::Nothing where {StateType<:Real, RealType<:Real}
+    m = obj.model
     m.phi = x[1]
     m.w   = x[2]
     return nothing
 end
 
-
-function getDerivatives!(simModel::SimulationModel{StateType,RealType}, der_x::Vector{StateType})::Nothing where {StateType<:Real, RealType<:Real}
-    m = simModel.model
+function getDerivatives!(obj::Pendulum{StateType,RealType}, der_x::AbstractVector)::Nothing where {StateType<:Real, RealType<:Real}
+    m = obj.model
     der_x[1] = m.w
     der_x[2] = m.der_w
     return nothing
 end
 
-function evaluate!(simModel::SimulationModel{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
-    m   = simModel.model
-    sim = simModel.simulationState
+function evaluate!(obj::Pendulum{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
+    m   = obj.model
+    sim = obj.simulationState
     m.der_w = (-m.m * m.g * m.L * sin(m.phi) - m.d * m.w) / (m.m * m.L^2)
 
     if sim.storeResult
@@ -312,16 +323,33 @@ function evaluate!(simModel::SimulationModel{StateType,RealType})::Nothing where
     return nothing
 end
 
-function addToResult!(result::ModelResult{StateType,RealType}, t::RealType, model::Model{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
-    push!(result.t, t)
-    push!(result.model, deepcopy(model))
-    return nothing;
+"Pendulum: Constructor for Pendulum SimulationModel"
+function Pendulum{StateType,RealType}(;kwargs...)  where {StateType, RealType}
+    model     = Model{StateType,RealType}(;kwargs...)
+    variables = ModelVariables()
+    x_start   = InitialStates(model, variables)
+
+    simulationState = SimulationState{StateType,RealType}("Pendulum", x_start, setStates!, getDerivatives!, setStatesAndDerivativesDummy!,
+                                      ODEresiduals!, evaluate!, ODEoutputs!, ModelResult, addToResult!, dae=false,
+                                      tolerance=1e-4, startTime=0.0, stopTime=1.0, interval=0.02)  # tolerance, startTime,  ... are optional defaults set by the model
+
+    obj = Pendulum{StateType,RealType}(simulationState, model, variables)
+    simulationState.simulationModel = obj
+    return obj
 end
 
-using PyPlot
+# The following definition tells DifferentialEquations.jl that a SimulationModel is mutable (otherwise stack overflow error for two calls of solve!)
+using ArrayInterface
+ArrayInterface.ismutable(::Type{Pendulum}) = true
+
+
+
+#------------------------------------------------------------------------------------------------
+#---------------------------------------- Simulation of the pendulum model
+#------------------------------------------------------------------------------------------------
 
 function standardPlot(solution, fig1, fig2)
-    result = solution.prob.p.result
+    result = solution.prob.p.simulationState.result
     StateType = string( typeof( solution.prob.p.simulationState.x_start[1] ) )
     figure(fig1)
     clf()
@@ -344,40 +372,33 @@ function standardPlot(solution, fig1, fig2)
     title("SimplePendulum with " * StateType)
 end
 
-#------------------------------------ Simulation of a particular Model
 
 # ODE integrator with Float64
-model     = Model{Float64,Float64}(m=1.1)
-variables = ModelVariables()
-result    = ModelResult(model, variables)
-x_start   = InitialStates(model, variables)
-simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, stopTime=7.0, tolerance=1e-6)
-solution = solve!(simulationModel, DifferentialEquations.Tsit5())
+pendulum = Pendulum{Float64,Float64}(m=1.1)
+solution = solve!(pendulum, DifferentialEquations.Tsit5(), stopTime=7.0, tolerance=1e-4)
 standardPlot(solution, 1, 2)
 
 # DAE integrator with FLoat64
-solution  = solve!(simulationModel, DifferentialEquations.IDA())
+solution = solve!(pendulum, DifferentialEquations.IDA(), stopTime=7.0, tolerance=1e-4)
 standardPlot(solution, 3, 4)
 
-
+#=
 # ODE integrator with DoubleFloats
-using DoubleFloats
 model     = Model{DoubleFloat{Float64},Float64}(m=1.1)
 variables = ModelVariables()
 result    = ModelResult(model, variables)
 x_start   = InitialStates(model, variables)
-simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, stopTime=7.0, tolerance=1e-6)
+simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, emptyResult!, stopTime=7.0, tolerance=1e-6)
 solution = solve!(simulationModel, DifferentialEquations.Tsit5())
 standardPlot(solution, 5, 6)
 
 
 # ODE integrator with Measurements
-using Measurements
 model     = Model{Measurement{Float64},Float64}(L=1.0±0.1, m=1.0±0.1)
 variables = ModelVariables()
 result    = ModelResult(model, variables)
 x_start   = InitialStates(model, variables)
-simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, stopTime=7.0, tolerance=1e-6)
+simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, emptyResult!, stopTime=7.0, tolerance=1e-6)
 solution = solve!(simulationModel, DifferentialEquations.Tsit5())
 
 
@@ -399,5 +420,6 @@ plot(t, phi_mean, label="\$\\varphi_{mean}\$" )
 grid(true)
 legend()
 title("SimplePendulum with Measurement{Float64}")
+=#
 
 end
