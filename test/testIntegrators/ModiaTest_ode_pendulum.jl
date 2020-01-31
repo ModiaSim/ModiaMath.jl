@@ -44,9 +44,9 @@ using BigFloat   // ArbNumerics is faster, but BigFLoat is supported by more Jul
 #---------------------------------------- ModiaMath definitions
 
 """
-    AbstractVariables{StateType<:Real,RealType<:Real}
+    AbstractSimulationModel{StateType,RealType}
 
-Supertype of all types that operate on variables.
+Supertype of all simulation models
 
 - StateType: Type of the state vector and of its derivative:
                 x::Vector{StateType}
@@ -57,16 +57,11 @@ Supertype of all types that operate on variables.
 
 - RealType : Type of floating point variables that are not of type StateType, such as:
              time, tolerance, startTime, StopTime, interval, nominal, ...
-
-From a user point of view, the instance of the root struct "Model <: AbstractVariables"
-defines the concrete types (typically `model = Model{Float64,Float64})()`) and all structs and functions that
-operate on the `model` deduce their concrete types from this Model type. This means that the
-concrete types need to be defined only once at the Model instance.
 """
-abstract type AbstractVariables{StateType<:Real,RealType<:Real} end
-abstract type AbstractSimulationModel{StateType<:Real,RealType<:Real} end
+abstract type AbstractSimulationModel{StateType,RealType} end
 
-mutable struct SimulationState{StateType,RealType} <: AbstractVariables{StateType,RealType}
+
+mutable struct SimulationState{StateType,RealType}
     modelName::AbstractString
 
     x_start::Vector{StateType}
@@ -121,7 +116,7 @@ end
 #
 
 "derivatives!: Called by ODE integrator for ODE model"
-function derivatives!(der_x::AbstractVector, x::AbstractVector, simulationModel::AbstractSimulationModel, t)::Nothing
+function derivatives!(der_x::AbstractVector, x::AbstractVector, simulationModel, t)::Nothing
     sim::SimulationState = simulationModel.simulationState
     sim.setStates!(simulationModel, x)
     sim.evaluate!(simulationModel)
@@ -131,7 +126,7 @@ end
 
 
 "ODEresiduals!: Called by DAE integrator for ODE model"
-function ODEresiduals!(residuals::AbstractVector, der_x::AbstractVector, x::AbstractVector, simulationModel::AbstractSimulationModel, t)::Nothing
+function ODEresiduals!(residuals::AbstractVector, der_x::AbstractVector, x::AbstractVector, simulationModel, t)::Nothing
     sim::SimulationState = simulationModel.simulationState
     derivatives!(sim.der_x, x, simulationModel, t)
     for i = 1:length(der_x)
@@ -154,24 +149,32 @@ function ODEoutputs!(x::AbstractVector, t, integrator)::Nothing
 end
 
 
-function setStatesAndDerivativesDummy!(simulationModel::AbstractSimulationModel, x::AbstractVector, der_x::AbstractVector)::Nothing
+function setStatesAndDerivativesDummy!(simulationModel, x::AbstractVector, der_x::AbstractVector)::Nothing
     error("setStatesAndDerivativesDummy! should never be called")
     return nothing
 end
 
 
+"SimulationState: Constructor for ODE Simulation State"
+SimulationState{StateType,RealType}(modelName, x_start, setStates!, getDerivatives!, evaluate!, Result, addToResult!;
+                                    tolerance=1e-4, startTime=0.0, stopTime=1.0, interval=0.02) where {StateType, RealType} =
+    SimulationState{StateType,RealType}(modelName, x_start, setStates!, getDerivatives!, setStatesAndDerivativesDummy!, ODEresiduals!,
+                                        evaluate!,  ODEoutputs!, Result, addToResult!; dae=false,
+                                        tolerance=tolerance, startTime=startTime, stopTime=stopTime, interval=interval)
+
+
 "solve!: Return DifferentialEquations.solve(...)"
-function solve!(simulationModel::AbstractSimulationModel{StateType,RealType}, integrator; tolerance=NaN, startTime=NaN, stopTime=NaN, interval=NaN) where {StateType<:Real, RealType<:Real}
-    sim::SimulationState = simulationModel.simulationState
+function solve!(simulationModel::AbstractSimulationModel{StateType,RealType}, integrator; tolerance=NaN, startTime=NaN, stopTime=NaN, interval=NaN) where {StateType, RealType}
+    sim::SimulationState{StateType,RealType} = simulationModel.simulationState
 
     # Construct a new result instance
     sim.result = sim.Result{StateType,RealType}(simulationModel)
 
     # Change tolerance, startTime, stopTime, interval if required
     if !isnan(tolerance); @assert(tolerance > 0); sim.tolerance = RealType(tolerance); end
-    if !isnan(interval) ; @assert(interval  > 0); sim.interval  = RealType(interval) ; end
     if !isnan(startTime); sim.startTime = RealType(startTime); end
     if !isnan(stopTime) ; sim.stopTime  = RealType(stopTime) ; end
+    if !isnan(interval) ; @assert(interval > 0); sim.interval = RealType(interval) ; end
 
     # Define problem based on integrator and model type
     if typeof(integrator) <: DifferentialEquations.IDA
@@ -205,6 +208,7 @@ end
 #------------------------------------------------------------------------------------------------
 
 #--------------------------------------- Generic for all models
+
 mutable struct Variable
     typ
     start
@@ -213,21 +217,20 @@ mutable struct Variable
 
     Variable(;typ=Real, start=nothing, fixed=nothing, info="") = new(typ, start, fixed, info)
 end
-
 const VariableDict = Dict{Symbol, Variable}
 
 
-mutable struct ModelResult{StateType,RealType} <: AbstractVariables{StateType,RealType}
+mutable struct ModelResult{StateType,RealType}
     t::Vector{RealType}
     model::AbstractVector
     variables::VariableDict
 
-    ModelResult{StateType,RealType}(m::AbstractSimulationModel) where {StateType<:Real, RealType<:Real} =
+    ModelResult{StateType,RealType}(m::AbstractSimulationModel) where {StateType, RealType} =
           new(RealType[], typeof(m.model)[], m.variables)
 end
 
 
-function addToResult!(result::ModelResult{StateType,RealType}, t, m::AbstractSimulationModel{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
+function addToResult!(result::ModelResult{StateType,RealType}, t, m::AbstractSimulationModel{StateType,RealType})::Nothing where {StateType, RealType}
     push!(result.t, deepcopy(t))
     push!(result.model, deepcopy(m.model))
     return nothing;
@@ -237,7 +240,7 @@ end
 
 #---------------------------------------- Specific to a particular model (here: Pendulum)
 
-mutable struct Model{StateType,RealType} <: AbstractVariables{StateType,RealType}
+mutable struct Model{StateType,RealType}
     # Parameters
     L::StateType
     m::StateType
@@ -261,6 +264,23 @@ mutable struct Model{StateType,RealType} <: AbstractVariables{StateType,RealType
 end
 
 
+mutable struct PendulumGeneric{StateType,RealType} <: AbstractSimulationModel{StateType,RealType}
+    # Required:
+    simulationState::SimulationState{StateType, RealType}
+
+    # Defined by Modia
+    model::Model{StateType,RealType}   # Data structure of model variable values
+    variables::VariableDict            # Data structure of model variable definition
+end
+const Pendulum = PendulumGeneric{Float64, Float64}
+
+
+# The following definition tells DifferentialEquations.jl that a SimulationModel is mutable (otherwise stack overflow error for two calls of solve!)
+using ArrayInterface
+ArrayInterface.ismutable(::Type{PendulumGeneric}) = true
+
+
+
 function ModelVariables()::VariableDict
     var = VariableDict()
 
@@ -282,37 +302,27 @@ function ModelVariables()::VariableDict
 end
 
 
-mutable struct Pendulum{StateType,RealType} <: AbstractSimulationModel{StateType,RealType}
-    # Required:
-    simulationState::SimulationState{StateType, RealType}
-
-    # Defined by Modia
-    model::Model{StateType,RealType}    # Data structure of model variable values
-    variables::Dict{Symbol, Variable}   # Data structure of model variable definition
-end
-
-
-function InitialStates(model::Model{StateType,RealType}, var::VariableDict)::Vector{StateType} where {StateType<:Real, RealType<:Real}
+function InitialStates(model::Model{StateType,RealType}, var::VariableDict)::Vector{StateType} where {StateType, RealType}
     x_start = [StateType(var[:phi].start),
                StateType(var[:w].start)]
     return x_start
 end
 
-function setStates!(obj::Pendulum{StateType,RealType}, x::AbstractVector)::Nothing where {StateType<:Real, RealType<:Real}
+function setStates!(obj::PendulumGeneric{StateType,RealType}, x::AbstractVector)::Nothing where {StateType, RealType}
     m = obj.model
     m.phi = x[1]
     m.w   = x[2]
     return nothing
 end
 
-function getDerivatives!(obj::Pendulum{StateType,RealType}, der_x::AbstractVector)::Nothing where {StateType<:Real, RealType<:Real}
+function getDerivatives!(obj::PendulumGeneric{StateType,RealType}, der_x::AbstractVector)::Nothing where {StateType, RealType}
     m = obj.model
     der_x[1] = m.w
     der_x[2] = m.der_w
     return nothing
 end
 
-function evaluate!(obj::Pendulum{StateType,RealType})::Nothing where {StateType<:Real, RealType<:Real}
+function evaluate!(obj::PendulumGeneric{StateType,RealType})::Nothing where {StateType, RealType}
     m   = obj.model
     sim = obj.simulationState
     m.der_w = (-m.m * m.g * m.L * sin(m.phi) - m.d * m.w) / (m.m * m.L^2)
@@ -324,23 +334,18 @@ function evaluate!(obj::Pendulum{StateType,RealType})::Nothing where {StateType<
 end
 
 "Pendulum: Constructor for Pendulum SimulationModel"
-function Pendulum{StateType,RealType}(;kwargs...)  where {StateType, RealType}
+function PendulumGeneric{StateType,RealType}(;kwargs...)  where {StateType, RealType}
     model     = Model{StateType,RealType}(;kwargs...)
     variables = ModelVariables()
     x_start   = InitialStates(model, variables)
 
-    simulationState = SimulationState{StateType,RealType}("Pendulum", x_start, setStates!, getDerivatives!, setStatesAndDerivativesDummy!,
-                                      ODEresiduals!, evaluate!, ODEoutputs!, ModelResult, addToResult!, dae=false,
-                                      tolerance=1e-4, startTime=0.0, stopTime=1.0, interval=0.02)  # tolerance, startTime,  ... are optional defaults set by the model
+    simulationState = SimulationState{StateType,RealType}("Pendulum", x_start, setStates!, getDerivatives!, evaluate!, ModelResult, addToResult!)
 
-    obj = Pendulum{StateType,RealType}(simulationState, model, variables)
-    simulationState.simulationModel = obj
-    return obj
+    simulationModel = PendulumGeneric{StateType,RealType}(simulationState, model, variables)
+    simulationState.simulationModel = simulationModel
+    return simulationModel
 end
 
-# The following definition tells DifferentialEquations.jl that a SimulationModel is mutable (otherwise stack overflow error for two calls of solve!)
-using ArrayInterface
-ArrayInterface.ismutable(::Type{Pendulum}) = true
 
 
 
@@ -374,7 +379,7 @@ end
 
 
 # ODE integrator with Float64
-pendulum = Pendulum{Float64,Float64}(m=1.1)
+pendulum = Pendulum(m=1.1)
 solution = solve!(pendulum, DifferentialEquations.Tsit5(), stopTime=7.0, tolerance=1e-4)
 standardPlot(solution, 1, 2)
 
@@ -382,27 +387,15 @@ standardPlot(solution, 1, 2)
 solution = solve!(pendulum, DifferentialEquations.IDA(), stopTime=7.0, tolerance=1e-4)
 standardPlot(solution, 3, 4)
 
-#=
 # ODE integrator with DoubleFloats
-model     = Model{DoubleFloat{Float64},Float64}(m=1.1)
-variables = ModelVariables()
-result    = ModelResult(model, variables)
-x_start   = InitialStates(model, variables)
-simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, emptyResult!, stopTime=7.0, tolerance=1e-6)
-solution = solve!(simulationModel, DifferentialEquations.Tsit5())
+pendulum = PendulumGeneric{DoubleFloat{Float64},Float64}(m=1.1)
+solution = solve!(pendulum, DifferentialEquations.Tsit5(), stopTime=7.0, tolerance=1e-4)
 standardPlot(solution, 5, 6)
 
-
 # ODE integrator with Measurements
-model     = Model{Measurement{Float64},Float64}(L=1.0±0.1, m=1.0±0.1)
-variables = ModelVariables()
-result    = ModelResult(model, variables)
-x_start   = InitialStates(model, variables)
-simulationModel = ODESimulationModel("PendulumODE", model, variables, result, x_start, setStates!, getDerivatives!, evaluate!, addToResult!, emptyResult!, stopTime=7.0, tolerance=1e-6)
-solution = solve!(simulationModel, DifferentialEquations.Tsit5())
-
-
-result = solution.prob.p.result
+pendulum = PendulumGeneric{Measurement{Float64},Float64}(L=1.0±0.1, m=1.0±0.1)
+solution = solve!(pendulum, DifferentialEquations.Tsit5(), stopTime=7.0, tolerance=1e-4)
+result   = solution.prob.p.simulationState.result
 StateType = string( typeof( solution.prob.p.simulationState.x_start[1] ) )
 
 t   = result.t
@@ -420,6 +413,6 @@ plot(t, phi_mean, label="\$\\varphi_{mean}\$" )
 grid(true)
 legend()
 title("SimplePendulum with Measurement{Float64}")
-=#
+
 
 end
