@@ -14,11 +14,11 @@ using DifferentialEquations, Measurements, StaticArrays, PyPlot
 MeanValue(v::Number) = v
 MeanValue(v::Measurement{Float64}) = Measurements.value(v)
 
-mutable struct EventHandler{M<:Real, F<:Real, T<:Real}   # M: Real type of variables where Measurement can be used.
-                                                         # F: Floating-point type for variables that are no measurements
-											             # T: Real-type of time
+mutable struct EventHandler{M<:Real, F<:Real}   # M: Real type of variables where Measurement can be used.
+                                                # F: Floating-point type for variables that are no measurements
+
    # Input values for the event functions
-    time::T                    # Current simulation time
+    time::M                    # Current simulation time
     initial::Bool              # = true, if model is called at initialization
                                #         (if initial, event=true)
     terminal::Bool             # = true, if model is called for termination (close files, streams, visualization, ...)
@@ -28,10 +28,10 @@ mutable struct EventHandler{M<:Real, F<:Real, T<:Real}   # M: Real type of varia
 
     # Computed by the event functions
     # For time events:
-    maxTime::T              # Integrate at most up to maxTime
+    maxTime::F              # Integrate at most up to maxTime
                             # (if integrateToEvent == true, maxTime = nextEventTime,
                             #  otherwise maxTime > nextEventTime)
-    nextEventTime::T        # Next time event instant (= typemax(Time) if no event)
+    nextEventTime::M        # Next time event instant (= typemax(Time) if no event)
     integrateToEvent::Bool  # = true, if integrator shall integrate to nextEventTime
                             # = false, if integrator can integrate beyond nextEventTime
     newEventIteration::Bool   # = true, if another event iteration; = false, if no event iteration anymore
@@ -47,13 +47,13 @@ mutable struct EventHandler{M<:Real, F<:Real, T<:Real}   # M: Real type of varia
                             #         =  1: Root is reported when crossing from negative to positive direction
                             #         = -1: Root is reported when crossing from positive to negative direction
 
-    function EventHandler{M,F,T}(;nz::Int=0) where {M<:Real, F<:Real, T<:Real}
+    function EventHandler{M,F}(;nz::Int=0) where {M<:Real, F<:Real}
         @assert(nz >= 0)
-        new(0, false, false, false, false, false, floatmax(T), floatmax(T),
+        new(0, false, false, false, false, false, M(floatmax(F)), M(floatmax(F)),
             true, false, false, nz, ones(M,nz), fill(false, nz), fill(0, nz))
     end
 end
-EventHandler(;nz::Int) = EventHandler{Float64,Float64,Float64}(;nz=nz)
+
 
 const zEps = 1e-12
 
@@ -85,9 +85,8 @@ function edge!(h::EventHandler, nr::Int, crossing)::Bool
 end
 
 
-mutable struct Model{M<:Real, F<:Real, T<:Real}   # M: Real type of variables where Measurement can be used.
-                                                  # F: Floating-point type for variables that are no measurements
-												  # T: Real-type of time
+mutable struct Model{M<:Real, F<:Real}   # M: Real type of variables where Measurement can be used.
+                                         # F: Floating-point type for variables that are no measurements
     # parameters
     m::M   # mass
     e::M   # coefficient of restitution
@@ -103,20 +102,20 @@ mutable struct Model{M<:Real, F<:Real, T<:Real}   # M: Real type of variables wh
 	x_start::Vector{M}
 	eventHandler::EventHandler
 
-    function Model{M,F,T}(m::M, e::M, g::F, h0::M) where {M<:Real, F<:Real, T<:Real}
+    function Model{M,F}(m::M, e::M, g::F, h0::M) where {M<:Real, F<:Real}
 	    @assert(m >= 0)
 	    @assert(e >= 0)
 		@assert(h0 > 0)
 		x_start = M[h0, 0]
-        new(m, e, g, 0, 0, 0, true, x_start, EventHandler{M,F,T}(nz=1))
+        new(m, e, g, 0, 0, 0, true, x_start, EventHandler{M,F}(nz=1))
     end
 end
 
-Model(;m::M=1.0, e::M=0.7, g::F=9.81, h0::M=1.0, TimeType=Float64) where {M<:Real, F<:Real} = Model{M,F,TimeType}(m,e,g,h0)
+Model(;m::M=1.0, e::M=0.7, g::F=9.81, h0::M=1.0) where {M<:Real, F<:Real} = Model{M,F}(m,e,g,h0)
 
 
 "Compute m::Model at actual time instant"
-function equations!(m::Model, t, x)::Nothing
+function equations!(m::Model{M,F}, t, x)::Nothing where {M,F}
     m.h = x[1]
     m.v = x[2]
 	if edge!(m.eventHandler, 1, -m.h)
@@ -125,8 +124,7 @@ function equations!(m::Model, t, x)::Nothing
 			m.flying = false
 			m.v = 0.0
 		end
-        # x[1] = MeanValue(m.h)
-		x[2] = MeanValue(m.v)   # re-initialize state vector x
+		x[2] = m.v   # re-initialize state vector x
 	end
 	m.a = m.flying ? -m.g : 0.0
     return nothing
@@ -167,7 +165,7 @@ end
 
 "affect!: Called at an event instant (either as affect! or here as affect_neg!)"
 function affect!(integrator, event_index)::Nothing
-    #println("affect! called at time = ", integrator.t, ", h = ", integrator.u[1])
+    println("affect! called at time = ", integrator.t, ", h = ", integrator.u[1])
     m::Model = integrator.p
     h = m.eventHandler
     h.event = true
@@ -177,14 +175,14 @@ function affect!(integrator, event_index)::Nothing
     return nothing
 end
 
-function x₀(m::Model{M,F,T}, t0::T)::Vector{M} where {M<:Real, F<:Real, T<:Real}
+function x₀(m::Model{M,F}, t0::M)::Vector{M} where {M<:Real, F<:Real}
     # Initialize model
     return deepcopy(m.x_start)
 end
 
 
 t_start = 0.0
-t_inc   = 0.01
+t_inc   = 0.0001
 t_end   = 5.0
 tspan   = (t_start, t_end)
 tspan2  = t_start:t_inc:t_end
@@ -228,12 +226,18 @@ Float64(v::Measurement{Float64}) = Measurements.value(v)
 model2 = Model(m=1.0 ± 0.1, e=0.7 ± 0.1, h0=1.0± 0.1, g=9.81)
 #println("model2 = $model2")
 #println("typeof(model2) = ", typeof(model2))
-#x2₀ = deepcopy(model2.x_start)
+x2₀ = deepcopy(model2.x_start)
+
+t_start = 0.0 ± 0.0
+t_inc   = 0.0001 ± 0.0
+t_end   = 5.0 ± 0.0
+tspan   = (t_start, t_end)
+tspan2  = t_start:t_inc:t_end
 
 saved_values2=SavedValues(typeof(model2.x_start[1]), Model)
 cb21 = SavingCallback(outputs!, saved_values2, saveat=tspan2)
 cb22 = VectorContinuousCallback(conditions_neg!, nothing, 1; affect_neg! = affect!, interp_points=10)
-prob2 = ODEProblem(derivatives!, x₀, tspan, model2)
+prob2 = ODEProblem(derivatives!, x2₀, tspan, model2)
 sol2  = solve(prob2, Tsit5(), reltol = 1e-6, saveat=t_inc, callback=CallbackSet(cb21,cb22))
 
 h = getindex.(sol2.u, 1)
@@ -250,5 +254,5 @@ plot(sol2.t, h, label="\$h_{mean}\$")
 grid(true)
 legend()
 title("Bouncing ball with Measurement{Float64}")
-
+#@show sol2.t
 end

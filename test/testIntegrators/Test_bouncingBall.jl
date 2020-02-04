@@ -9,6 +9,10 @@ https://github.com/JuliaDiffEq/DifferentialEquations.jl/issues/551
 Event restart: Stepsize not adapted for Tsit5 #558
 
 https://github.com/JuliaDiffEq/DifferentialEquations.jl/issues/558
+
+Fixed in the model by adding
+    auto_dt_reset!(integrator)
+    set_proposed_dt!(integrator, integrator.dt)
 =#
 
 

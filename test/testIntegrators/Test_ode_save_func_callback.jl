@@ -4,6 +4,11 @@ module Test_ode_save_func_callback
 StackOverFlowError with two usages of save_func #548
 
 https://github.com/JuliaDiffEq/DifferentialEquations.jl/issues/548
+
+Issue is fixed by setting:
+
+   ArrayInterface.ismutable(::Type{Model}) = true
+
 =#
 
 

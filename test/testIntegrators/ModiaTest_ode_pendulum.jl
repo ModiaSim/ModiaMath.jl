@@ -7,7 +7,6 @@
 ODE-model of a mass point attached via a rod to a revolute joint with 2 states.
 
 This test is used to evalute how to use DifferentialEquations.jl in ModiaMath
-utilizing the new Modia structure that is currently under development.
 """
 module ModiaTest_ode_pendulum
 
@@ -414,5 +413,37 @@ grid(true)
 legend()
 title("SimplePendulum with Measurement{Float64}")
 
+
+# ODE integrator with ArbReal (interval arithmetic)
+#=
+
+# Does not work because ArbNumerics does not support NaN
+
+using ArbNumerics
+setworkingprecision(ArbFloat, bits=64+8)
+L = setball(ArbFloat(1.0), ArbFloat(0.1))
+m = setball(ArbFloat(1.0), ArbFloat(0.1))
+StateType = typeof(L)
+pendulum = PendulumGeneric{StateType,Float64}(L=L, m=m)
+solution = solve!(pendulum, DifferentialEquations.Tsit5(), stopTime=7.0, tolerance=1e-4, interval=0.01)
+result   = solution.prob.p.simulationState.result
+StateType = string( typeof( solution.prob.p.simulationState.x_start[1] ) )
+
+t   = result.t
+phi = getfield.(result.model, :phi)
+phi_mean = midpoint.(phi)
+phi_u    = radius.(phi)
+phi_min  = phi_mean + phi_u
+phi_max  = phi_mean - phi_u
+
+figure(8)
+clf()
+plot(t, phi_max , label="\$\\varphi_{max}\$")
+plot(t, phi_min , label="\$\\varphi_{min}\$" )
+plot(t, phi_mean, label="\$\\varphi_{mean}\$" )
+grid(true)
+legend()
+title("SimplePendulum with ArbNumerics{72}")
+=#
 
 end
