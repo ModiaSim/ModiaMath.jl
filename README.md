@@ -7,6 +7,9 @@
 [![Latest](https://img.shields.io/badge/docs-latest-blue.svg)](https://modiasim.github.io/ModiaMath.jl/latest/)
 [![The MIT License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/ModiaSim/ModiaMath.jl/blob/master/LICENSE.md)
 
+ModiaMath is **outdated** and should not be used. The package is currently redesigned. 
+For more details, see ModiaSim](https://modiasim.github.io/docs/). 
+
 ModiaMath provides a simulation engine and other mathematical utilities for packages
 [Modia](https://github.com/ModiaSim/Modia.jl) and [Modia3D](https://github.com/ModiaSim/Modia3D.jl)
 that are used to model physical systems such as electrical circuits, robots, or vehicles.
