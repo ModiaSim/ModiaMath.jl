@@ -1,7 +1,9 @@
-# ModiaMath
+> ⚠️ **INFO: This repository is deprecated**
+> 
+> Do no longer use this repository. Use instead [Modia.jl](https://github.com/ModiaSim/Modia.jl).
+> For more details, see [ModiaSim](https://modiasim.github.io/docs/). 
 
-ModiaMath is **outdated** and should not be used. The package is currently redesigned. 
-For more details, see [ModiaSim](https://modiasim.github.io/docs/). 
+# ModiaMath
 
 [![Travis](https://travis-ci.org/ModiaSim/ModiaMath.jl.svg?branch=master)](https://travis-ci.org/ModiaSim/ModiaMath.jl)
 [![AppVoyer](https://ci.appveyor.com/api/projects/status/github/ModiaSim/ModiaMath.jl?svg=true)](https://ci.appveyor.com/project/MartinOtter/modiamath-jl)
